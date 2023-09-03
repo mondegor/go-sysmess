@@ -6,6 +6,8 @@ import (
     "github.com/mondegor/go-sysmess/mrmsg"
 )
 
+const ErrorIdInternal = "errInternal"
+
 const (
     ErrorKindInternal ErrorKind = iota
     ErrorKindInternalNotice
@@ -13,14 +15,11 @@ const (
     ErrorKindUser
 )
 
-const ErrorIdInternal = "errInternal"
-
 type (
-    ErrorId string
     ErrorKind int
 
     AppError struct {
-        id ErrorId
+        id string
         kind ErrorKind
         traceId *string
         message string
@@ -32,7 +31,7 @@ type (
     }
 )
 
-func New(id ErrorId, message string, args ...any) *AppError {
+func New(id string, message string, args ...any) *AppError {
     newErr := &AppError{
         id: id,
         kind: ErrorKindUser,
@@ -69,7 +68,7 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
     e.err = argsErrorFactory.new(e.err, nil)
 }
 
-func (e *AppError) Id() ErrorId {
+func (e *AppError) Id() string {
     return e.id
 }
 

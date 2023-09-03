@@ -15,7 +15,7 @@ const (
 
 type (
     AppErrorFactory struct {
-        id ErrorId
+        id string
         kind ErrorKind
         message string
         argsNames []string
@@ -23,7 +23,7 @@ type (
     }
 )
 
-func NewFactory(id ErrorId, kind ErrorKind, message string) *AppErrorFactory {
+func NewFactory(id string, kind ErrorKind, message string) *AppErrorFactory {
     return &AppErrorFactory{
         id: id,
         kind: kind,

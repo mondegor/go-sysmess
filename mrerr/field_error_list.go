@@ -6,16 +6,18 @@ type (
     FieldErrorList []FieldError
 )
 
-func NewList(items ...FieldError) FieldErrorList {
+func NewList(items ...FieldError) *FieldErrorList {
+    list := &FieldErrorList{}
+
     if len(items) > 0 {
-        return append(FieldErrorList{}, items...)
+        *list = append(*list, items...)
     }
 
-    return FieldErrorList{}
+    return list
 }
 
-func NewListWith(fieldId string, err error) FieldErrorList {
-    return FieldErrorList{newFieldError(fieldId, err)}
+func NewListWith(fieldId string, err error) *FieldErrorList {
+    return &FieldErrorList{newFieldError(fieldId, err)}
 }
 
 func (e *FieldErrorList) Add(fieldId string, err error) {
