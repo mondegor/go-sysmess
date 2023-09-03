@@ -33,14 +33,14 @@ func main() {
     for _, loc := range tr.RegisteredLocales() {
         fmt.Println(loc.LangCode())
 
-        locTest := tr.LocaleFirstFound(loc.LangCode())
+        locTest := tr.FindFirstLocale(loc.LangCode())
 
         fmt.Println(locTest.LangCode())
         fmt.Println(locTest.TranslateMessage("msgExample", "Default message for msgExample"))
-        fmt.Println(locTest.TranslateError("errInternal", "Default message for errInternal"))
+        fmt.Println(locTest.TranslateError("errInternal", "Default error message for errInternal"))
     }
 
     // fr - not found
-    locTest := tr.LocaleFirstFound("fr")
+    locTest := tr.FindFirstLocale("fr")
     fmt.Println(locTest.LangCode())
 }

@@ -6,7 +6,7 @@ import (
 )
 
 // Translate - translate error message for user
-func (e *appError) Translate(loc mrlang.Locale) mrlang.ErrorMessage {
+func (e *AppError) Translate(loc mrlang.Locale) mrlang.ErrorMessage {
     if e.kind != ErrorKindInternal {
         return loc.TranslateError(string(e.Id()), e.message, e.getNamedArgs()...)
     }
@@ -14,21 +14,15 @@ func (e *appError) Translate(loc mrlang.Locale) mrlang.ErrorMessage {
     return loc.TranslateError(ErrorIdInternal, ErrorIdInternal)
 }
 
-func (e *appError) renderMessage() []byte {
+func (e *AppError) renderMessage() []byte {
     if len(e.argsNames) == 0 || len(e.argsNames) != len(e.args) {
         return []byte(e.message)
     }
 
-    message, err := mrmsg.Render(e.message, e.getNamedArgs())
-
-    if err != nil {
-        return []byte(e.message)
-    }
-
-    return []byte(message)
+    return []byte(mrmsg.Render(e.message, e.getNamedArgs()))
 }
 
-func (e *appError) getNamedArgs() []mrmsg.NamedArg {
+func (e *AppError) getNamedArgs() []mrmsg.NamedArg {
     var namedArgs []mrmsg.NamedArg
 
     for i, argName := range e.argsNames {

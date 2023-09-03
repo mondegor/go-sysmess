@@ -7,12 +7,12 @@ const (
 type (
     FieldError struct {
         Id string
-        Err AppError
+        Err *AppError
     }
 )
 
 func newFieldError(id string, err error) FieldError {
-    appArr, ok := err.(AppError)
+    appArr, ok := err.(*AppError)
 
     if !ok {
         appArr = New(

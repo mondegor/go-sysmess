@@ -10,27 +10,11 @@ import (
 )
 
 const (
-    eventIdPattern = "ER-%s"
+    traceIdPattern = "ER-%s"
 )
 
 type (
-    AppErrorFactory interface {
-        New(args ...any) AppError
-        Wrap(err error, args ...any) AppError
-        Caller(skip int) AppErrorFactory
-        Is(err error) bool
-    }
-
-    AppError interface {
-        Id() ErrorId
-        Kind() ErrorKind
-        Is(err error) bool
-        Error() string
-        Unwrap() error
-        EventId() string
-    }
-
-    appErrorFactory struct {
+    AppErrorFactory struct {
         id ErrorId
         kind ErrorKind
         message string
@@ -39,8 +23,8 @@ type (
     }
 )
 
-func NewFactory(id ErrorId, kind ErrorKind, message string) AppErrorFactory {
-    return &appErrorFactory{
+func NewFactory(id ErrorId, kind ErrorKind, message string) *AppErrorFactory {
+    return &AppErrorFactory{
         id: id,
         kind: kind,
         message: message,
@@ -48,20 +32,8 @@ func NewFactory(id ErrorId, kind ErrorKind, message string) AppErrorFactory {
     }
 }
 
-func (e *appErrorFactory) New(args ...any) AppError {
-    return e.new(nil, args)
-}
-
-func (e *appErrorFactory) Wrap(err error, args ...any) AppError {
-    if err == nil {
-        err = fmt.Errorf("error is nil, wrapping is not necessary")
-    }
-
-    return e.new(err, args)
-}
-
-func (e *appErrorFactory) Caller(skip int) AppErrorFactory {
-    return &appErrorFactory{
+func (e *AppErrorFactory) Caller(skip int) *AppErrorFactory {
+    return &AppErrorFactory{
         id: e.id,
         kind: e.kind,
         message: e.message,
@@ -70,13 +42,25 @@ func (e *appErrorFactory) Caller(skip int) AppErrorFactory {
     }
 }
 
-// Is - see: appError::Is
-func (e *appErrorFactory) Is(err error) bool {
-    return errors.Is(err, &appError{id: e.id})
+func (e *AppErrorFactory) New(args ...any) *AppError {
+    return e.new(nil, args)
 }
 
-func (e *appErrorFactory) new(err error, args []any) *appError {
-    newErr := &appError{
+func (e *AppErrorFactory) Wrap(err error, args ...any) *AppError {
+    if err == nil {
+        err = fmt.Errorf("specified error is nil, wrapping is not necessary")
+    }
+
+    return e.new(err, args)
+}
+
+// Is - see: AppError::Is
+func (e *AppErrorFactory) Is(err error) bool {
+    return errors.Is(err, &AppError{id: e.id})
+}
+
+func (e *AppErrorFactory) new(err error, args []any) *AppError {
+    newErr := &AppError{
         id: e.id,
         kind: e.kind,
         message: e.message,
@@ -90,22 +74,27 @@ func (e *appErrorFactory) new(err error, args []any) *appError {
     return newErr
 }
 
-func (e *appErrorFactory) init(newErr *appError) {
+func (e *AppErrorFactory) init(newErr *AppError) {
     newErr.setErrorIfArgsNotEqual(3)
 
     if newErr.err != nil {
-        appErr, ok := newErr.err.(*appError)
+        appErr, ok := newErr.err.(*AppError)
 
         // raising to the top
-        if ok && appErr.eventId != nil {
-            newErr.eventId = appErr.eventId
-            appErr.eventId = nil
+        if ok && appErr.traceId != nil {
+            newErr.traceId = appErr.traceId
+            appErr.traceId = nil
             return
         }
     }
 
     if e.kind != ErrorKindInternal && e.kind != ErrorKindSystem {
         return
+    }
+
+    if newErr.traceId == nil {
+        newErr.traceId = new(string)
+        *newErr.traceId = fmt.Sprintf(traceIdPattern, uuid.New().String())
     }
 
     _, file, line, ok := runtime.Caller(e.callerSkip + 3)
@@ -118,14 +107,5 @@ func (e *appErrorFactory) init(newErr *appError) {
         newErr.file = new(string)
         *newErr.file = file
         newErr.line = line
-    }
-
-    //if e.eventId == nil {
-    //    e.eventId = (*string)(sentry.CaptureException(e))
-    //}
-
-    if newErr.eventId == nil {
-        newErr.eventId = new(string)
-        *newErr.eventId = fmt.Sprintf(eventIdPattern, uuid.New().String())
     }
 }

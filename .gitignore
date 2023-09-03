@@ -2,10 +2,3 @@
 
 .idea
 .vscode
-
-/.env
-
-/app/bin
-/app/logs
-
-/*dump*

@@ -11,29 +11,29 @@ const (
     ErrorKindInternalNotice
     ErrorKindSystem
     ErrorKindUser
-
-    ErrorIdInternal = "errInternal"
 )
+
+const ErrorIdInternal = "errInternal"
 
 type (
     ErrorId string
-    ErrorKind int32
+    ErrorKind int
 
-    appError struct {
+    AppError struct {
         id ErrorId
         kind ErrorKind
+        traceId *string
         message string
         argsNames []string
         args []any
         err error
         file *string
         line int
-        eventId *string
     }
 )
 
-func New(id ErrorId, message string, args ...any) AppError {
-    newErr := &appError{
+func New(id ErrorId, message string, args ...any) *AppError {
+    newErr := &AppError{
         id: id,
         kind: ErrorKindUser,
         message: message,
@@ -46,7 +46,7 @@ func New(id ErrorId, message string, args ...any) AppError {
     return newErr
 }
 
-func (e *appError) setErrorIfArgsNotEqual(callerSkip int) {
+func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
     if len(e.argsNames) == len(e.args) {
         return
     }
@@ -59,7 +59,7 @@ func (e *appError) setErrorIfArgsNotEqual(callerSkip int) {
         errMessage = "too many arguments in message '%s'"
     }
 
-    argsErrorFactory := appErrorFactory{
+    argsErrorFactory := AppErrorFactory{
         id: ErrorIdInternal,
         kind: ErrorKindInternal,
         message: fmt.Sprintf(errMessage, e.message),
@@ -69,28 +69,28 @@ func (e *appError) setErrorIfArgsNotEqual(callerSkip int) {
     e.err = argsErrorFactory.new(e.err, nil)
 }
 
-func (e *appError) Id() ErrorId {
+func (e *AppError) Id() ErrorId {
     return e.id
 }
 
-func (e *appError) Kind() ErrorKind {
+func (e *AppError) Kind() ErrorKind {
     return e.kind
 }
 
-func (e *appError) Is(err error) bool {
-    if v, ok := err.(*appError); ok && e.id == v.id {
-        return true
+func (e *AppError) TraceId() string {
+    if e.traceId == nil {
+        return ""
     }
 
-    return false
+    return *e.traceId
 }
 
-func (e *appError) Error() string {
+func (e *AppError) Error() string {
     var buf []byte
 
-    if e.eventId != nil {
+    if e.traceId != nil {
         buf = append(buf, '[')
-        buf = append(buf, *e.eventId...)
+        buf = append(buf, *e.traceId...)
         buf = append(buf, ']', ' ')
     }
 
@@ -108,14 +108,14 @@ func (e *appError) Error() string {
     return string(buf)
 }
 
-func (e *appError) Unwrap() error {
-    return e.err
-}
-
-func (e *appError) EventId() string {
-    if e.eventId == nil {
-        return ""
+func (e *AppError) Is(err error) bool {
+    if v, ok := err.(*AppError); ok && e.id == v.id {
+        return true
     }
 
-    return *e.eventId
+    return false
+}
+
+func (e *AppError) Unwrap() error {
+    return e.err
 }

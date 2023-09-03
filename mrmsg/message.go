@@ -14,7 +14,17 @@ const (
 
 var regexpArgName = regexp.MustCompile(`^\.[A-Za-z][A-Za-z0-9]*$`)
 
-func Render(message string, args []NamedArg) (string, error) {
+func Render(message string, args []NamedArg) string {
+    value, err := render(message, args)
+
+    if err != nil {
+        return message
+    }
+
+    return value
+}
+
+func render(message string, args []NamedArg) (string, error) {
     if message == "" {
         return "", nil
     }
@@ -42,14 +52,16 @@ func Render(message string, args []NamedArg) (string, error) {
     return msg.String(), nil
 }
 
-func MustRender(message string, args []NamedArg) string {
-    value, err := Render(message, args)
+func CheckParse(message string) error {
+    var args []NamedArg
 
-    if err != nil {
-        return message
+    for _, arg := range ParseArgsNames(message) {
+        args = append(args, NamedArg{arg, arg})
     }
 
-    return value
+    _, err := render(message, args)
+
+    return err
 }
 
 func ParseArgsNames(message string) []string {

@@ -1,28 +1,15 @@
 package mrlang
 
-import (
-    "fmt"
+import "fmt"
 
-    "github.com/mondegor/go-sysmess/mrmsg"
-)
+const langPathPattern = "%s/%s.%s" // dir/lang.ext, ./translate/en.yaml
 
 type (
-    Translator interface {
-        LocaleFirstFound(langs ...string) Locale
-        RegisteredLocales() []Locale
-    }
+    langMap map[string]*Locale
 
-    Locale interface {
-        LangCode() string
-        TranslateMessage(id string, defaultMessage string, args ...mrmsg.NamedArg) Message
-        TranslateError(id string, defaultMessage string, args ...mrmsg.NamedArg) ErrorMessage
-    }
-
-    langMap map[string]*locale
-
-    translator struct {
+    Translator struct {
         langs langMap
-        defaultLocale *locale
+        defaultLocale *Locale
     }
 
     TranslatorOptions struct {
@@ -33,7 +20,7 @@ type (
     }
 )
 
-func NewTranslator(opt TranslatorOptions) (Translator, error) {
+func NewTranslator(opt TranslatorOptions) (*Translator, error) {
     if opt.LangByDefault == "" {
         return nil, fmt.Errorf("opt.LangByDefault is required")
     }
@@ -46,12 +33,12 @@ func NewTranslator(opt TranslatorOptions) (Translator, error) {
         langCodes = append(langCodes, opt.LangByDefault)
     }
 
-    tr := translator{
+    tr := Translator{
         langs: make(langMap, 2),
     }
 
     for i, langCode := range opt.LangCodes {
-        loc, err := newLocale(langCode, fmt.Sprintf("%s/%s.%s", opt.DirPath, langCode, opt.FileType))
+        loc, err := newLocale(langCode, fmt.Sprintf(langPathPattern, opt.DirPath, langCode, opt.FileType))
 
         if err != nil {
             return nil, err
@@ -67,7 +54,7 @@ func NewTranslator(opt TranslatorOptions) (Translator, error) {
     return &tr, nil
 }
 
-func (t *translator) LocaleFirstFound(langs ...string) Locale {
+func (t *Translator) FindFirstLocale(langs ...string) *Locale {
     for _, lang := range langs {
         if loc, ok := t.langs[lang]; ok {
             return loc
@@ -77,8 +64,8 @@ func (t *translator) LocaleFirstFound(langs ...string) Locale {
     return t.defaultLocale
 }
 
-func (t *translator) RegisteredLocales() []Locale {
-    var locs []Locale
+func (t *Translator) RegisteredLocales() []*Locale {
+    var locs []*Locale
 
     for _, loc := range t.langs {
         locs = append(locs, loc)

@@ -8,52 +8,33 @@ import (
 )
 
 type (
-    locale struct {
+    Locale struct {
         langCode string
         messages map[string]Message
         errors map[string]ErrorMessage
     }
 
-    LocaleConfig struct {
+    localeConfig struct {
         Messages map[string]Message `yaml:"messages"`
         Errors map[string]ErrorMessage `yaml:"errors"`
     }
 )
 
-func newLocale(langCode string, filePath string) (*locale, error) {
-    cfg := LocaleConfig{}
-    err := cleanenv.ReadConfig(filePath, &cfg)
-
-    if err != nil {
-        return nil, fmt.Errorf("while reading locale '%s', error '%s' occurred", filePath, err)
-    }
-
-    for id, value := range cfg.Messages {
-        var args []mrmsg.NamedArg
-
-        for _, arg := range mrmsg.ParseArgsNames(string(value)) {
-            args = append(args, mrmsg.NewArg(arg, arg))
-        }
-
-        _, err = mrmsg.Render(string(value), args)
-
-        if err != nil {
-            return nil, fmt.Errorf("message with id '%s' has error '%s' in locale %s", id, err, filePath)
-        }
-    }
-
-    return &locale{
-        langCode: langCode,
-        messages: cfg.Messages,
-        errors: cfg.Errors,
-    }, nil
+var std = &Locale{
+    langCode: "default",
+    messages: make(map[string]Message, 0),
+    errors: make(map[string]ErrorMessage, 0),
 }
 
-func (l locale) LangCode() string {
+func DefaultLocale() *Locale {
+    return std
+}
+
+func (l *Locale) LangCode() string {
     return l.langCode
 }
 
-func (l locale) TranslateMessage(id string, defaultMessage string, args ...mrmsg.NamedArg) Message {
+func (l *Locale) TranslateMessage(id string, defaultMessage string, args ...mrmsg.NamedArg) Message {
     value, ok := l.messages[id]
 
     if !ok {
@@ -61,13 +42,13 @@ func (l locale) TranslateMessage(id string, defaultMessage string, args ...mrmsg
     }
 
     if len(args) > 0 {
-        value = Message(mrmsg.MustRender(string(value), args))
+        value = Message(mrmsg.Render(string(value), args))
     }
 
     return value
 }
 
-func (l locale) TranslateError(id string, defaultMessage string, args ...mrmsg.NamedArg) ErrorMessage {
+func (l *Locale) TranslateError(id string, defaultMessage string, args ...mrmsg.NamedArg) ErrorMessage {
     value, ok := l.errors[id]
 
     if !ok {
@@ -75,12 +56,61 @@ func (l locale) TranslateError(id string, defaultMessage string, args ...mrmsg.N
     }
 
     if len(args) > 0 {
-        value.Reason = mrmsg.MustRender(value.Reason, args)
+        value.Reason = mrmsg.Render(value.Reason, args)
 
         for i := 0; i < len(value.Details); i++ {
-            value.Details[i] = mrmsg.MustRender(value.Details[i], args)
+            value.Details[i] = mrmsg.Render(value.Details[i], args)
         }
     }
 
     return value
+}
+
+func newLocale(langCode string, filePath string) (*Locale, error) {
+    cfg := localeConfig{}
+    err := cleanenv.ReadConfig(filePath, &cfg)
+
+    if err != nil {
+        return nil, fmt.Errorf("while reading locale '%s', error '%s' occurred", filePath, err)
+    }
+
+    err = checkLocale(filePath, &cfg)
+
+    if err != nil {
+        return nil, err
+    }
+
+    return &Locale{
+        langCode: langCode,
+        messages: cfg.Messages,
+        errors: cfg.Errors,
+    }, nil
+}
+
+func checkLocale(filePath string, cfg *localeConfig) error {
+    for messId, value := range cfg.Messages {
+        err := mrmsg.CheckParse(string(value))
+
+        if err != nil {
+            return fmt.Errorf("message with id '%s' has error '%s' in locale %s", messId, err, filePath)
+        }
+    }
+
+    for errId, value := range cfg.Errors {
+        err := mrmsg.CheckParse(value.Reason)
+
+        if err != nil {
+            return fmt.Errorf("error.Reason with id '%s' has error '%s' in locale %s", errId, err, filePath)
+        }
+
+        for n, detail := range value.Details {
+            err = mrmsg.CheckParse(detail)
+
+            if err != nil {
+                return fmt.Errorf("error.Details[%d] with id '%s' has error '%s' in locale %s", n, errId, err, filePath)
+            }
+        }
+    }
+
+    return nil
 }
