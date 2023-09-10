@@ -1,30 +1,30 @@
 package mrerr
 
 var (
-    FactoryInternal = NewFactory(
+    ErrFactoryInternal = NewFactory(
         ErrorIdInternal, ErrorKindInternal, "internal server error")
 
-    FactoryInternalNilPointer = NewFactory(
+    ErrFactoryInternalNilPointer = NewFactory(
         "errInternalNilPointer", ErrorKindInternal, "nil pointer")
 
-    FactoryInternalTypeAssertion = NewFactory(
+    ErrFactoryInternalTypeAssertion = NewFactory(
         "errInternalTypeAssertion", ErrorKindInternal, "invalid type '{{ .type }}' assertion (value: {{ .value }})")
 
-    FactoryInternalInvalidType = NewFactory(
+    ErrFactoryInternalInvalidType = NewFactory(
         "errInternalInvalidType", ErrorKindInternal, "invalid type '{{ .type1 }}', expected: '{{ .type2 }}'")
 
-    FactoryInternalInvalidData = NewFactory(
+    ErrFactoryInternalInvalidData = NewFactory(
         "errInternalInvalidData", ErrorKindInternal, "invalid data '{{ .value }}'")
 
-    FactoryInternalParseData = NewFactory(
+    ErrFactoryInternalParseData = NewFactory(
         "errInternalParseData", ErrorKindInternal, "data '{{ .name1 }}' parsed to {{ .name2 }} with error")
 
-    FactoryInternalFailedToClose = NewFactory(
+    ErrFactoryInternalFailedToClose = NewFactory(
         "errInternalFailedToClose", ErrorKindInternal, "failed to close '{{ .name }}'")
 
-    FactoryInternalMapValueNotFound = NewFactory(
+    ErrFactoryInternalMapValueNotFound = NewFactory(
         "errInternalMapValueNotFound", ErrorKindInternal, "'{{ .value }}' is not found in map {{ .name }}")
 
-    FactoryDataContainer = NewFactory(
-        "errDataContainer", ErrorKindInternalNotice, "data: '{{ .value }}'")
+    ErrFactoryInternalNoticeDataContainer = NewFactory(
+        "errInternalNoticeDataContainer", ErrorKindInternalNotice, "data: '{{ .value }}'")
 )
