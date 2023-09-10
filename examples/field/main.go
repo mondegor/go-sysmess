@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-    list := mrerr.NewListWith("fieldEmail", fmt.Errorf("error in email") )
+    list := mrerr.NewListWith("fieldEmail", fmt.Errorf("error in email"))
     fmt.Println(list)
 
     factory := mrerr.NewFactory(
@@ -16,10 +16,22 @@ func main() {
         "my error with '{{ .param1 }}' and '{{ .param2 }}'",
     )
 
-    list = mrerr.NewListWith("fieldPhone", factory.New("123", "567") )
+    list = mrerr.NewListWith("fieldPhone", factory.New("123", "567"))
 
-    fmt.Println(list[0].Id) // field id
-    fmt.Println(list[0].Err.Id()) // error id for field
-    fmt.Println(list[0].Err.Kind()) // 3 - mrerr.ErrorKindUser
-    fmt.Println(list[0].Err)
+    if list == nil {
+        fmt.Println("list is nil")
+        return
+    }
+
+    tmp := *list
+
+    if len(tmp) == 0 {
+        fmt.Println("list is empty")
+        return
+    }
+
+    fmt.Println(tmp[0].Id)         // field id
+    fmt.Println(tmp[0].Err.Id())   // error id for field
+    fmt.Println(tmp[0].Err.Kind()) // 3 - mrerr.ErrorKindUser
+    fmt.Println(tmp[0].Err)
 }

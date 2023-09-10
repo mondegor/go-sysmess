@@ -3,13 +3,13 @@ module github.com/mondegor/go-sysmess
 go 1.20
 
 require (
-	github.com/google/uuid v1.3.0
-	github.com/ilyakaznacheev/cleanenv v1.4.2
+	github.com/google/uuid v1.3.1
+	github.com/ilyakaznacheev/cleanenv v1.5.0
 )
 
 require (
-	github.com/BurntSushi/toml v1.1.0 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect

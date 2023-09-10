@@ -3,10 +3,14 @@
 
 ## 2023-09-10
 ### Changed
-- FactoryDataContainer -> ErrFactoryInternalNoticeDataContainer
-- FactoryInternal* -> ErrFactoryInternal*
+- Обновлены зависимости библиотеки;
+- FactoryDataContainer -> ErrFactoryInternalNoticeDataContainer;
+- FactoryInternal* -> ErrFactoryInternal*;
+
+### Fixed
+- Исправлен баг в examples/field/main.go;
 
 ## 2023-09-03
 ### Changed
-- ErrorId -> string
-- FieldErrorList -> *FieldErrorList
+- ErrorId -> string;
+- FieldErrorList -> *FieldErrorList;
