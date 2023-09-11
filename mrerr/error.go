@@ -6,9 +6,9 @@ import (
     "github.com/mondegor/go-sysmess/mrmsg"
 )
 
-const ErrorIdInternal = "errInternal"
-
 const (
+    ErrorIdInternal = "errInternal"
+
     ErrorKindInternal ErrorKind = iota
     ErrorKindInternalNotice
     ErrorKindSystem

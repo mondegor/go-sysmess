@@ -4,7 +4,9 @@ import (
     "fmt"
 )
 
-type Arg map[string]any
+type (
+	Arg map[string]any
+)
 
 func (a Arg) String() string {
     var buf []byte

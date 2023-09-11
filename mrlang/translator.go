@@ -2,7 +2,9 @@ package mrlang
 
 import "fmt"
 
-const langPathPattern = "%s/%s.%s" // dir/lang.ext, ./translate/en.yaml
+const (
+	langPathPattern = "%s/%s.%s" // dir/lang.ext, ./translate/en.yaml
+)
 
 type (
     langMap map[string]*Locale

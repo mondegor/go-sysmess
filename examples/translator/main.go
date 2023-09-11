@@ -7,7 +7,9 @@ import (
     "github.com/mondegor/go-sysmess/mrlang"
 )
 
-var langsDir string
+var (
+	langsDir string
+)
 
 func init() {
    flag.StringVar(&langsDir, "langs-dir", "./examples/translator/langs", "Dir to language files")

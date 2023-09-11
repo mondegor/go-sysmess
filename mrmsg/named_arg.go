@@ -5,10 +5,12 @@ import (
     "strconv"
 )
 
-type NamedArg struct {
-    name  string
-    value any
-}
+type (
+	NamedArg struct {
+        name  string
+        value any
+    }
+)
 
 func NewArg(name string, value any) NamedArg {
     return NamedArg{
