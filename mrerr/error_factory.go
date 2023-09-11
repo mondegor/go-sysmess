@@ -10,7 +10,7 @@ import (
 )
 
 const (
-    traceIdPattern = "ERR-%s"
+    traceIdPattern = "ER%s"
 )
 
 type (

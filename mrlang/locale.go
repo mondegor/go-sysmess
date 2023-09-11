@@ -21,7 +21,7 @@ type (
 )
 
 var (
-	std = &Locale{
+	defaultLocale = &Locale{
         langCode: "default",
         messages: make(map[string]Message, 0),
         errors: make(map[string]ErrorMessage, 0),
@@ -29,7 +29,7 @@ var (
 )
 
 func DefaultLocale() *Locale {
-    return std
+    return defaultLocale
 }
 
 func (l *Locale) LangCode() string {
