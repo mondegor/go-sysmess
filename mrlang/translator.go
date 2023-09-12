@@ -15,31 +15,31 @@ type (
     }
 
     TranslatorOptions struct {
-        LangByDefault string
         DirPath string
         FileType string
         LangCodes []string
+        DefaultLang string // optional
     }
 )
 
 func NewTranslator(opt TranslatorOptions) (*Translator, error) {
-    if opt.LangByDefault == "" {
-        return nil, fmt.Errorf("opt.LangByDefault is required")
+    if len(opt.LangCodes) == 0 {
+        return nil, fmt.Errorf("opt.LangCodes is required")
     }
 
-    var langCodes []string
+    langCodes := opt.LangCodes
 
-    if len(opt.LangCodes) > 0 {
-        langCodes = opt.LangCodes
-    } else {
-        langCodes = append(langCodes, opt.LangByDefault)
+    if opt.DefaultLang == "" {
+        opt.DefaultLang = langCodes[0]
+    } else if !defaultLangInArray(opt.DefaultLang, &langCodes) {
+        return nil, fmt.Errorf("opt.DefaultLang='%s' is not found in opt.LangCodes", opt.DefaultLang)
     }
 
     tr := Translator{
         langs: make(langMap, 2),
     }
 
-    for i, langCode := range opt.LangCodes {
+    for _, langCode := range opt.LangCodes {
         loc, err := newLocale(langCode, fmt.Sprintf(langPathPattern, opt.DirPath, langCode, opt.FileType))
 
         if err != nil {
@@ -48,12 +48,26 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
 
         tr.langs[langCode] = loc
 
-        if i == 0 {
+        if opt.DefaultLang == langCode {
             tr.defaultLocale = loc
         }
     }
 
     return &tr, nil
+}
+
+func defaultLangInArray(lang string, langs *[]string) bool {
+    for _, value := range *langs {
+        if value == lang {
+            return true
+        }
+    }
+
+    return false
+}
+
+func (t *Translator) DefaultLocale() *Locale {
+    return t.defaultLocale
 }
 
 func (t *Translator) FindFirstLocale(langs ...string) *Locale {

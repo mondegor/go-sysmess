@@ -9,10 +9,10 @@ import (
 const (
     ErrorIdInternal = "errInternal"
 
-    ErrorKindInternal ErrorKind = iota
-    ErrorKindInternalNotice
-    ErrorKindSystem
-    ErrorKindUser
+    ErrorKindInternal ErrorKind = iota // внутренняя ошибка + traceId + call stack
+    ErrorKindInternalNotice // внутреннее предупреждение, которое, в некоторых случаях, может стать поводом для реальной ошибки
+    ErrorKindSystem // системная ошибка + traceId + call stack
+    ErrorKindUser // пользовательская ошибка
 )
 
 type (

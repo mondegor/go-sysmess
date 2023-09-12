@@ -20,10 +20,10 @@ func main() {
 
     tr, err := mrlang.NewTranslator(
         mrlang.TranslatorOptions{
-            LangByDefault: "en",
             DirPath: langsDir,
             FileType: "yaml",
             LangCodes: []string{"en", "ru"},
+            DefaultLang: "ru",
         },
     )
 
@@ -32,8 +32,11 @@ func main() {
         return
     }
 
+    defaultLoc := tr.DefaultLocale()
+    fmt.Printf("DefaultLoc: %s\n", defaultLoc.LangCode())
+
     for _, loc := range tr.RegisteredLocales() {
-        fmt.Println(loc.LangCode())
+        fmt.Printf("LangCode: %s\n", loc.LangCode())
 
         locTest := tr.FindFirstLocale(loc.LangCode())
 
