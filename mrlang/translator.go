@@ -40,16 +40,16 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
     }
 
     for _, langCode := range opt.LangCodes {
-        loc, err := newLocale(langCode, fmt.Sprintf(langPathPattern, opt.DirPath, langCode, opt.FileType))
+        locale, err := newLocale(langCode, fmt.Sprintf(langPathPattern, opt.DirPath, langCode, opt.FileType))
 
         if err != nil {
             return nil, err
         }
 
-        tr.langs[langCode] = loc
+        tr.langs[langCode] = locale
 
         if opt.DefaultLang == langCode {
-            tr.defaultLocale = loc
+            tr.defaultLocale = locale
         }
     }
 
@@ -72,8 +72,8 @@ func (t *Translator) DefaultLocale() *Locale {
 
 func (t *Translator) FindFirstLocale(langs ...string) *Locale {
     for _, lang := range langs {
-        if loc, ok := t.langs[lang]; ok {
-            return loc
+        if locale, ok := t.langs[lang]; ok {
+            return locale
         }
     }
 
@@ -83,8 +83,8 @@ func (t *Translator) FindFirstLocale(langs ...string) *Locale {
 func (t *Translator) RegisteredLocales() []*Locale {
     var locs []*Locale
 
-    for _, loc := range t.langs {
-        locs = append(locs, loc)
+    for _, locale := range t.langs {
+        locs = append(locs, locale)
     }
 
     return locs

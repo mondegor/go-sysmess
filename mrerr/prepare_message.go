@@ -6,12 +6,12 @@ import (
 )
 
 // Translate - translate error message for user
-func (e *AppError) Translate(loc mrlang.Locale) mrlang.ErrorMessage {
-    if e.kind != ErrorKindInternal {
-        return loc.TranslateError(e.Id(), e.message, e.getNamedArgs()...)
+func (e *AppError) Translate(locale *mrlang.Locale) mrlang.ErrorMessage {
+    if e.kind == ErrorKindInternal || e.kind == ErrorKindInternalNotice {
+        return locale.TranslateError(ErrorIdInternal, ErrorIdInternal)
     }
 
-    return loc.TranslateError(ErrorIdInternal, ErrorIdInternal)
+    return locale.TranslateError(e.id, e.message, e.getNamedArgs()...)
 }
 
 func (e *AppError) renderMessage() []byte {

@@ -5,8 +5,6 @@ import (
 )
 
 type (
-    Message string
-
     ErrorMessage struct {
         Reason string `yaml:"reason"`
         Details []string `yaml:"details"`

@@ -35,10 +35,10 @@ func main() {
     defaultLoc := tr.DefaultLocale()
     fmt.Printf("DefaultLoc: %s\n", defaultLoc.LangCode())
 
-    for _, loc := range tr.RegisteredLocales() {
-        fmt.Printf("LangCode: %s\n", loc.LangCode())
+    for _, locale := range tr.RegisteredLocales() {
+        fmt.Printf("LangCode: %s\n", locale.LangCode())
 
-        locTest := tr.FindFirstLocale(loc.LangCode())
+        locTest := tr.FindFirstLocale(locale.LangCode())
 
         fmt.Println(locTest.LangCode())
         fmt.Println(locTest.TranslateMessage("msgExample", "Default message for msgExample"))

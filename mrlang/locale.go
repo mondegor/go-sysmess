@@ -10,12 +10,12 @@ import (
 type (
     Locale struct {
         langCode string
-        messages map[string]Message
+        messages map[string]string
         errors map[string]ErrorMessage
     }
 
     localeConfig struct {
-        Messages map[string]Message `yaml:"messages"`
+        Messages map[string]string `yaml:"messages"`
         Errors map[string]ErrorMessage `yaml:"errors"`
     }
 )
@@ -23,7 +23,7 @@ type (
 var (
 	defaultLocale = &Locale{
         langCode: "default",
-        messages: make(map[string]Message, 0),
+        messages: make(map[string]string, 0),
         errors: make(map[string]ErrorMessage, 0),
     }
 )
@@ -36,15 +36,15 @@ func (l *Locale) LangCode() string {
     return l.langCode
 }
 
-func (l *Locale) TranslateMessage(id string, defaultMessage string, args ...mrmsg.NamedArg) Message {
+func (l *Locale) TranslateMessage(id string, defaultMessage string, args ...mrmsg.NamedArg) string {
     value, ok := l.messages[id]
 
     if !ok {
-        value = Message(defaultMessage)
+        value = defaultMessage
     }
 
     if len(args) > 0 {
-        value = Message(mrmsg.Render(string(value), args))
+        value = mrmsg.Render(value, args)
     }
 
     return value
@@ -91,7 +91,7 @@ func newLocale(langCode string, filePath string) (*Locale, error) {
 
 func checkLocale(filePath string, cfg *localeConfig) error {
     for messId, value := range cfg.Messages {
-        err := mrmsg.CheckParse(string(value))
+        err := mrmsg.CheckParse(value)
 
         if err != nil {
             return fmt.Errorf("message with id '%s' has error '%s' in locale %s", messId, err, filePath)
