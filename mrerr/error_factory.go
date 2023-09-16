@@ -81,9 +81,9 @@ func (e *AppErrorFactory) init(newErr *AppError) {
         appErr, ok := newErr.err.(*AppError)
 
         // raising to the top
-        if ok && appErr.traceId != nil {
+        if ok && appErr.traceId != "" {
             newErr.traceId = appErr.traceId
-            appErr.traceId = nil
+            appErr.traceId = ""
             return
         }
     }
@@ -92,9 +92,8 @@ func (e *AppErrorFactory) init(newErr *AppError) {
         return
     }
 
-    if newErr.traceId == nil {
-        newErr.traceId = new(string)
-        *newErr.traceId = fmt.Sprintf(traceIdPattern, uuid.New().String())
+    if newErr.traceId == "" {
+        newErr.traceId = fmt.Sprintf(traceIdPattern, uuid.New().String())
     }
 
     _, file, line, ok := runtime.Caller(e.callerSkip + 3)
@@ -104,8 +103,7 @@ func (e *AppErrorFactory) init(newErr *AppError) {
             file = "???"
         }
 
-        newErr.file = new(string)
-        *newErr.file = file
+        newErr.file = file
         newErr.line = line
     }
 }

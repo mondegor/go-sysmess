@@ -2,6 +2,7 @@ package mrerr
 
 import (
     "fmt"
+    "strings"
 
     "github.com/mondegor/go-sysmess/mrmsg"
 )
@@ -21,12 +22,12 @@ type (
     AppError struct {
         id string
         kind ErrorKind
-        traceId *string
+        traceId string
         message string
         argsNames []string
         args []any
         err error
-        file *string
+        file string
         line int
     }
 )
@@ -77,34 +78,30 @@ func (e *AppError) Kind() ErrorKind {
 }
 
 func (e *AppError) TraceId() string {
-    if e.traceId == nil {
-        return ""
-    }
-
-    return *e.traceId
+    return e.traceId
 }
 
 func (e *AppError) Error() string {
-    var buf []byte
+    var buf strings.Builder
 
-    if e.traceId != nil {
-        buf = append(buf, '[')
-        buf = append(buf, *e.traceId...)
-        buf = append(buf, ']', ' ')
+    if e.traceId != "" {
+        buf.WriteByte('[')
+        buf.WriteString(e.traceId)
+        buf.Write([]byte{']', ' '})
     }
 
-    buf = append(buf, e.renderMessage()...)
+    buf.Write(e.renderMessage())
 
-    if e.file != nil {
-        buf = append(buf, fmt.Sprintf(" in %s:%d", *e.file, e.line)...)
+    if e.file != "" {
+        buf.WriteString(fmt.Sprintf(" in %s:%d", e.file, e.line))
     }
 
     if e.err != nil {
-        buf = append(buf, ';', ' ')
-        buf = append(buf, e.err.Error()...)
+        buf.Write([]byte{';', ' '})
+        buf.WriteString(e.err.Error())
     }
 
-    return string(buf)
+    return buf.String()
 }
 
 func (e *AppError) Is(err error) bool {
