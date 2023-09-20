@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	Arg map[string]any
+    Arg map[string]any
 )
 
 func (a Arg) String() string {

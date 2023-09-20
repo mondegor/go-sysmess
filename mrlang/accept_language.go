@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	maxAcceptLanguageLen = 256
+    maxAcceptLanguageLen = 256
 )
 
 var (
-	regexpAcceptLanguage = regexp.MustCompile(`^[a-z]{2}(-[a-zA-Z0-9-]+)?$`)
+    regexpAcceptLanguage = regexp.MustCompile(`^[a-z]{2}(-[a-zA-Z0-9-]+)?$`)
 )
 
 // ParseAcceptLanguage

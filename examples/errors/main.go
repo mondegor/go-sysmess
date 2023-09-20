@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	FactoryError = mrerr.NewFactory(
+    FactoryError = mrerr.NewFactory(
         "errMyErrorWithParams",
         mrerr.ErrorKindInternal,
         "my error with '{{ .param1 }}' and '{{ .param2 }}'",

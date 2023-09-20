@@ -21,7 +21,7 @@ type (
 )
 
 var (
-	defaultLocale = &Locale{
+    defaultLocale = &Locale{
         langCode: "default",
         messages: make(map[string]string, 0),
         errors: make(map[string]ErrorMessage, 0),

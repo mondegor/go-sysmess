@@ -3,7 +3,7 @@ package mrlang
 import "fmt"
 
 const (
-	langPathPattern = "%s/%s.%s" // dir/lang.ext, ./translate/en.yaml
+    langPathPattern = "%s/%s.%s" // dir/lang.ext, ./translate/en.yaml
 )
 
 type (

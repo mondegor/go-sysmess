@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	NamedArg struct {
+    NamedArg struct {
         name  string
         value any
     }

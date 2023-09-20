@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	langsDir string
+    langsDir string
 )
 
 func init() {

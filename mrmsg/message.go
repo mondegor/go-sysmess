@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	regexpArgName = regexp.MustCompile(`^\.[A-Za-z][A-Za-z0-9]*$`)
+    regexpArgName = regexp.MustCompile(`^\.[A-Za-z][A-Za-z0-9]*$`)
 )
 
 func Render(message string, args []NamedArg) string {

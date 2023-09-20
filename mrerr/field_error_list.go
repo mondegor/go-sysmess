@@ -25,5 +25,5 @@ func (e *FieldErrorList) Add(fieldId string, err error) {
 }
 
 func (e *FieldErrorList) Error() string {
-    return fmt.Sprintf("%+v", *e)
+    return fmt.Sprintf("%v", *e)
 }
