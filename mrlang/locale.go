@@ -70,15 +70,12 @@ func (l *Locale) TranslateError(id string, defaultMessage string, args ...mrmsg.
 
 func newLocale(langCode string, filePath string) (*Locale, error) {
     cfg := localeConfig{}
-    err := cleanenv.ReadConfig(filePath, &cfg)
 
-    if err != nil {
+    if err := cleanenv.ReadConfig(filePath, &cfg); err != nil {
         return nil, fmt.Errorf("while reading locale '%s', error '%s' occurred", filePath, err)
     }
 
-    err = checkLocale(filePath, &cfg)
-
-    if err != nil {
+    if err := checkLocale(filePath, &cfg); err != nil {
         return nil, err
     }
 
@@ -91,24 +88,18 @@ func newLocale(langCode string, filePath string) (*Locale, error) {
 
 func checkLocale(filePath string, cfg *localeConfig) error {
     for messId, value := range cfg.Messages {
-        err := mrmsg.CheckParse(value)
-
-        if err != nil {
+        if err := mrmsg.CheckParse(value); err != nil {
             return fmt.Errorf("message with id '%s' has error '%s' in locale %s", messId, err, filePath)
         }
     }
 
     for errId, value := range cfg.Errors {
-        err := mrmsg.CheckParse(value.Reason)
-
-        if err != nil {
+        if err := mrmsg.CheckParse(value.Reason); err != nil {
             return fmt.Errorf("error.Reason with id '%s' has error '%s' in locale %s", errId, err, filePath)
         }
 
         for n, detail := range value.Details {
-            err = mrmsg.CheckParse(detail)
-
-            if err != nil {
+            if err := mrmsg.CheckParse(detail); err != nil {
                 return fmt.Errorf("error.Details[%d] with id '%s' has error '%s' in locale %s", n, errId, err, filePath)
             }
         }
