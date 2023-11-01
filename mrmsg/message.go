@@ -37,7 +37,7 @@ func render(message string, args []NamedArg) (string, error) {
         return "", err
     }
 
-    data := make(map[string]string, 2)
+    data := make(map[string]string, len(args))
 
     for _, item := range args {
         data[item.name] = item.valueString()
@@ -102,7 +102,7 @@ func ParseArgsNames(message string) []string {
         name = name[1:] // left trim .
 
         if keys == nil {
-            keys = make(map[string]bool, 2)
+            keys = make(map[string]bool, 1)
         } else {
             if _, ok := keys[name]; ok {
                 continue

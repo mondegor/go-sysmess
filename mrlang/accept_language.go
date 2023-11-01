@@ -34,7 +34,7 @@ func ParseAcceptLanguage(s string) []string {
             }
 
             if keys == nil {
-                keys = make(map[string]bool, 2)
+                keys = make(map[string]bool, 1)
             } else {
                 if _, ok := keys[lang]; ok {
                     continue

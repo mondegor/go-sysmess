@@ -23,10 +23,10 @@ func (e *AppError) renderMessage() []byte {
 }
 
 func (e *AppError) getNamedArgs() []mrmsg.NamedArg {
-    var namedArgs []mrmsg.NamedArg
+    namedArgs := make([]mrmsg.NamedArg, len(e.argsNames))
 
     for i, argName := range e.argsNames {
-        namedArgs = append(namedArgs, mrmsg.NewArg(argName, e.args[i]))
+        namedArgs[i] = mrmsg.NewArg(argName, e.args[i])
     }
 
     return namedArgs

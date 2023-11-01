@@ -16,7 +16,7 @@ func main() {
         "my error with '{{ .param1 }}' and '{{ .param2 }}'",
     )
 
-    list = mrerr.NewListWith("fieldPhone", factory.New("123", "567"))
+    list = mrerr.NewList(mrerr.FieldError{Id: "fieldPhone", Err: factory.New("123", "567")})
 
     if list == nil {
         fmt.Println("list is nil")

@@ -3,7 +3,7 @@ module github.com/mondegor/go-sysmess
 go 1.20
 
 require (
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 )
 

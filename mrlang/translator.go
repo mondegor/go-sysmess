@@ -27,16 +27,14 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
         return nil, fmt.Errorf("opt.LangCodes is required")
     }
 
-    langCodes := opt.LangCodes
-
     if opt.DefaultLang == "" {
-        opt.DefaultLang = langCodes[0]
-    } else if !defaultLangInArray(opt.DefaultLang, &langCodes) {
-        return nil, fmt.Errorf("opt.DefaultLang='%s' is not found in opt.LangCodes", opt.DefaultLang)
+        opt.DefaultLang = opt.LangCodes[0]
+    } else if !defaultLangInArray(opt.DefaultLang, opt.LangCodes) {
+        return nil, fmt.Errorf("opt.DefaultLang='%s' not found in opt.LangCodes", opt.DefaultLang)
     }
 
     tr := Translator{
-        langs: make(langMap, 2),
+        langs: make(langMap, 0),
     }
 
     for _, langCode := range opt.LangCodes {
@@ -56,8 +54,8 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
     return &tr, nil
 }
 
-func defaultLangInArray(lang string, langs *[]string) bool {
-    for _, value := range *langs {
+func defaultLangInArray(lang string, langs []string) bool {
+    for _, value := range langs {
         if value == lang {
             return true
         }
@@ -81,10 +79,12 @@ func (t *Translator) FindFirstLocale(langs ...string) *Locale {
 }
 
 func (t *Translator) RegisteredLocales() []*Locale {
-    var locs []*Locale
+    locs := make([]*Locale, len(t.langs))
+    i := 0
 
     for _, locale := range t.langs {
-        locs = append(locs, locale)
+        locs[i] = locale
+        i++
     }
 
     return locs
