@@ -8,11 +8,11 @@ import (
 )
 
 const (
-    ErrorIdInternal = "errInternal"
+    ErrorInternalID = "errInternal"
 
-    ErrorKindInternal ErrorKind = iota // внутренняя ошибка + traceId + call stack
+    ErrorKindInternal ErrorKind = iota // внутренняя ошибка + traceID + call stack
     ErrorKindInternalNotice // внутреннее предупреждение, которое, в некоторых случаях, может стать поводом для реальной ошибки
-    ErrorKindSystem // системная ошибка + traceId + call stack
+    ErrorKindSystem // системная ошибка + traceID + call stack
     ErrorKindUser // пользовательская ошибка
 )
 
@@ -22,7 +22,7 @@ type (
     AppError struct {
         id string
         kind ErrorKind
-        traceId string
+        traceID string
         message string
         argsNames []string
         args []any
@@ -32,7 +32,7 @@ type (
     }
 )
 
-func New(id string, message string, args ...any) *AppError {
+func New(id, message string, args ...any) *AppError {
     newErr := &AppError{
         id: id,
         kind: ErrorKindUser,
@@ -60,7 +60,7 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
     }
 
     argsErrorFactory := AppErrorFactory{
-        id: ErrorIdInternal,
+        id: ErrorInternalID,
         kind: ErrorKindInternal,
         message: fmt.Sprintf(errMessage, e.message),
         callerSkip: callerSkip,
@@ -69,7 +69,7 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
     e.err = argsErrorFactory.new(e.err, nil)
 }
 
-func (e *AppError) Id() string {
+func (e *AppError) ID() string {
     return e.id
 }
 
@@ -77,16 +77,16 @@ func (e *AppError) Kind() ErrorKind {
     return e.kind
 }
 
-func (e *AppError) TraceId() string {
-    return e.traceId
+func (e *AppError) TraceID() string {
+    return e.traceID
 }
 
 func (e *AppError) Error() string {
     var buf strings.Builder
 
-    if e.traceId != "" {
+    if e.traceID != "" {
         buf.WriteByte('[')
-        buf.WriteString(e.traceId)
+        buf.WriteString(e.traceID)
         buf.Write([]byte{']', ' '})
     }
 

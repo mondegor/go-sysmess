@@ -10,7 +10,7 @@ import (
 )
 
 const (
-    traceIdPattern = "ER%s"
+    traceIDPattern = "ER%s"
 )
 
 type (
@@ -29,6 +29,7 @@ func NewFactory(id string, kind ErrorKind, message string) *AppErrorFactory {
         kind: kind,
         message: message,
         argsNames: mrmsg.ParseArgsNames(message),
+        callerSkip: 4, // to parent function
     }
 }
 
@@ -81,9 +82,9 @@ func (e *AppErrorFactory) init(newErr *AppError) {
         appErr, ok := newErr.err.(*AppError)
 
         // raising to the top
-        if ok && appErr.traceId != "" {
-            newErr.traceId = appErr.traceId
-            appErr.traceId = ""
+        if ok && appErr.traceID != "" {
+            newErr.traceID = appErr.traceID
+            appErr.traceID = ""
             return
         }
     }
@@ -92,11 +93,11 @@ func (e *AppErrorFactory) init(newErr *AppError) {
         return
     }
 
-    if newErr.traceId == "" {
-        newErr.traceId = fmt.Sprintf(traceIdPattern, uuid.New().String())
+    if newErr.traceID == "" {
+        newErr.traceID = fmt.Sprintf(traceIDPattern, uuid.New().String())
     }
 
-    _, file, line, ok := runtime.Caller(e.callerSkip + 3)
+    _, file, line, ok := runtime.Caller(e.callerSkip)
 
     if ok {
         if file == "" {

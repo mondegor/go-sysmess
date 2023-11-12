@@ -16,7 +16,7 @@ func main() {
         "my error with '{{ .param1 }}' and '{{ .param2 }}'",
     )
 
-    list = mrerr.NewList(mrerr.FieldError{Id: "fieldPhone", Err: factory.New("123", "567")})
+    list = mrerr.NewList(mrerr.FieldError{ID: "fieldPhone", Err: factory.New("123", "567")})
 
     if list == nil {
         fmt.Println("list is nil")
@@ -30,8 +30,8 @@ func main() {
         return
     }
 
-    fmt.Println(tmp[0].Id)         // field id
-    fmt.Println(tmp[0].Err.Id())   // error id for field
+    fmt.Println(tmp[0].ID)         // field id
+    fmt.Println(tmp[0].Err.ID())   // error id for field
     fmt.Println(tmp[0].Err.Kind()) // 3 - mrerr.ErrorKindUser
     fmt.Println(tmp[0].Err)
 }

@@ -1,12 +1,12 @@
 package mrerr
 
 const (
-    errorIdField = "errMessageForField"
+    fieldErrorID = "errFieldMessage"
 )
 
 type (
     FieldError struct {
-        Id string
+        ID string
         Err *AppError
     }
 )
@@ -16,13 +16,13 @@ func newFieldError(id string, err error) FieldError {
 
     if !ok {
         appArr = New(
-            errorIdField,
+            fieldErrorID,
             err.Error(),
         )
     }
 
     return FieldError{
-        Id: id,
+        ID: id,
         Err: appArr,
     }
 }

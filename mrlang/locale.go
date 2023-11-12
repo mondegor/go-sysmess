@@ -36,7 +36,7 @@ func (l *Locale) LangCode() string {
     return l.langCode
 }
 
-func (l *Locale) TranslateMessage(id string, defaultMessage string, args ...mrmsg.NamedArg) string {
+func (l *Locale) TranslateMessage(id, defaultMessage string, args ...mrmsg.NamedArg) string {
     value, ok := l.messages[id]
 
     if !ok {
@@ -50,7 +50,7 @@ func (l *Locale) TranslateMessage(id string, defaultMessage string, args ...mrms
     return value
 }
 
-func (l *Locale) TranslateError(id string, defaultMessage string, args ...mrmsg.NamedArg) ErrorMessage {
+func (l *Locale) TranslateError(id, defaultMessage string, args ...mrmsg.NamedArg) ErrorMessage {
     value, ok := l.errors[id]
 
     if !ok {
@@ -68,7 +68,7 @@ func (l *Locale) TranslateError(id string, defaultMessage string, args ...mrmsg.
     return value
 }
 
-func newLocale(langCode string, filePath string) (*Locale, error) {
+func newLocale(langCode, filePath string) (*Locale, error) {
     cfg := localeConfig{}
 
     if err := cleanenv.ReadConfig(filePath, &cfg); err != nil {
@@ -87,20 +87,20 @@ func newLocale(langCode string, filePath string) (*Locale, error) {
 }
 
 func checkLocale(filePath string, cfg *localeConfig) error {
-    for messId, value := range cfg.Messages {
+    for messID, value := range cfg.Messages {
         if err := mrmsg.CheckParse(value); err != nil {
-            return fmt.Errorf("message with id '%s' has error '%s' in locale %s", messId, err, filePath)
+            return fmt.Errorf("message with id '%s' has error '%s' in locale %s", messID, err, filePath)
         }
     }
 
-    for errId, value := range cfg.Errors {
+    for errID, value := range cfg.Errors {
         if err := mrmsg.CheckParse(value.Reason); err != nil {
-            return fmt.Errorf("error.Reason with id '%s' has error '%s' in locale %s", errId, err, filePath)
+            return fmt.Errorf("error.Reason with id '%s' has error '%s' in locale %s", errID, err, filePath)
         }
 
         for n, detail := range value.Details {
             if err := mrmsg.CheckParse(detail); err != nil {
-                return fmt.Errorf("error.Details[%d] with id '%s' has error '%s' in locale %s", n, errId, err, filePath)
+                return fmt.Errorf("error.Details[%d] with id '%s' has error '%s' in locale %s", n, errID, err, filePath)
             }
         }
     }

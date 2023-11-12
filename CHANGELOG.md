@@ -1,6 +1,13 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2023-11-12
+### Added
+- Переименованы некоторые переменные и функции (типа Id -> ID) в соответствии с code style языка go;
+
+### Changed
+- Изменён `callerSkip` с 3 на 4, для того чтобы в логах выводить путь к родительской функции, где произошла ошибка;
+
 ## 2023-11-01
 ### Changed
 - Оптимизирована работа с некоторыми структурами данных;
@@ -8,23 +15,19 @@
 
 ## 2023-10-08
 ### Changed
-- В методе mrlang.newLocale обработка ошибок приведена к более компактному виду;
-
-## 2023-09-20
-### Changed
-- Заменены tabs на пробелы в коде;
+- В методе `mrlang.newLocale` обработка ошибок приведена к более компактному виду;
 
 ## 2023-09-16
 ### Changed
-- Заменено *string на string при формировании traceId и пути файла file;
-- Сообщение об ошибке теперь формируется с помощью strings.Builder;  
+- Заменено `*string` на `string` при формировании `traceId` и пути файла `file`;
+- Сообщение об ошибке теперь формируется с помощью `strings.Builder`;  
 
 ## 2023-09-13
 ### Changed
-- Заменено Message -> string, чтобы избежать лишних преобразований;
+- Заменено `Message -> string`, чтобы избежать лишних преобразований;
 
 ### Fixed
-- mrlang.Locale -> *mrlang.Locale)
+- `mrlang.Locale -> *mrlang.Locale`;
 
 ## 2023-09-12
 ### Added
@@ -32,11 +35,11 @@
 
 ### Changed
 - Изменена логика определения языка по умолчанию;
-- TranslatorOptions.LangByDefault -> DefaultLang
+- `TranslatorOptions.LangByDefault` -> `DefaultLang`;
 
 ## 2023-09-11
 ### Fixed
-- Формат глобальных const, type, var приведён к общему виду;
+- Формат глобальных `const`, `type`, `var` приведён к общему виду;
 
 ### Removed
 - Удалены из пакета переменные предопределёнными ошибками;
@@ -44,13 +47,13 @@
 ## 2023-09-10
 ### Changed
 - Обновлены зависимости библиотеки;
-- FactoryDataContainer -> ErrFactoryInternalNoticeDataContainer;
-- FactoryInternal* -> ErrFactoryInternal*;
+- `FactoryDataContainer` -> `ErrFactoryInternalNoticeDataContainer`;
+- `FactoryInternal*` -> `ErrFactoryInternal*`;
 
 ### Fixed
-- Исправлен баг в examples/field/main.go;
+- Исправлен баг в `examples/field/main.go`;
 
 ## 2023-09-03
 ### Changed
-- ErrorId -> string;
-- FieldErrorList -> *FieldErrorList;
+- `ErrorId` -> `string`;
+- `FieldErrorList` -> `*FieldErrorList`;
