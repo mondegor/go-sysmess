@@ -6,7 +6,7 @@ import (
 
 type (
 	ErrorMessage struct {
-		Reason string `yaml:"reason"`
+		Reason  string   `yaml:"reason"`
 		Details []string `yaml:"details"`
 	}
 )

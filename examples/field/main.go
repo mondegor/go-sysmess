@@ -30,7 +30,7 @@ func main() {
 		return
 	}
 
-	fmt.Println(tmp[0].ID)		 // field id
+	fmt.Println(tmp[0].ID)         // field id
 	fmt.Println(tmp[0].Err.ID())   // error id for field
 	fmt.Println(tmp[0].Err.Kind()) // 3 - mrerr.ErrorKindUser
 	fmt.Println(tmp[0].Err)

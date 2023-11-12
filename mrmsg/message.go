@@ -70,7 +70,7 @@ func ParseArgsNames(message string) []string {
 	var argsNames []string
 	var keys map[string]bool
 
-	for ;  ; {
+	for {
 		pos1 := strings.Index(message, leftDelim)
 
 		if pos1 < 0 {
@@ -81,7 +81,7 @@ func ParseArgsNames(message string) []string {
 		pos2 := strings.Index(message, rightDelim)
 
 		// 4 = space + . + char + space
-		if pos2 < 0 + 4 {
+		if pos2 < 0+4 {
 			break
 		}
 

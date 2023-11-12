@@ -12,7 +12,7 @@ var (
 )
 
 func init() {
-   flag.StringVar(&langsDir, "langs-dir", "./examples/translator/langs", "Dir to language files")
+	flag.StringVar(&langsDir, "langs-dir", "./examples/translator/langs", "Dir to language files")
 }
 
 func main() {
@@ -20,9 +20,9 @@ func main() {
 
 	tr, err := mrlang.NewTranslator(
 		mrlang.TranslatorOptions{
-			DirPath: langsDir,
-			FileType: "yaml",
-			LangCodes: []string{"en", "ru"},
+			DirPath:     langsDir,
+			FileType:    "yaml",
+			LangCodes:   []string{"en", "ru"},
 			DefaultLang: "ru",
 		},
 	)

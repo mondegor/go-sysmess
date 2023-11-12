@@ -10,35 +10,35 @@ import (
 const (
 	ErrorInternalID = "errInternal"
 
-	ErrorKindInternal ErrorKind = iota // внутренняя ошибка + traceID + call stack
-	ErrorKindInternalNotice // внутреннее предупреждение, которое, в некоторых случаях, может стать поводом для реальной ошибки
-	ErrorKindSystem // системная ошибка + traceID + call stack
-	ErrorKindUser // пользовательская ошибка
+	ErrorKindInternal       ErrorKind = iota // внутренняя ошибка + traceID + call stack
+	ErrorKindInternalNotice                  // внутреннее предупреждение, которое, в некоторых случаях, может стать поводом для реальной ошибки
+	ErrorKindSystem                          // системная ошибка + traceID + call stack
+	ErrorKindUser                            // пользовательская ошибка
 )
 
 type (
 	ErrorKind int
 
 	AppError struct {
-		id string
-		kind ErrorKind
-		traceID string
-		message string
+		id        string
+		kind      ErrorKind
+		traceID   string
+		message   string
 		argsNames []string
-		args []any
-		err error
-		file string
-		line int
+		args      []any
+		err       error
+		file      string
+		line      int
 	}
 )
 
 func New(id, message string, args ...any) *AppError {
 	newErr := &AppError{
-		id: id,
-		kind: ErrorKindUser,
-		message: message,
+		id:        id,
+		kind:      ErrorKindUser,
+		message:   message,
 		argsNames: mrmsg.ParseArgsNames(message),
-		args: args,
+		args:      args,
 	}
 
 	newErr.setErrorIfArgsNotEqual(1)
@@ -60,9 +60,9 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
 	}
 
 	argsErrorFactory := AppErrorFactory{
-		id: ErrorInternalID,
-		kind: ErrorKindInternal,
-		message: fmt.Sprintf(errMessage, e.message),
+		id:         ErrorInternalID,
+		kind:       ErrorKindInternal,
+		message:    fmt.Sprintf(errMessage, e.message),
 		callerSkip: callerSkip,
 	}
 

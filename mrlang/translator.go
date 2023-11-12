@@ -10,14 +10,14 @@ type (
 	langMap map[string]*Locale
 
 	Translator struct {
-		langs langMap
+		langs         langMap
 		defaultLocale *Locale
 	}
 
 	TranslatorOptions struct {
-		DirPath string
-		FileType string
-		LangCodes []string
+		DirPath     string
+		FileType    string
+		LangCodes   []string
 		DefaultLang string // optional
 	}
 )

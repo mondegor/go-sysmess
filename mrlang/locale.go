@@ -11,12 +11,12 @@ type (
 	Locale struct {
 		langCode string
 		messages map[string]string
-		errors map[string]ErrorMessage
+		errors   map[string]ErrorMessage
 	}
 
 	localeConfig struct {
-		Messages map[string]string `yaml:"messages"`
-		Errors map[string]ErrorMessage `yaml:"errors"`
+		Messages map[string]string       `yaml:"messages"`
+		Errors   map[string]ErrorMessage `yaml:"errors"`
 	}
 )
 
@@ -24,7 +24,7 @@ var (
 	defaultLocale = &Locale{
 		langCode: "default",
 		messages: make(map[string]string, 0),
-		errors: make(map[string]ErrorMessage, 0),
+		errors:   make(map[string]ErrorMessage, 0),
 	}
 )
 
@@ -82,7 +82,7 @@ func newLocale(langCode, filePath string) (*Locale, error) {
 	return &Locale{
 		langCode: langCode,
 		messages: cfg.Messages,
-		errors: cfg.Errors,
+		errors:   cfg.Errors,
 	}, nil
 }
 

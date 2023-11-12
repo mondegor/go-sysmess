@@ -15,30 +15,30 @@ const (
 
 type (
 	AppErrorFactory struct {
-		id string
-		kind ErrorKind
-		message string
-		argsNames []string
+		id         string
+		kind       ErrorKind
+		message    string
+		argsNames  []string
 		callerSkip int
 	}
 )
 
 func NewFactory(id string, kind ErrorKind, message string) *AppErrorFactory {
 	return &AppErrorFactory{
-		id: id,
-		kind: kind,
-		message: message,
-		argsNames: mrmsg.ParseArgsNames(message),
+		id:         id,
+		kind:       kind,
+		message:    message,
+		argsNames:  mrmsg.ParseArgsNames(message),
 		callerSkip: 4, // to parent function
 	}
 }
 
 func (e *AppErrorFactory) Caller(skip int) *AppErrorFactory {
 	return &AppErrorFactory{
-		id: e.id,
-		kind: e.kind,
-		message: e.message,
-		argsNames: e.argsNames,
+		id:         e.id,
+		kind:       e.kind,
+		message:    e.message,
+		argsNames:  e.argsNames,
 		callerSkip: e.callerSkip + skip,
 	}
 }
@@ -62,12 +62,12 @@ func (e *AppErrorFactory) Is(err error) bool {
 
 func (e *AppErrorFactory) new(err error, args []any) *AppError {
 	newErr := &AppError{
-		id: e.id,
-		kind: e.kind,
-		message: e.message,
+		id:        e.id,
+		kind:      e.kind,
+		message:   e.message,
 		argsNames: e.argsNames,
-		args: args,
-		err: err,
+		args:      args,
+		err:       err,
 	}
 
 	e.init(newErr)
