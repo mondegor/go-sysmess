@@ -1,117 +1,117 @@
 package mrerr
 
 import (
-    "fmt"
-    "strings"
+	"fmt"
+	"strings"
 
-    "github.com/mondegor/go-sysmess/mrmsg"
+	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 const (
-    ErrorInternalID = "errInternal"
+	ErrorInternalID = "errInternal"
 
-    ErrorKindInternal ErrorKind = iota // внутренняя ошибка + traceID + call stack
-    ErrorKindInternalNotice // внутреннее предупреждение, которое, в некоторых случаях, может стать поводом для реальной ошибки
-    ErrorKindSystem // системная ошибка + traceID + call stack
-    ErrorKindUser // пользовательская ошибка
+	ErrorKindInternal ErrorKind = iota // внутренняя ошибка + traceID + call stack
+	ErrorKindInternalNotice // внутреннее предупреждение, которое, в некоторых случаях, может стать поводом для реальной ошибки
+	ErrorKindSystem // системная ошибка + traceID + call stack
+	ErrorKindUser // пользовательская ошибка
 )
 
 type (
-    ErrorKind int
+	ErrorKind int
 
-    AppError struct {
-        id string
-        kind ErrorKind
-        traceID string
-        message string
-        argsNames []string
-        args []any
-        err error
-        file string
-        line int
-    }
+	AppError struct {
+		id string
+		kind ErrorKind
+		traceID string
+		message string
+		argsNames []string
+		args []any
+		err error
+		file string
+		line int
+	}
 )
 
 func New(id, message string, args ...any) *AppError {
-    newErr := &AppError{
-        id: id,
-        kind: ErrorKindUser,
-        message: message,
-        argsNames: mrmsg.ParseArgsNames(message),
-        args: args,
-    }
+	newErr := &AppError{
+		id: id,
+		kind: ErrorKindUser,
+		message: message,
+		argsNames: mrmsg.ParseArgsNames(message),
+		args: args,
+	}
 
-    newErr.setErrorIfArgsNotEqual(1)
+	newErr.setErrorIfArgsNotEqual(1)
 
-    return newErr
+	return newErr
 }
 
 func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
-    if len(e.argsNames) == len(e.args) {
-        return
-    }
+	if len(e.argsNames) == len(e.args) {
+		return
+	}
 
-    var errMessage string
+	var errMessage string
 
-    if len(e.argsNames) > len(e.args) {
-        errMessage = "not enough arguments in message '%s'"
-    } else {
-        errMessage = "too many arguments in message '%s'"
-    }
+	if len(e.argsNames) > len(e.args) {
+		errMessage = "not enough arguments in message '%s'"
+	} else {
+		errMessage = "too many arguments in message '%s'"
+	}
 
-    argsErrorFactory := AppErrorFactory{
-        id: ErrorInternalID,
-        kind: ErrorKindInternal,
-        message: fmt.Sprintf(errMessage, e.message),
-        callerSkip: callerSkip,
-    }
+	argsErrorFactory := AppErrorFactory{
+		id: ErrorInternalID,
+		kind: ErrorKindInternal,
+		message: fmt.Sprintf(errMessage, e.message),
+		callerSkip: callerSkip,
+	}
 
-    e.err = argsErrorFactory.new(e.err, nil)
+	e.err = argsErrorFactory.new(e.err, nil)
 }
 
 func (e *AppError) ID() string {
-    return e.id
+	return e.id
 }
 
 func (e *AppError) Kind() ErrorKind {
-    return e.kind
+	return e.kind
 }
 
 func (e *AppError) TraceID() string {
-    return e.traceID
+	return e.traceID
 }
 
 func (e *AppError) Error() string {
-    var buf strings.Builder
+	var buf strings.Builder
 
-    if e.traceID != "" {
-        buf.WriteByte('[')
-        buf.WriteString(e.traceID)
-        buf.Write([]byte{']', ' '})
-    }
+	if e.traceID != "" {
+		buf.WriteByte('[')
+		buf.WriteString(e.traceID)
+		buf.Write([]byte{']', ' '})
+	}
 
-    buf.Write(e.renderMessage())
+	buf.Write(e.renderMessage())
 
-    if e.file != "" {
-        buf.WriteString(fmt.Sprintf(" in %s:%d", e.file, e.line))
-    }
+	if e.file != "" {
+		buf.WriteString(fmt.Sprintf(" in %s:%d", e.file, e.line))
+	}
 
-    if e.err != nil {
-        buf.Write([]byte{';', ' '})
-        buf.WriteString(e.err.Error())
-    }
+	if e.err != nil {
+		buf.Write([]byte{';', ' '})
+		buf.WriteString(e.err.Error())
+	}
 
-    return buf.String()
+	return buf.String()
 }
 
 func (e *AppError) Is(err error) bool {
-    if v, ok := err.(*AppError); ok && e.id == v.id {
-        return true
-    }
+	if v, ok := err.(*AppError); ok && e.id == v.id {
+		return true
+	}
 
-    return false
+	return false
 }
 
 func (e *AppError) Unwrap() error {
-    return e.err
+	return e.err
 }

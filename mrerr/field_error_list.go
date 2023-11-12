@@ -3,27 +3,27 @@ package mrerr
 import "fmt"
 
 type (
-    FieldErrorList []FieldError
+	FieldErrorList []FieldError
 )
 
 func NewList(items ...FieldError) *FieldErrorList {
-    list := &FieldErrorList{}
+	list := &FieldErrorList{}
 
-    if len(items) > 0 {
-        *list = append(*list, items...)
-    }
+	if len(items) > 0 {
+		*list = append(*list, items...)
+	}
 
-    return list
+	return list
 }
 
 func NewListWith(fieldID string, err error) *FieldErrorList {
-    return &FieldErrorList{newFieldError(fieldID, err)}
+	return &FieldErrorList{newFieldError(fieldID, err)}
 }
 
 func (e *FieldErrorList) Add(fieldID string, err error) {
-    *e = append(*e, newFieldError(fieldID, err))
+	*e = append(*e, newFieldError(fieldID, err))
 }
 
 func (e *FieldErrorList) Error() string {
-    return fmt.Sprintf("%v", *e)
+	return fmt.Sprintf("%v", *e)
 }
