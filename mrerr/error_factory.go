@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	traceIDPattern = "ER%s"
+	traceIDPrefix = "ER"
 )
 
 type (
@@ -94,7 +94,7 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 	}
 
 	if newErr.traceID == "" {
-		newErr.traceID = fmt.Sprintf(traceIDPattern, uuid.New().String())
+		newErr.traceID = traceIDPrefix + uuid.New().String()
 	}
 
 	_, file, line, ok := runtime.Caller(e.callerSkip)

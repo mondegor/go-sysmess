@@ -1,29 +1,28 @@
 package mrerr
 
-import "fmt"
-
-type (
-	FieldErrorList []FieldError
+import (
+	"strings"
 )
 
-func NewList(items ...FieldError) *FieldErrorList {
-	list := &FieldErrorList{}
+type (
+	FieldErrorList []*FieldError
+)
 
-	if len(items) > 0 {
-		*list = append(*list, items...)
+func (l *FieldErrorList) Add(fieldID string, err error) {
+	*l = append(*l, NewFieldError(fieldID, err))
+}
+
+func (l *FieldErrorList) AddAppErr(fieldID string, err *AppError) {
+	*l = append(*l, NewFieldErrorAppErr(fieldID, err))
+}
+
+func (l FieldErrorList) Error() string {
+	var buf strings.Builder
+
+	for i := 0; i < len(l); i++ {
+		buf.WriteString(l[i].Error())
+		buf.WriteString("\n")
 	}
 
-	return list
-}
-
-func NewListWith(fieldID string, err error) *FieldErrorList {
-	return &FieldErrorList{newFieldError(fieldID, err)}
-}
-
-func (e *FieldErrorList) Add(fieldID string, err error) {
-	*e = append(*e, newFieldError(fieldID, err))
-}
-
-func (e *FieldErrorList) Error() string {
-	return fmt.Sprintf("%v", *e)
+	return strings.TrimSpace(buf.String())
 }

@@ -1,17 +1,24 @@
 package mrerr
 
+import "fmt"
+
 const (
-	fieldErrorID = "errFieldMessage"
+	fieldErrorID           = "errFieldMessage"
+	fieldErrorUnknownError = "unknown error (err = nil)"
 )
 
 type (
 	FieldError struct {
-		ID  string
-		Err *AppError
+		id  string
+		err *AppError
 	}
 )
 
-func newFieldError(id string, err error) FieldError {
+func NewFieldError(id string, err error) *FieldError {
+	if err == nil {
+		return NewFieldMessage(id, fieldErrorUnknownError)
+	}
+
 	appArr, ok := err.(*AppError)
 
 	if !ok {
@@ -21,8 +28,45 @@ func newFieldError(id string, err error) FieldError {
 		)
 	}
 
-	return FieldError{
-		ID:  id,
-		Err: appArr,
+	return &FieldError{
+		id:  id,
+		err: appArr,
 	}
+}
+
+func NewFieldErrorAppErr(id string, err *AppError) *FieldError {
+	if err == nil {
+		return NewFieldMessage(id, fieldErrorUnknownError)
+	}
+
+	return &FieldError{
+		id:  id,
+		err: err,
+	}
+}
+
+func NewFieldMessage(id string, message string) *FieldError {
+	return &FieldError{
+		id: id,
+		err: New(
+			fieldErrorID,
+			message,
+		),
+	}
+}
+
+func (e *FieldError) ID() string {
+	return e.id
+}
+
+func (e *FieldError) Kind() ErrorKind {
+	return e.err.kind
+}
+
+func (e *FieldError) AppError() *AppError {
+	return e.err
+}
+
+func (e *FieldError) Error() string {
+	return fmt.Sprintf("%s: %s", e.id, e.err.Error())
 }
