@@ -3,8 +3,7 @@ package mrerr
 import "fmt"
 
 const (
-	fieldErrorID           = "errFieldMessage"
-	fieldErrorUnknownError = "unknown error (err = nil)"
+	fieldErrorIDPrefix = "field_err"
 )
 
 type (
@@ -16,14 +15,14 @@ type (
 
 func NewFieldError(id string, err error) *FieldError {
 	if err == nil {
-		return NewFieldMessage(id, fieldErrorUnknownError)
+		return NewFieldErrorMessage(id, "err is nil")
 	}
 
 	appArr, ok := err.(*AppError)
 
 	if !ok {
 		appArr = New(
-			fieldErrorID,
+			fieldErrorIDPrefix+"_"+id,
 			err.Error(),
 		)
 	}
@@ -34,9 +33,9 @@ func NewFieldError(id string, err error) *FieldError {
 	}
 }
 
-func NewFieldErrorAppErr(id string, err *AppError) *FieldError {
+func NewFieldErrorAppError(id string, err *AppError) *FieldError {
 	if err == nil {
-		return NewFieldMessage(id, fieldErrorUnknownError)
+		return NewFieldErrorMessage(id, "appErr is nil")
 	}
 
 	return &FieldError{
@@ -45,11 +44,11 @@ func NewFieldErrorAppErr(id string, err *AppError) *FieldError {
 	}
 }
 
-func NewFieldMessage(id string, message string) *FieldError {
+func NewFieldErrorMessage(id string, message string) *FieldError {
 	return &FieldError{
 		id: id,
 		err: New(
-			fieldErrorID,
+			fieldErrorIDPrefix+"_"+id,
 			message,
 		),
 	}
@@ -59,14 +58,10 @@ func (e *FieldError) ID() string {
 	return e.id
 }
 
-func (e *FieldError) Kind() ErrorKind {
-	return e.err.kind
-}
-
 func (e *FieldError) AppError() *AppError {
 	return e.err
 }
 
 func (e *FieldError) Error() string {
-	return fmt.Sprintf("%s: %s", e.id, e.err.Error())
+	return fmt.Sprintf("fieldId=%s; err={%s}", e.id, e.err.Error())
 }

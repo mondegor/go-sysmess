@@ -2,10 +2,7 @@ module github.com/mondegor/go-sysmess
 
 go 1.20
 
-require (
-	github.com/google/uuid v1.4.0
-	github.com/ilyakaznacheev/cleanenv v1.5.0
-)
+require github.com/ilyakaznacheev/cleanenv v1.5.0
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect

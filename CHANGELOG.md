@@ -1,13 +1,23 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2023-12-03
+### Changed
+- Генерация ID ошибки реализована на стандартных библиотеках и вынесена в отдельный метод `generateErrorID`;
+- Метод `NewFieldMessage` переименован в `NewFieldErrorMessage` и в нём изменилась логика формирования id ошибки; 
+- Переименован метод `FieldErrorList.AddAppErr` -> `AddAppError`;
+- ErrorKind вынесен в отдельный файл и добавлен метод String() к нему;
+
+### Removed
+- Удалён метод `FieldError.Kind()`;
+
 ## 2023-11-19
 ### Changed
 - Переработан механизм работы с пользовательскими ошибками, которые привязываются к конкретным полям объектов:
-    - Для FieldError добавлены методы: NewFieldError, NewFieldErrorAppErr, NewFieldMessage;
-    - У FieldErrorList удалены методы NewList и NewListWith (теперь необходимо пользоваться методами у FieldError), добавлен метод AddAppErr;
+    - Для `FieldError` добавлены методы: `NewFieldError`, `NewFieldErrorAppErr`, `NewFieldMessage`;
+    - У `FieldErrorList` удалены методы `NewList` и `NewListWith` (теперь необходимо пользоваться методами у `FieldError`), добавлен метод `AddAppErr`;
     - Обновлён пример работы с такими ошибками;
-- В некоторых местах оптимизирована конкатенация строк (Sprintf заменён на нативный "+");
+- В некоторых местах оптимизирована конкатенация строк (`Sprintf` заменён на нативный "+");
 - Обновлён `.editorconfig`;
 
 ## 2023-11-12

@@ -9,16 +9,9 @@ import (
 
 const (
 	ErrorInternalID = "errInternal"
-
-	ErrorKindInternal       ErrorKind = iota // внутренняя ошибка + traceID + call stack
-	ErrorKindInternalNotice                  // внутреннее предупреждение, которое, в некоторых случаях, может стать поводом для реальной ошибки
-	ErrorKindSystem                          // системная ошибка + traceID + call stack
-	ErrorKindUser                            // пользовательская ошибка
 )
 
 type (
-	ErrorKind int
-
 	AppError struct {
 		id        string
 		kind      ErrorKind
@@ -89,6 +82,9 @@ func (e *AppError) Error() string {
 		buf.WriteString(e.traceID)
 		buf.Write([]byte{']', ' '})
 	}
+
+	// buf.WriteString(e.id)
+	// buf.Write([]byte{':', ' '})
 
 	buf.Write(e.renderMessage())
 

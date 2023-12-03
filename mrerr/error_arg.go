@@ -12,7 +12,7 @@ func (a Arg) String() string {
 	var buf []byte
 	firstItem := true
 
-	buf = append(buf, '[')
+	buf = append(buf, '{')
 
 	for key, value := range a {
 		if firstItem {
@@ -26,7 +26,7 @@ func (a Arg) String() string {
 		buf = append(buf, fmt.Sprintf("%v", value)...)
 	}
 
-	buf = append(buf, ']')
+	buf = append(buf, '}')
 
 	return string(buf)
 }

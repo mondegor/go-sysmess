@@ -1,16 +1,15 @@
 package mrerr
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"runtime"
+	"strconv"
+	"time"
 
-	"github.com/google/uuid"
 	"github.com/mondegor/go-sysmess/mrmsg"
-)
-
-const (
-	traceIDPrefix = "ER"
 )
 
 type (
@@ -94,7 +93,7 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 	}
 
 	if newErr.traceID == "" {
-		newErr.traceID = traceIDPrefix + uuid.New().String()
+		newErr.traceID = e.generateErrorID()
 	}
 
 	_, file, line, ok := runtime.Caller(e.callerSkip)
@@ -107,4 +106,16 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 		newErr.file = file
 		newErr.line = line
 	}
+}
+
+// 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f
+func (e *AppErrorFactory) generateErrorID() string {
+	value := make([]byte, 4)
+	_, err := rand.Read(value)
+
+	if err != nil {
+		value = []byte{0x0, 0xee, 0xee, 0x0}
+	}
+
+	return strconv.FormatInt(time.Now().Unix(), 16) + "-" + hex.EncodeToString(value)
 }
