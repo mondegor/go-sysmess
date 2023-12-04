@@ -9,6 +9,7 @@ import (
 
 const (
 	ErrorInternalID = "errInternal"
+	ErrorSystemID   = "errSystem"
 )
 
 type (

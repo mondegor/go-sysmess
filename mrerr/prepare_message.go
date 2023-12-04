@@ -8,7 +8,13 @@ import (
 // Translate - translate error message for user
 func (e *AppError) Translate(locale *mrlang.Locale) mrlang.ErrorMessage {
 	if e.kind == ErrorKindInternal || e.kind == ErrorKindInternalNotice {
-		return locale.TranslateError(ErrorInternalID, ErrorInternalID)
+		if !locale.CheckErrorID(e.id) {
+			return locale.TranslateError(ErrorInternalID, ErrorInternalID)
+		}
+	} else if e.kind == ErrorKindSystem {
+		if !locale.CheckErrorID(e.id) {
+			return locale.TranslateError(ErrorSystemID, ErrorSystemID)
+		}
 	}
 
 	return locale.TranslateError(e.id, e.message, e.getNamedArgs()...)

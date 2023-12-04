@@ -50,6 +50,12 @@ func (l *Locale) TranslateMessage(id, defaultMessage string, args ...mrmsg.Named
 	return value
 }
 
+func (l *Locale) CheckErrorID(id string) bool {
+	_, ok := l.errors[id]
+
+	return ok
+}
+
 func (l *Locale) TranslateError(id, defaultMessage string, args ...mrmsg.NamedArg) ErrorMessage {
 	value, ok := l.errors[id]
 

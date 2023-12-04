@@ -93,7 +93,7 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 	}
 
 	if newErr.traceID == "" {
-		newErr.traceID = e.generateErrorID()
+		newErr.traceID = e.generateTraceID()
 	}
 
 	_, file, line, ok := runtime.Caller(e.callerSkip)
@@ -109,7 +109,7 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 }
 
 // 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f
-func (e *AppErrorFactory) generateErrorID() string {
+func (e *AppErrorFactory) generateTraceID() string {
 	value := make([]byte, 4)
 	_, err := rand.Read(value)
 
