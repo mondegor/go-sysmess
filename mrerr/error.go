@@ -2,6 +2,7 @@ package mrerr
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/mondegor/go-sysmess/mrmsg"
@@ -21,8 +22,12 @@ type (
 		argsNames []string
 		args      []any
 		err       error
-		file      string
-		line      int
+		callStack []callFile
+	}
+
+	callFile struct {
+		file string
+		line int
 	}
 )
 
@@ -89,8 +94,18 @@ func (e *AppError) Error() string {
 
 	buf.Write(e.renderMessage())
 
-	if e.file != "" {
-		buf.WriteString(fmt.Sprintf(" in %s:%d", e.file, e.line))
+	if len(e.callStack) > 0 {
+		buf.WriteString(" in ")
+
+		for i := range e.callStack {
+			if i > 0 {
+				buf.Write([]byte{' ', '<', '-', ' '})
+			}
+
+			buf.WriteString(e.callStack[i].file)
+			buf.WriteByte(':')
+			buf.WriteString(strconv.Itoa(e.callStack[i].line))
+		}
 	}
 
 	if e.err != nil {

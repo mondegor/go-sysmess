@@ -28,7 +28,7 @@ func NewFactory(id string, kind ErrorKind, message string) *AppErrorFactory {
 		kind:       kind,
 		message:    message,
 		argsNames:  mrmsg.ParseArgsNames(message),
-		callerSkip: 4, // to parent function
+		callerSkip: 3, // skip: New, new, init
 	}
 }
 
@@ -52,6 +52,10 @@ func (e *AppErrorFactory) Wrap(err error, args ...any) *AppError {
 	}
 
 	return e.new(err, args)
+}
+
+func (e *AppErrorFactory) ErrorID() string {
+	return e.id
 }
 
 // Is - see: AppError::Is
@@ -96,15 +100,31 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 		newErr.traceID = e.generateTraceID()
 	}
 
-	_, file, line, ok := runtime.Caller(e.callerSkip)
+	for i := 0; i < callStackOptions.Deep; i++ {
+		_, file, line, ok := runtime.Caller(e.callerSkip + i)
 
-	if ok {
+		if !ok {
+			break
+		}
+
 		if file == "" {
 			file = "???"
 		}
 
-		newErr.file = file
-		newErr.line = line
+		newErr.callStack = append(newErr.callStack, callFile{file, line})
+	}
+
+	if callStackOptions.UseShortPath {
+		pattern := callStackOptions.RootPath
+
+		for i := range newErr.callStack {
+			if pattern == "" {
+				pattern = newErr.callStack[i].file
+				continue
+			}
+
+			newErr.callStack[i].file = shortFileName(pattern, newErr.callStack[i].file)
+		}
 	}
 }
 

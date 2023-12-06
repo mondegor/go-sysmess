@@ -21,10 +21,10 @@ func main() {
 		mrerr.NewFieldErrorAppError("fieldPhone", factory.New("123", "567")),
 	}
 
-	list.AddAppError("field2", factory.New("p1-22", "p2-22"))
-	list.Add("field3", factory.New("p1-33", "p2-33"))
-	list.Add("field4", factory.New("p1-44", "p2-44"))
-	list.Add("field5", nil)
+	list = append(list, mrerr.NewFieldErrorAppError("field2", factory.New("p1-22", "p2-22")))
+	list = append(list, mrerr.NewFieldError("field3", factory.New("p1-33", "p2-33")))
+	list = append(list, mrerr.NewFieldError("field4", factory.New("p1-44", "p2-44")))
+	list = append(list, mrerr.NewFieldError("field5", nil))
 
 	addSomeItems(&list)
 
@@ -47,8 +47,8 @@ func addSomeItems(list *mrerr.FieldErrorList) {
 		"my error with '{{ .param1 }}'",
 	)
 
-	list.AddAppError("field6", factory.New("p6-56"))
-	list.Add("field7", factory.New("p7-77"))
-	list.Add("field8", factory.New("p8-88"))
-	list.AddAppError("field9", nil)
+	*list = append(*list, mrerr.NewFieldErrorAppError("field6", factory.New("p6-56")))
+	*list = append(*list, mrerr.NewFieldError("field7", factory.New("p7-77")))
+	*list = append(*list, mrerr.NewFieldError("field8", factory.New("p8-88")))
+	*list = append(*list, mrerr.NewFieldErrorAppError("field9", nil))
 }
