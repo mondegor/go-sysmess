@@ -22,12 +22,7 @@ type (
 		argsNames []string
 		args      []any
 		err       error
-		callStack []callFile
-	}
-
-	callFile struct {
-		file string
-		line int
+		callStack []CallStackRow
 	}
 )
 
@@ -102,9 +97,9 @@ func (e *AppError) Error() string {
 				buf.Write([]byte{' ', '<', '-', ' '})
 			}
 
-			buf.WriteString(e.callStack[i].file)
+			buf.WriteString(e.callStack[i].File)
 			buf.WriteByte(':')
-			buf.WriteString(strconv.Itoa(e.callStack[i].line))
+			buf.WriteString(strconv.Itoa(e.callStack[i].Line))
 		}
 	}
 

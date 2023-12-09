@@ -32,7 +32,10 @@ func (e *AppError) getNamedArgs() []mrmsg.NamedArg {
 	namedArgs := make([]mrmsg.NamedArg, len(e.argsNames))
 
 	for i, argName := range e.argsNames {
-		namedArgs[i] = mrmsg.NewArg(argName, e.args[i])
+		namedArgs[i] = mrmsg.NamedArg{
+			Name:  argName,
+			Value: e.args[i],
+		}
 	}
 
 	return namedArgs

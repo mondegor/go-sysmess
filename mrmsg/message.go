@@ -40,7 +40,7 @@ func render(message string, args []NamedArg) (string, error) {
 	data := make(map[string]string, len(args))
 
 	for _, item := range args {
-		data[item.name] = item.valueString()
+		data[item.Name] = item.valueString()
 	}
 
 	var msg bytes.Buffer

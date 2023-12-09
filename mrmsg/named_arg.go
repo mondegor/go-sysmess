@@ -7,20 +7,13 @@ import (
 
 type (
 	NamedArg struct {
-		name  string
-		value any
+		Name  string
+		Value any
 	}
 )
 
-func NewArg(name string, value any) NamedArg {
-	return NamedArg{
-		name:  name,
-		value: value,
-	}
-}
-
-func (n *NamedArg) valueString() string {
-	switch val := n.value.(type) {
+func (a *NamedArg) valueString() string {
+	switch val := a.Value.(type) {
 	case string:
 		return val
 

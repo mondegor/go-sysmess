@@ -1,20 +1,20 @@
-package mrerr
+package mrmsg
 
 import (
 	"fmt"
 )
 
 type (
-	Arg map[string]any
+	Data map[string]any
 )
 
-func (a Arg) String() string {
+func (d Data) String() string {
 	var buf []byte
 	firstItem := true
 
 	buf = append(buf, '{')
 
-	for key, value := range a {
+	for key, value := range d {
 		if firstItem {
 			firstItem = false
 		} else {

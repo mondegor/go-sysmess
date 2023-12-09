@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"runtime"
 	"strconv"
 	"time"
 
@@ -33,13 +32,14 @@ func NewFactory(id string, kind ErrorKind, message string) *AppErrorFactory {
 }
 
 func (e *AppErrorFactory) Caller(skip int) *AppErrorFactory {
-	return &AppErrorFactory{
-		id:         e.id,
-		kind:       e.kind,
-		message:    e.message,
-		argsNames:  e.argsNames,
-		callerSkip: e.callerSkip + skip,
+	if skip == 0 {
+		return e
 	}
+
+	c := *e
+	c.callerSkip += skip
+
+	return &c
 }
 
 func (e *AppErrorFactory) New(args ...any) *AppError {
@@ -100,32 +100,7 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 		newErr.traceID = e.generateTraceID()
 	}
 
-	for i := 0; i < callStackOptions.Deep; i++ {
-		_, file, line, ok := runtime.Caller(e.callerSkip + i)
-
-		if !ok {
-			break
-		}
-
-		if file == "" {
-			file = "???"
-		}
-
-		newErr.callStack = append(newErr.callStack, callFile{file, line})
-	}
-
-	if callStackOptions.UseShortPath {
-		pattern := callStackOptions.RootPath
-
-		for i := range newErr.callStack {
-			if pattern == "" {
-				pattern = newErr.callStack[i].file
-				continue
-			}
-
-			newErr.callStack[i].file = shortFileName(pattern, newErr.callStack[i].file)
-		}
-	}
+	newErr.callStack = caller.CallStack(e.callerSkip)
 }
 
 // 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f

@@ -1,6 +1,15 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2023-12-09
+### Changed
+- Перенесён `mrerr.Arg` -> `mrmsg.Data`;
+- Доработана логика копирования объекта в `AppErrorFactory.Caller`;
+- `CallStack` заменён на `Caller`, который теперь сам формирует `CallStack` и может использоваться независимо;
+
+### Removed
+- Удалён mrmsg.NewArg;
+
 ## 2023-12-06
 ### Added
 - Добавлен метод `AppErrorFactory.ErrorID()`, который возвращает идентификатор типа ошибки;
