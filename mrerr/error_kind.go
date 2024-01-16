@@ -8,7 +8,7 @@ const (
 )
 
 type (
-	ErrorKind int
+	ErrorKind int8
 )
 
 func (k ErrorKind) String() string {

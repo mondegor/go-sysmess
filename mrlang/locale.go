@@ -3,18 +3,19 @@ package mrlang
 import (
 	"fmt"
 
-	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 type (
 	Locale struct {
+		langID   int32
 		langCode string
 		messages map[string]string
 		errors   map[string]ErrorMessage
 	}
 
 	localeConfig struct {
+		LangID   int32                   `yaml:"lang_id"`
 		Messages map[string]string       `yaml:"messages"`
 		Errors   map[string]ErrorMessage `yaml:"errors"`
 	}
@@ -22,6 +23,7 @@ type (
 
 var (
 	defaultLocale = &Locale{
+		langID:   0,
 		langCode: "default",
 		messages: make(map[string]string, 0),
 		errors:   make(map[string]ErrorMessage, 0),
@@ -30,6 +32,10 @@ var (
 
 func DefaultLocale() *Locale {
 	return defaultLocale
+}
+
+func (l *Locale) LangID() int32 {
+	return l.langID
 }
 
 func (l *Locale) LangCode() string {
@@ -77,8 +83,8 @@ func (l *Locale) TranslateError(id, defaultMessage string, args ...mrmsg.NamedAr
 func newLocale(langCode, filePath string) (*Locale, error) {
 	cfg := localeConfig{}
 
-	if err := cleanenv.ReadConfig(filePath, &cfg); err != nil {
-		return nil, fmt.Errorf("while reading locale '%s', error '%s' occurred", filePath, err)
+	if err := parseFile(filePath, &cfg); err != nil {
+		return nil, fmt.Errorf("error parsing locale file '%s': %w", filePath, err)
 	}
 
 	if err := checkLocale(filePath, &cfg); err != nil {
@@ -86,6 +92,7 @@ func newLocale(langCode, filePath string) (*Locale, error) {
 	}
 
 	return &Locale{
+		langID:   cfg.LangID,
 		langCode: langCode,
 		messages: cfg.Messages,
 		errors:   cfg.Errors,
@@ -93,6 +100,10 @@ func newLocale(langCode, filePath string) (*Locale, error) {
 }
 
 func checkLocale(filePath string, cfg *localeConfig) error {
+	if cfg.LangID <= 0 {
+		return fmt.Errorf("lang_id cannot be '%d' in locale %s", cfg.LangID, filePath)
+	}
+
 	for messID, value := range cfg.Messages {
 		if err := mrmsg.CheckParse(value); err != nil {
 			return fmt.Errorf("message with id '%s' has error '%s' in locale %s", messID, err, filePath)

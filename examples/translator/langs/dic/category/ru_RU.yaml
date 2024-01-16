@@ -1,0 +1,15 @@
+---
+1:
+  name: 1-name (ru_RU)
+  prop2: 1-prop2 (ru_RU)
+  prop3: 1-prop3 (ru_RU)
+
+2:
+  name: 2-name (ru_RU)
+  prop2: 2-prop2 (ru_RU)
+  prop3: 2-prop3 (ru_RU)
+
+keyString:
+  name: keyString-name (ru_RU)
+  prop2: keyString-prop2 (ru_RU)
+  prop3: keyString-prop3 (ru_RU)

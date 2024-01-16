@@ -1,6 +1,13 @@
 package mrerr
 
-import "runtime"
+import (
+	"runtime"
+	"strings"
+)
+
+const (
+	callerStackBreak = "src/runtime/proc.go"
+)
 
 type (
 	Caller struct {
@@ -9,27 +16,22 @@ type (
 		rootPath     string
 	}
 
-	CallerOptions struct {
-		Deep         int
-		UseShortPath bool
-		RootPath     string
-	}
-
 	CallStackRow struct {
 		File string
 		Line int
 	}
 )
 
-func NewCaller(opt CallerOptions) *Caller {
-	if opt.Deep < 0 {
-		opt.Deep = 0
-	}
+func NewCaller(opts ...CallerOption) *Caller {
+	c := &Caller{}
+	c.applyOptions(opts)
 
-	return &Caller{
-		deep:         opt.Deep,
-		useShortPath: opt.UseShortPath,
-		rootPath:     opt.RootPath,
+	return c
+}
+
+func (c *Caller) applyOptions(opts []CallerOption) {
+	for _, f := range opts {
+		f(c)
 	}
 }
 
@@ -39,7 +41,7 @@ func (c *Caller) CallStack(skip int) []CallStackRow {
 	for i := 0; i < c.deep; i++ {
 		_, file, line, ok := runtime.Caller(skip + i + 1)
 
-		if !ok {
+		if !ok || strings.HasSuffix(file, callerStackBreak) {
 			break
 		}
 

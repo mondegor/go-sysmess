@@ -1,9 +1,0 @@
----
-messages:
-  msgExample: Message example (en)
-
-errors:
-  errInternal:
-    reason: Internal server error (en)
-    details:
-      - Contact support in telegram (en)

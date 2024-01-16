@@ -22,7 +22,22 @@ func ParseAcceptLanguage(s string) []string {
 		var langs []string
 		var keys map[string]bool
 
-		for _, lang := range strings.Split(strings.ToLower(s), ",") {
+		addLang := func(lang string) bool {
+			if keys == nil {
+				keys = make(map[string]bool, 1)
+			} else {
+				if _, ok := keys[lang]; ok {
+					return false
+				}
+			}
+
+			langs = append(langs, lang)
+			keys[lang] = true
+
+			return true
+		}
+
+		for _, lang := range strings.Split(s, ",") {
 			if index := strings.Index(lang, ";"); index >= 0 {
 				lang = lang[:index]
 			}
@@ -33,16 +48,13 @@ func ParseAcceptLanguage(s string) []string {
 				continue
 			}
 
-			if keys == nil {
-				keys = make(map[string]bool, 1)
+			if len(lang) > 2 {
+				addLang(lang[0:2] + "_" + lang[3:]) // ru-RU -> ru_RU
 			} else {
-				if _, ok := keys[lang]; ok {
-					continue
+				if addLang(lang) {
+					addLang(lang + "_" + strings.ToUpper(lang))
 				}
 			}
-
-			langs = append(langs, lang)
-			keys[lang] = true
 		}
 
 		if len(langs) > 0 {

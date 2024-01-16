@@ -2,13 +2,12 @@ package mrerr
 
 var (
 	caller = NewCaller(
-		CallerOptions{
-			Deep:         2,
-			UseShortPath: true,
-		})
+		CallerDeep(2),
+		CallerUseShortPath(true),
+	)
 )
 
 // SetCallerOptions - WARNING: use only when starting the main process
-func SetCallerOptions(opt CallerOptions) {
-	caller = NewCaller(opt)
+func SetCallerOptions(opts ...CallerOption) {
+	caller = NewCaller(opts...)
 }

@@ -20,10 +20,11 @@ func main() {
 
 	tr, err := mrlang.NewTranslator(
 		mrlang.TranslatorOptions{
-			DirPath:     langsDir,
-			FileType:    "yaml",
-			LangCodes:   []string{"en", "ru"},
-			DefaultLang: "ru",
+			DirPath:           langsDir,
+			LangCodes:         []string{"en_EN", "ru_RU"},
+			DefaultLang:       "ru_RU",
+			DictionaryDirPath: langsDir + "/dic",
+			Dictionaries:      []string{"category"},
 		},
 	)
 
@@ -35,14 +36,31 @@ func main() {
 	defaultLoc := tr.DefaultLocale()
 	fmt.Printf("DefaultLoc: %s\n", defaultLoc.LangCode())
 
-	for _, locale := range tr.RegisteredLocales() {
-		fmt.Printf("LangCode: %s\n", locale.LangCode())
+	for _, localeCode := range tr.RegisteredLocales() {
+		locale, _ := tr.LocaleByCode(localeCode)
+		fmt.Printf("LangCode: %s\n", localeCode)
 
-		locTest := tr.FindFirstLocale(locale.LangCode())
+		locTest := tr.FindFirstLocale(localeCode)
 
-		fmt.Println(locTest.LangCode())
+		fmt.Printf("ID=%d, code=%s\n", locale.LangID(), localeCode)
 		fmt.Println(locTest.TranslateMessage("msgExample", "Default message for msgExample"))
 		fmt.Println(locTest.TranslateError("errInternal", "Default error message for errInternal"))
+
+		for _, dicName := range tr.RegisteredDictionaries() {
+			mdict, _ := tr.Dictionary(dicName)
+			fmt.Printf("dictionary=%s\n", mdict.Name())
+
+			dict, _ := mdict.ByLangCode(localeCode)
+
+			for _, itemID := range dict.RegisteredItems() {
+				fmt.Printf("  - ID=%s\n", itemID)
+				dictItem := dict.ItemByKey(itemID)
+
+				for _, attrName := range dictItem.RegisteredAttrs() {
+					fmt.Printf("    - attr=%s, value=%s\n", attrName, dictItem.Attr(attrName, "UNKNOWN"))
+				}
+			}
+		}
 	}
 
 	// fr - not found
