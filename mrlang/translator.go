@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	locByIDsMap   map[int32]*Locale
+	locByIDsMap   map[uint16]*Locale
 	locByCodesMap map[string]*Locale
 
 	Translator struct {
@@ -124,7 +124,7 @@ func (t *Translator) FindFirstLocale(langs ...string) *Locale {
 	return t.defaultLocale
 }
 
-func (t *Translator) LocaleByID(langID int32) (*Locale, error) {
+func (t *Translator) LocaleByID(langID uint16) (*Locale, error) {
 	if locale, ok := t.locByIDs[langID]; ok {
 		return locale, nil
 	}

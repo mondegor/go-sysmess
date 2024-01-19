@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	dicByLangIDsMap   map[int32]*Dictionary
+	dicByLangIDsMap   map[uint16]*Dictionary
 	dicByLangCodesMap map[string]*Dictionary
 
 	MultiLangDictionary struct {
@@ -19,7 +19,7 @@ func (d *MultiLangDictionary) Name() string {
 	return d.name
 }
 
-func (d *MultiLangDictionary) ByLangID(id int32) (*Dictionary, error) {
+func (d *MultiLangDictionary) ByLangID(id uint16) (*Dictionary, error) {
 	if dict, ok := d.dicByLangIDs[id]; ok {
 		return dict, nil
 	}

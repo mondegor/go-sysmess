@@ -8,14 +8,14 @@ import (
 
 type (
 	Locale struct {
-		langID   int32
+		langID   uint16
 		langCode string
 		messages map[string]string
 		errors   map[string]ErrorMessage
 	}
 
 	localeConfig struct {
-		LangID   int32                   `yaml:"lang_id"`
+		LangID   uint16                   `yaml:"lang_id"`
 		Messages map[string]string       `yaml:"messages"`
 		Errors   map[string]ErrorMessage `yaml:"errors"`
 	}
@@ -34,7 +34,7 @@ func DefaultLocale() *Locale {
 	return defaultLocale
 }
 
-func (l *Locale) LangID() int32 {
+func (l *Locale) LangID() uint16 {
 	return l.langID
 }
 
