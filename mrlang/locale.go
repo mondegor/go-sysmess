@@ -15,7 +15,7 @@ type (
 	}
 
 	localeConfig struct {
-		LangID   uint16                   `yaml:"lang_id"`
+		LangID   uint16                  `yaml:"lang_id"`
 		Messages map[string]string       `yaml:"messages"`
 		Errors   map[string]ErrorMessage `yaml:"errors"`
 	}
