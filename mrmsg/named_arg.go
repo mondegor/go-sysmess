@@ -12,7 +12,7 @@ type (
 	}
 )
 
-func (a *NamedArg) valueString() string {
+func (a *NamedArg) ValueString() string {
 	switch val := a.Value.(type) {
 	case string:
 		return val

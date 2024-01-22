@@ -2,8 +2,18 @@
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
 ## 2024-01-22
+### Added
+- Добавлен метод `AppErrorFactory.WithAttr` для прикрепления доп. информации к ошибке;
+
 ### Changed
-- Внесены небольшие исправления;
+- Переименовано:
+  - `FieldError` -> `CustomError`;
+  - `FieldErrorList` -> `CustomErrorList`;
+  - `AppError.ID()` -> `Code()`;
+  - `AppErrorFactory.ErrorID()` -> `Code()`;
+  - `Locale.CheckErrorID` -> `CheckError`;
+  - `NamedArg.valueString` -> `ValueString`;
+- Добавлен интерфейс `mrmsg.ErrorTranslator` чтобы избавиться от зависимости пакета `mrlang`;
 
 ## 2024-01-19
 ### Changed

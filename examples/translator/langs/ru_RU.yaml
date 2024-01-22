@@ -2,10 +2,10 @@
 lang_id: 2
 
 messages:
-  msgExample: Message example (ru_RU)
+  msgExample: Message example (ru-RU)
 
 errors:
   errInternal:
-    reason: Internal server error (ru_RU)
+    reason: Internal server error (ru-RU)
     details:
-      - Contact support in telegram (ru_RU)
+      - Contact support in telegram (ru-RU)

@@ -9,26 +9,27 @@ import (
 )
 
 const (
-	ErrorInternalID = "errInternal"
-	ErrorSystemID   = "errSystem"
+	ErrorCodeInternal = "errInternal"
+	ErrorCodeSystem   = "errSystem"
 )
 
 type (
 	AppError struct {
-		id        string
+		code      string
 		kind      ErrorKind
 		traceID   string
 		message   string
 		argsNames []string
 		args      []any
+		attrs     []mrmsg.NamedArg
 		err       error
 		callStack []CallStackRow
 	}
 )
 
-func New(id, message string, args ...any) *AppError {
+func New(code, message string, args ...any) *AppError {
 	newErr := &AppError{
-		id:        id,
+		code:      code,
 		kind:      ErrorKindUser,
 		message:   message,
 		argsNames: mrmsg.ParseArgsNames(message),
@@ -54,7 +55,7 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
 	}
 
 	argsErrorFactory := AppErrorFactory{
-		id:         ErrorInternalID,
+		code:       ErrorCodeInternal,
 		kind:       ErrorKindInternal,
 		message:    fmt.Sprintf(errMessage, e.message),
 		callerSkip: callerSkip,
@@ -63,8 +64,8 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
 	e.err = argsErrorFactory.new(e.err, nil)
 }
 
-func (e *AppError) ID() string {
-	return e.id
+func (e *AppError) Code() string {
+	return e.code
 }
 
 func (e *AppError) Kind() ErrorKind {
@@ -84,10 +85,26 @@ func (e *AppError) Error() string {
 		buf.Write([]byte{']', ' '})
 	}
 
-	// buf.WriteString(e.id)
+	// buf.WriteString(e.code)
 	// buf.Write([]byte{':', ' '})
 
 	buf.Write(e.renderMessage())
+
+	if len(e.attrs) > 0 {
+		buf.Write([]byte{' ', '('})
+
+		for i, attr := range e.attrs {
+			if i > 0 {
+				buf.Write([]byte{',', ' '})
+			}
+
+			buf.WriteString(attr.Name)
+			buf.Write([]byte{':', ' '})
+			buf.WriteString(attr.ValueString())
+		}
+
+		buf.WriteByte(')')
+	}
 
 	if len(e.callStack) > 0 {
 		buf.WriteString(" in ")
@@ -112,7 +129,7 @@ func (e *AppError) Error() string {
 }
 
 func (e *AppError) Is(err error) bool {
-	if v, ok := err.(*AppError); ok && e.id == v.id {
+	if v, ok := err.(*AppError); ok && e.code == v.code {
 		return true
 	}
 

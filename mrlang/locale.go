@@ -11,13 +11,13 @@ type (
 		langID   uint16
 		langCode string
 		messages map[string]string
-		errors   map[string]ErrorMessage
+		errors   map[string]mrmsg.ErrorMessage
 	}
 
 	localeConfig struct {
-		LangID   uint16                  `yaml:"lang_id"`
-		Messages map[string]string       `yaml:"messages"`
-		Errors   map[string]ErrorMessage `yaml:"errors"`
+		LangID   uint16                        `yaml:"lang_id"`
+		Messages map[string]string             `yaml:"messages"` // code -> message
+		Errors   map[string]mrmsg.ErrorMessage `yaml:"errors"`   // code -> {reason, []details}
 	}
 )
 
@@ -26,7 +26,7 @@ var (
 		langID:   0,
 		langCode: "default",
 		messages: make(map[string]string, 0),
-		errors:   make(map[string]ErrorMessage, 0),
+		errors:   make(map[string]mrmsg.ErrorMessage, 0),
 	}
 )
 
@@ -42,8 +42,8 @@ func (l *Locale) LangCode() string {
 	return l.langCode
 }
 
-func (l *Locale) TranslateMessage(id, defaultMessage string, args ...mrmsg.NamedArg) string {
-	value, ok := l.messages[id]
+func (l *Locale) TranslateMessage(code, defaultMessage string, args ...mrmsg.NamedArg) string {
+	value, ok := l.messages[code]
 
 	if !ok {
 		value = defaultMessage
@@ -56,17 +56,17 @@ func (l *Locale) TranslateMessage(id, defaultMessage string, args ...mrmsg.Named
 	return value
 }
 
-func (l *Locale) CheckErrorID(id string) bool {
-	_, ok := l.errors[id]
+func (l *Locale) CheckError(code string) bool {
+	_, ok := l.errors[code]
 
 	return ok
 }
 
-func (l *Locale) TranslateError(id, defaultMessage string, args ...mrmsg.NamedArg) ErrorMessage {
-	value, ok := l.errors[id]
+func (l *Locale) TranslateError(code, defaultMessage string, args ...mrmsg.NamedArg) mrmsg.ErrorMessage {
+	value, ok := l.errors[code]
 
 	if !ok {
-		value = ErrorMessage{Reason: defaultMessage}
+		value = mrmsg.ErrorMessage{Reason: defaultMessage}
 	}
 
 	if len(args) > 0 {
@@ -104,20 +104,20 @@ func checkLocale(filePath string, cfg *localeConfig) error {
 		return fmt.Errorf("lang_id cannot be '%d' in locale %s", cfg.LangID, filePath)
 	}
 
-	for messID, value := range cfg.Messages {
+	for messCode, value := range cfg.Messages {
 		if err := mrmsg.CheckParse(value); err != nil {
-			return fmt.Errorf("message with id '%s' has error '%s' in locale %s", messID, err, filePath)
+			return fmt.Errorf("message with code '%s' has error '%s' in locale %s", messCode, err, filePath)
 		}
 	}
 
-	for errID, value := range cfg.Errors {
+	for errCode, value := range cfg.Errors {
 		if err := mrmsg.CheckParse(value.Reason); err != nil {
-			return fmt.Errorf("error.Reason with id '%s' has error '%s' in locale %s", errID, err, filePath)
+			return fmt.Errorf("error.Reason with code '%s' has error '%s' in locale %s", errCode, err, filePath)
 		}
 
 		for n, detail := range value.Details {
 			if err := mrmsg.CheckParse(detail); err != nil {
-				return fmt.Errorf("error.Details[%d] with id '%s' has error '%s' in locale %s", n, errID, err, filePath)
+				return fmt.Errorf("error.Details[%d] with code '%s' has error '%s' in locale %s", n, errCode, err, filePath)
 			}
 		}
 	}

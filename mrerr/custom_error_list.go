@@ -5,10 +5,10 @@ import (
 )
 
 type (
-	FieldErrorList []*FieldError
+	CustomErrorList []*CustomError
 )
 
-func (l FieldErrorList) Error() string {
+func (l CustomErrorList) Error() string {
 	var buf strings.Builder
 
 	for i := 0; i < len(l); i++ {

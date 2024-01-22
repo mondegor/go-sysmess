@@ -11,19 +11,24 @@ import (
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
+const (
+	attrNameByDefault = "unnamed"
+)
+
 type (
 	AppErrorFactory struct {
-		id         string
+		code       string
 		kind       ErrorKind
 		message    string
 		argsNames  []string
+		attrs      []mrmsg.NamedArg
 		callerSkip int
 	}
 )
 
-func NewFactory(id string, kind ErrorKind, message string) *AppErrorFactory {
+func NewFactory(code string, kind ErrorKind, message string) *AppErrorFactory {
 	return &AppErrorFactory{
-		id:         id,
+		code:       code,
 		kind:       kind,
 		message:    message,
 		argsNames:  mrmsg.ParseArgsNames(message),
@@ -42,6 +47,23 @@ func (e *AppErrorFactory) Caller(skip int) *AppErrorFactory {
 	return &c
 }
 
+func (e *AppErrorFactory) WithAttr(name string, value any) *AppErrorFactory {
+	if name == "" {
+		name = attrNameByDefault
+	}
+
+	c := *e
+	c.attrs = append(
+		c.attrs,
+		mrmsg.NamedArg{
+			Name:  name,
+			Value: value,
+		},
+	)
+
+	return &c
+}
+
 func (e *AppErrorFactory) New(args ...any) *AppError {
 	return e.new(nil, args)
 }
@@ -54,22 +76,23 @@ func (e *AppErrorFactory) Wrap(err error, args ...any) *AppError {
 	return e.new(err, args)
 }
 
-func (e *AppErrorFactory) ErrorID() string {
-	return e.id
+func (e *AppErrorFactory) Code() string {
+	return e.code
 }
 
 // Is - see: AppError::Is
 func (e *AppErrorFactory) Is(err error) bool {
-	return errors.Is(err, &AppError{id: e.id})
+	return errors.Is(err, &AppError{code: e.code})
 }
 
 func (e *AppErrorFactory) new(err error, args []any) *AppError {
 	newErr := &AppError{
-		id:        e.id,
+		code:      e.code,
 		kind:      e.kind,
 		message:   e.message,
 		argsNames: e.argsNames,
 		args:      args,
+		attrs:     e.attrs,
 		err:       err,
 	}
 

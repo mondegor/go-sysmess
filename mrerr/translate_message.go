@@ -1,23 +1,22 @@
 package mrerr
 
 import (
-	"github.com/mondegor/go-sysmess/mrlang"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 // Translate - translate error message for user
-func (e *AppError) Translate(locale *mrlang.Locale) mrlang.ErrorMessage {
+func (e *AppError) Translate(t mrmsg.ErrorTranslator) mrmsg.ErrorMessage {
 	if e.kind == ErrorKindInternal || e.kind == ErrorKindInternalNotice {
-		if !locale.CheckErrorID(e.id) {
-			return locale.TranslateError(ErrorInternalID, ErrorInternalID)
+		if !t.CheckError(e.code) {
+			return t.TranslateError(ErrorCodeInternal, ErrorCodeInternal)
 		}
 	} else if e.kind == ErrorKindSystem {
-		if !locale.CheckErrorID(e.id) {
-			return locale.TranslateError(ErrorSystemID, ErrorSystemID)
+		if !t.CheckError(e.code) {
+			return t.TranslateError(ErrorCodeSystem, ErrorCodeSystem)
 		}
 	}
 
-	return locale.TranslateError(e.id, e.message, e.getNamedArgs()...)
+	return t.TranslateError(e.code, e.message, e.getNamedArgs()...)
 }
 
 func (e *AppError) renderMessage() []byte {

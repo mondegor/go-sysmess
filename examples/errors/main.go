@@ -19,7 +19,7 @@ func main() {
 
 	fmt.Println(err)
 	fmt.Println(err.TraceID())
-	fmt.Println(err.ID())
+	fmt.Println(err.Code())
 	fmt.Println(err.Kind()) // 0 - mrerr.ErrorKindInternal
 
 	err = createErrLevel2()

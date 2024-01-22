@@ -1,15 +1,15 @@
 ---
 1:
-  name: 1-name (en_EN)
-  prop2: 1-prop2 (en_EN)
-  prop3: 1-prop3 (en_EN)
+  name: 1-name (en-EN)
+  prop2: 1-prop2 (en-EN)
+  prop3: 1-prop3 (en-EN)
 
 2:
-  name: 2-name (en_EN)
-  prop2: 2-prop2 (en_EN)
-  prop3: 2-prop3 (en_EN)
+  name: 2-name (en-EN)
+  prop2: 2-prop2 (en-EN)
+  prop3: 2-prop3 (en-EN)
 
 keyString:
-  name: keyString-name (en_EN)
-  prop2: keyString-prop2 (en_EN)
-  prop3: keyString-prop3 (en_EN)
+  name: keyString-name (en-EN)
+  prop2: keyString-prop2 (en-EN)
+  prop3: keyString-prop3 (en-EN)
