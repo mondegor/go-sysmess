@@ -46,7 +46,7 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
 			return nil, fmt.Errorf("duplicate locale '%s' detected", langCode)
 		}
 
-		locale, err := newLocale(langCode, filePath(opt.DirPath, langCode))
+		locale, err := newLocale(langCode, getFilePath(opt.DirPath, langCode))
 
 		if err != nil {
 			return nil, err
@@ -82,7 +82,7 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
 
 		for _, langCode := range opt.LangCodes {
 			dict, err := newDictionary(
-				filePath(opt.DictionaryDirPath, dicName+"/"+langCode),
+				getFilePath(opt.DictionaryDirPath, dicName+"/"+langCode),
 			)
 
 			if err != nil {

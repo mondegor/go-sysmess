@@ -23,7 +23,7 @@ func parseFile(path string, data any) error {
 	return yaml.NewDecoder(f).Decode(data)
 }
 
-func filePath(dirPath, name string) string {
-	// dir/lang.ext, ./translate/en.yaml, ./translate/dic/category/en.yaml
+func getFilePath(dirPath, name string) string {
+	// dir/lang.ext: ./translate/en_EN.yaml, ./translate/dic/category/en_EN.yaml
 	return strings.TrimRight(dirPath, "/") + "/" + strings.Trim(name, "/") + "." + langFileType
 }
