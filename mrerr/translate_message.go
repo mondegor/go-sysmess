@@ -6,13 +6,15 @@ import (
 
 // Translate - translate error message for user
 func (e *AppError) Translate(t mrmsg.ErrorTranslator) mrmsg.ErrorMessage {
-	if e.kind == ErrorKindInternal || e.kind == ErrorKindInternalNotice {
-		if !t.CheckError(e.code) {
-			return t.TranslateError(ErrorCodeInternal, ErrorCodeInternal)
-		}
-	} else if e.kind == ErrorKindSystem {
-		if !t.CheckError(e.code) {
-			return t.TranslateError(ErrorCodeSystem, ErrorCodeSystem)
+	if e.kind == ErrorKindInternal || e.kind == ErrorKindInternalNotice || e.kind == ErrorKindSystem {
+		if !t.HasErrorCode(e.code) {
+			code := ErrorCodeInternal
+
+			if e.kind == ErrorKindSystem {
+				code = ErrorCodeSystem
+			}
+
+			return t.TranslateError(code, code)
 		}
 	}
 

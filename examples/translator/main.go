@@ -33,9 +33,6 @@ func main() {
 		return
 	}
 
-	defaultLoc := tr.DefaultLocale()
-	fmt.Printf("DefaultLoc: %s\n", defaultLoc.LangCode())
-
 	for _, localeCode := range tr.RegisteredLocales() {
 		locale, _ := tr.LocaleByCode(localeCode)
 		fmt.Printf("LangCode: %s\n", localeCode)

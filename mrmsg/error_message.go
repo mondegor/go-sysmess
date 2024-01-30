@@ -4,7 +4,7 @@ import "strings"
 
 type (
 	ErrorTranslator interface {
-		CheckError(code string) bool
+		HasErrorCode(code string) bool
 		TranslateError(code, defaultMessage string, args ...NamedArg) ErrorMessage
 	}
 

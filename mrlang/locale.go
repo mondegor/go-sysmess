@@ -1,6 +1,7 @@
 package mrlang
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrmsg"
@@ -22,17 +23,13 @@ type (
 )
 
 var (
-	defaultLocale = &Locale{
+	stubLocale = &Locale{
 		langID:   0,
-		langCode: "default",
+		langCode: "stub-locale",
 		messages: make(map[string]string, 0),
 		errors:   make(map[string]mrmsg.ErrorMessage, 0),
 	}
 )
-
-func DefaultLocale() *Locale {
-	return defaultLocale
-}
 
 func (l *Locale) LangID() uint16 {
 	return l.langID
@@ -40,6 +37,10 @@ func (l *Locale) LangID() uint16 {
 
 func (l *Locale) LangCode() string {
 	return l.langCode
+}
+
+func (l *Locale) WithContext(ctx context.Context) context.Context {
+	return WithContext(ctx, l)
 }
 
 func (l *Locale) TranslateMessage(code, defaultMessage string, args ...mrmsg.NamedArg) string {
@@ -56,7 +57,7 @@ func (l *Locale) TranslateMessage(code, defaultMessage string, args ...mrmsg.Nam
 	return value
 }
 
-func (l *Locale) CheckError(code string) bool {
+func (l *Locale) HasErrorCode(code string) bool {
 	_, ok := l.errors[code]
 
 	return ok

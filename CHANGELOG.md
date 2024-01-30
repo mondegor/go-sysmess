@@ -1,6 +1,16 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-01-30
+### Added
+- добавлены: `mrlang.WithContext()`, `mrlang.Ctx()`, `mrlang.Locale.WithContext()`;
+
+### Changed
+- переименован `mrmsg.ErrorTranslator.CheckError()` -> `HasErrorCode()`;
+
+### Removed
+- удалён `mrlang.DefaultLocale()` (необходимо использовать `mrlang.Translator.DefaultLocale()`);
+
 ## 2024-01-22
 ### Added
 - Добавлен метод `AppErrorFactory.WithAttr` для прикрепления доп. информации к ошибке;
