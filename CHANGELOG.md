@@ -1,15 +1,19 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-02-05
+### Changed
+- Добавлены в ошибку `error parsing dictionary file` подробности о причинах её возникновения;
+
 ## 2024-01-30
 ### Added
-- добавлены: `mrlang.WithContext()`, `mrlang.Ctx()`, `mrlang.Locale.WithContext()`;
+- Добавлены: `mrlang.WithContext()`, `mrlang.Ctx()`, `mrlang.Locale.WithContext()`;
 
 ### Changed
-- переименован `mrmsg.ErrorTranslator.CheckError()` -> `HasErrorCode()`;
+- Переименован `mrmsg.ErrorTranslator.CheckError()` -> `HasErrorCode()`;
 
 ### Removed
-- удалён `mrlang.DefaultLocale()` (необходимо использовать `mrlang.Translator.DefaultLocale()`);
+- Удалён `mrlang.DefaultLocale()` (необходимо использовать `mrlang.Translator.DefaultLocale()`);
 
 ## 2024-01-22
 ### Added

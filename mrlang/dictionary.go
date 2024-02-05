@@ -17,7 +17,7 @@ func newDictionary(filePath string) (*Dictionary, error) {
 	data := make(DictionaryMap, 0)
 
 	if err := parseFile(filePath, &data); err != nil {
-		return nil, fmt.Errorf("error parsing dictionary file '%s': %w", filePath, err)
+		return nil, fmt.Errorf("error parsing dictionary file '%s': %w (see registered dicts: config.yaml:translation/dictionaries/list)", filePath, err)
 	}
 
 	return &Dictionary{
