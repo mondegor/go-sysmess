@@ -1,6 +1,10 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-03-14
+### Changed
+- В функции `mrlang.NewTranslator` переименован параметр `opt` -> `opts`;
+
 ## 2024-02-05
 ### Changed
 - Добавлены в ошибку `error parsing dictionary file` подробности о причинах её возникновения;

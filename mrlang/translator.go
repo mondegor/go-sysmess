@@ -24,15 +24,15 @@ type (
 	}
 )
 
-func NewTranslator(opt TranslatorOptions) (*Translator, error) {
-	if len(opt.LangCodes) == 0 {
-		return nil, fmt.Errorf("opt.LangCodes is required")
+func NewTranslator(opts TranslatorOptions) (*Translator, error) {
+	if len(opts.LangCodes) == 0 {
+		return nil, fmt.Errorf("opts.LangCodes is required")
 	}
 
-	if opt.DefaultLang == "" {
-		opt.DefaultLang = opt.LangCodes[0]
-	} else if !defaultLangInArray(opt.DefaultLang, opt.LangCodes) {
-		return nil, fmt.Errorf("opt.DefaultLang='%s' not found in opt.LangCodes", opt.DefaultLang)
+	if opts.DefaultLang == "" {
+		opts.DefaultLang = opts.LangCodes[0]
+	} else if !defaultLangInArray(opts.DefaultLang, opts.LangCodes) {
+		return nil, fmt.Errorf("opts.DefaultLang='%s' not found in opts.LangCodes", opts.DefaultLang)
 	}
 
 	tr := Translator{
@@ -41,12 +41,12 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
 		dictionaries: make(map[string]*MultiLangDictionary, 0),
 	}
 
-	for _, langCode := range opt.LangCodes {
+	for _, langCode := range opts.LangCodes {
 		if _, ok := tr.locByCodes[langCode]; ok {
 			return nil, fmt.Errorf("duplicate locale '%s' detected", langCode)
 		}
 
-		locale, err := newLocale(langCode, getFilePath(opt.DirPath, langCode))
+		locale, err := newLocale(langCode, getFilePath(opts.DirPath, langCode))
 
 		if err != nil {
 			return nil, err
@@ -64,12 +64,12 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
 		tr.locByIDs[locale.LangID()] = locale
 		tr.locByCodes[langCode] = locale
 
-		if opt.DefaultLang == langCode {
+		if opts.DefaultLang == langCode {
 			tr.defaultLocale = locale
 		}
 	}
 
-	for _, dicName := range opt.Dictionaries {
+	for _, dicName := range opts.Dictionaries {
 		if _, ok := tr.dictionaries[dicName]; ok {
 			return nil, fmt.Errorf("duplicate dictionary '%s' detected", dicName)
 		}
@@ -80,9 +80,9 @@ func NewTranslator(opt TranslatorOptions) (*Translator, error) {
 			dicByLangCodes: make(dicByLangCodesMap, 0),
 		}
 
-		for _, langCode := range opt.LangCodes {
+		for _, langCode := range opts.LangCodes {
 			dict, err := newDictionary(
-				getFilePath(opt.DictionaryDirPath, dicName+"/"+langCode),
+				getFilePath(opts.DictionaryDirPath, dicName+"/"+langCode),
 			)
 
 			if err != nil {
