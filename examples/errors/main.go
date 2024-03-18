@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	FactoryError = mrerr.NewFactory(
+	FactoryError = mrerr.NewFactoryWithCaller(
 		"errMyErrorWithParams",
 		mrerr.ErrorKindInternal,
 		"my error with '{{ .param1 }}' and '{{ .param2 }}'",
@@ -18,11 +18,14 @@ func main() {
 	err := createErr()
 
 	fmt.Println(err)
-	fmt.Println(err.TraceID())
-	fmt.Println(err.Code())
-	fmt.Println(err.Kind()) // 0 - mrerr.ErrorKindInternal
+	fmt.Println("trace ID = " + err.TraceID())
+	fmt.Println("Code = " + err.Code())
+	fmt.Println("Kind = " + err.Kind().String()) // 0 - mrerr.ErrorKindInternal
 
 	err = createErrLevel2()
+	fmt.Println(err)
+
+	err = createErrDisabledCaller()
 	fmt.Println(err)
 }
 
@@ -30,10 +33,14 @@ func createErr() *mrerr.AppError {
 	return FactoryError.New("my-param1", 123456)
 }
 
-func createErr2() *mrerr.AppError {
-	return FactoryError.Caller(1).New("my-param2", 555555)
-}
-
 func createErrLevel2() *mrerr.AppError {
 	return createErr2()
+}
+
+func createErr2() *mrerr.AppError {
+	return FactoryError.WithCaller(2).New("my-param2", "with Caller 2")
+}
+
+func createErrDisabledCaller() *mrerr.AppError {
+	return FactoryError.DisableCaller().New("my-param3", "with DisabledCaller")
 }

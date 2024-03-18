@@ -17,32 +17,49 @@ const (
 
 type (
 	AppErrorFactory struct {
-		code       string
-		kind       ErrorKind
-		message    string
-		argsNames  []string
-		attrs      []mrmsg.NamedArg
-		callerSkip int
+		code            string
+		kind            ErrorKind
+		message         string
+		argsNames       []string
+		attrs           []mrmsg.NamedArg
+		withCaller      bool
+		callerSkipFrame int
 	}
 )
 
 func NewFactory(code string, kind ErrorKind, message string) *AppErrorFactory {
+	return newFactory(code, kind, message, false)
+}
+
+func NewFactoryWithCaller(code string, kind ErrorKind, message string) *AppErrorFactory {
+	return newFactory(code, kind, message, true)
+}
+
+func newFactory(code string, kind ErrorKind, message string, withCaller bool) *AppErrorFactory {
 	return &AppErrorFactory{
-		code:       code,
-		kind:       kind,
-		message:    message,
-		argsNames:  mrmsg.ParseArgsNames(message),
-		callerSkip: 3, // skip: New, new, init
+		code:            code,
+		kind:            kind,
+		message:         message,
+		argsNames:       mrmsg.ParseArgsNames(message),
+		withCaller:      withCaller,
+		callerSkipFrame: 3, // skip AppError: init + new + New
 	}
 }
 
-func (e *AppErrorFactory) Caller(skip int) *AppErrorFactory {
-	if skip == 0 {
-		return e
+func (e *AppErrorFactory) WithCaller(skipFrame ...int) *AppErrorFactory {
+	c := *e
+	c.withCaller = true
+
+	if len(skipFrame) > 0 {
+		c.callerSkipFrame += skipFrame[0]
 	}
 
+	return &c
+}
+
+func (e *AppErrorFactory) DisableCaller() *AppErrorFactory {
 	c := *e
-	c.callerSkip += skip
+	c.withCaller = false
 
 	return &c
 }
@@ -115,15 +132,10 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 		}
 	}
 
-	if e.kind != ErrorKindInternal && e.kind != ErrorKindSystem {
-		return
-	}
-
-	if newErr.traceID == "" {
+	if e.withCaller {
 		newErr.traceID = e.generateTraceID()
+		newErr.callStack = caller.CallStack(e.callerSkipFrame)
 	}
-
-	newErr.callStack = caller.CallStack(e.callerSkip)
 }
 
 // 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f

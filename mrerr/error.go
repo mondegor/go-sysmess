@@ -41,7 +41,7 @@ func New(code, message string, args ...any) *AppError {
 	return newErr
 }
 
-func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
+func (e *AppError) setErrorIfArgsNotEqual(callerSkipFrame int) {
 	if len(e.argsNames) == len(e.args) {
 		return
 	}
@@ -55,10 +55,10 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkip int) {
 	}
 
 	argsErrorFactory := AppErrorFactory{
-		code:       ErrorCodeInternal,
-		kind:       ErrorKindInternal,
-		message:    fmt.Sprintf(errMessage, e.message),
-		callerSkip: callerSkip,
+		code:            ErrorCodeInternal,
+		kind:            ErrorKindInternal,
+		message:         fmt.Sprintf(errMessage, e.message),
+		callerSkipFrame: callerSkipFrame,
 	}
 
 	e.err = argsErrorFactory.new(e.err, nil)
@@ -74,6 +74,11 @@ func (e *AppError) Kind() ErrorKind {
 
 func (e *AppError) TraceID() string {
 	return e.traceID
+}
+
+// HasCallStack - including wrapped errors
+func (e *AppError) HasCallStack() bool {
+	return e.traceID != ""
 }
 
 func (e *AppError) Error() string {
@@ -111,7 +116,7 @@ func (e *AppError) Error() string {
 
 		for i := range e.callStack {
 			if i > 0 {
-				buf.Write([]byte{' ', '<', '-', ' '})
+				buf.Write([]byte{' ', ',', ' '})
 			}
 
 			buf.WriteString(e.callStack[i].File)
