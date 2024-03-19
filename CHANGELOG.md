@@ -4,17 +4,18 @@
 ## 2024-03-18
 ### Changed
 - Переработан механизм формирования `CallStack`:
-  - теперь он не зависит от типа ошибки, а включается с помощью конструктора `mrerr.NewFactoryWithCaller`;
-  - переименован метод `AppErrorFactory.Caller` -> `WithCaller`, который теперь принудительно включает
-    формирование `CallStack`, а также добавлен метод `DisableCaller()` для принудительного его отключения;
-  - удалена константа `ErrorKindInternalNotice`, вместо неё достаточно использовать `ErrorKindInternal` вместе
-    с `mrerr.NewFactory`, который не формирует по умолчанию `CallStack`;
-  - для `AppError` добавлен метод `HasCallStack()`, который возвращает, был сформирован для самой ошибки или
-    для одной из её вложенных ошибок `CallStack`;
+    - теперь он не зависит от типа ошибки, а включается с помощью конструктора `mrerr.NewFactoryWithCaller`;
+    - переименован метод `AppErrorFactory.Caller -> WithCaller`, который теперь принудительно включает
+      формирование `CallStack`, а также добавлен метод `DisableCaller()` для принудительного его отключения;
+    - удалена константа `ErrorKindInternalNotice`, вместо неё достаточно использовать `ErrorKindInternal` вместе
+      с `mrerr.NewFactory`, который не формирует по умолчанию `CallStack`;
+    - для `AppError` добавлен метод `HasCallStack()`, который возвращает, был сформирован для самой ошибки или
+      для одной из её вложенных ошибок `CallStack`;
+- Поправлено форматирование документации;
 
 ## 2024-03-14
 ### Changed
-- В функции `mrlang.NewTranslator` переименован параметр `opt` -> `opts`;
+- В функции `mrlang.NewTranslator` переименован параметр `opt -> opts`;
 
 ## 2024-02-05
 ### Changed
@@ -25,7 +26,7 @@
 - Добавлены: `mrlang.WithContext()`, `mrlang.Ctx()`, `mrlang.Locale.WithContext()`;
 
 ### Changed
-- Переименован `mrmsg.ErrorTranslator.CheckError()` -> `HasErrorCode()`;
+- Переименован `mrmsg.ErrorTranslator.CheckError() -> HasErrorCode()`;
 
 ### Removed
 - Удалён `mrlang.DefaultLocale()` (необходимо использовать `mrlang.Translator.DefaultLocale()`);
@@ -36,12 +37,12 @@
 
 ### Changed
 - Переименовано:
-  - `FieldError` -> `CustomError`;
-  - `FieldErrorList` -> `CustomErrorList`;
-  - `AppError.ID()` -> `Code()`;
-  - `AppErrorFactory.ErrorID()` -> `Code()`;
-  - `Locale.CheckErrorID` -> `CheckError`;
-  - `NamedArg.valueString` -> `ValueString`;
+    - `FieldError -> CustomError`;
+    - `FieldErrorList -> CustomErrorList`;
+    - `AppError.ID() -> Code()`;
+    - `AppErrorFactory.ErrorID() -> Code()`;
+    - `Locale.CheckErrorID -> CheckError`;
+    - `NamedArg.valueString -> ValueString`;
 - Добавлен интерфейс `mrmsg.ErrorTranslator` чтобы избавиться от зависимости пакета `mrlang`;
 
 ## 2024-01-19
@@ -60,7 +61,7 @@
 
 ## 2023-12-09
 ### Changed
-- Перенесён `mrerr.Arg` -> `mrmsg.Data`;
+- Перенесён `mrerr.Arg -> mrmsg.Data`;
 - Доработана логика копирования объекта в `AppErrorFactory.Caller`;
 - `CallStack` заменён на `Caller`, который теперь сам формирует `CallStack` и может использоваться независимо;
 
@@ -88,7 +89,7 @@
 ### Changed
 - Генерация ID ошибки реализована на стандартных библиотеках и вынесена в отдельный метод `generateTraceID`;
 - Метод `NewFieldMessage` переименован в `NewFieldErrorMessage` и в нём изменилась логика формирования id ошибки; 
-- Переименован метод `FieldErrorList.AddAppErr` -> `AddAppError`;
+- Переименован метод `FieldErrorList.AddAppErr -> AddAppError`;
 - ErrorKind вынесен в отдельный файл и добавлен метод String() к нему;
 
 ### Removed
@@ -97,9 +98,9 @@
 ## 2023-11-19
 ### Changed
 - Переработан механизм работы с пользовательскими ошибками, которые привязываются к конкретным полям объектов:
-    - Для `FieldError` добавлены методы: `NewFieldError`, `NewFieldErrorAppErr`, `NewFieldMessage`;
-    - У `FieldErrorList` удалены методы `NewList` и `NewListWith` (теперь необходимо пользоваться методами у `FieldError`), добавлен метод `AddAppErr`;
-    - Обновлён пример работы с такими ошибками;
+    - для `FieldError` добавлены методы: `NewFieldError`, `NewFieldErrorAppErr`, `NewFieldMessage`;
+    - у `FieldErrorList` удалены методы `NewList` и `NewListWith` (теперь необходимо пользоваться методами у `FieldError`), добавлен метод `AddAppErr`;
+    - обновлён пример работы с такими ошибками;
 - В некоторых местах оптимизирована конкатенация строк (`Sprintf` заменён на нативный "+");
 - Обновлён `.editorconfig`;
 
@@ -136,7 +137,7 @@
 
 ### Changed
 - Изменена логика определения языка по умолчанию;
-- `TranslatorOptions.LangByDefault` -> `DefaultLang`;
+- `TranslatorOptions.LangByDefault -> DefaultLang`;
 
 ## 2023-09-11
 ### Fixed
@@ -148,13 +149,13 @@
 ## 2023-09-10
 ### Changed
 - Обновлены зависимости библиотеки;
-- `FactoryDataContainer` -> `ErrFactoryInternalNoticeDataContainer`;
-- `FactoryInternal*` -> `ErrFactoryInternal*`;
+- `FactoryDataContainer -> ErrFactoryInternalNoticeDataContainer`;
+- `FactoryInternal* -> ErrFactoryInternal*`;
 
 ### Fixed
 - Исправлен баг в `examples/field/main.go`;
 
 ## 2023-09-03
 ### Changed
-- `ErrorId` -> `string`;
-- `FieldErrorList` -> `*FieldErrorList`;
+- `ErrorId -> string`;
+- `FieldErrorList -> *FieldErrorList`;
