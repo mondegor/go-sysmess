@@ -22,14 +22,12 @@ type (
 	}
 )
 
-var (
-	stubLocale = &Locale{
-		langID:   0,
-		langCode: "stub-locale",
-		messages: make(map[string]string, 0),
-		errors:   make(map[string]mrmsg.ErrorMessage, 0),
-	}
-)
+var stubLocale = &Locale{
+	langID:   0,
+	langCode: "stub-locale",
+	messages: make(map[string]string, 0),
+	errors:   make(map[string]mrmsg.ErrorMessage, 0),
+}
 
 func (l *Locale) LangID() uint16 {
 	return l.langID

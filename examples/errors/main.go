@@ -6,12 +6,10 @@ import (
 	"github.com/mondegor/go-sysmess/mrerr"
 )
 
-var (
-	FactoryError = mrerr.NewFactoryWithCaller(
-		"errMyErrorWithParams",
-		mrerr.ErrorKindInternal,
-		"my error with '{{ .param1 }}' and '{{ .param2 }}'",
-	)
+var FactoryError = mrerr.NewFactoryWithCaller(
+	"errMyErrorWithParams",
+	mrerr.ErrorKindInternal,
+	"my error with '{{ .param1 }}' and '{{ .param2 }}'",
 )
 
 func main() {

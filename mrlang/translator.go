@@ -47,7 +47,6 @@ func NewTranslator(opts TranslatorOptions) (*Translator, error) {
 		}
 
 		locale, err := newLocale(langCode, getFilePath(opts.DirPath, langCode))
-
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +83,6 @@ func NewTranslator(opts TranslatorOptions) (*Translator, error) {
 			dict, err := newDictionary(
 				getFilePath(opts.DictionaryDirPath, dicName+"/"+langCode),
 			)
-
 			if err != nil {
 				return nil, err
 			}

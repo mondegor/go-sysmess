@@ -141,9 +141,8 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 // 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f
 func (e *AppErrorFactory) generateTraceID() string {
 	value := make([]byte, 4)
-	_, err := rand.Read(value)
 
-	if err != nil {
+	if _, err := rand.Read(value); err != nil {
 		value = []byte{0x0, 0xee, 0xee, 0x0}
 	}
 

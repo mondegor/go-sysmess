@@ -13,7 +13,6 @@ const (
 
 func parseFile(path string, data any) error {
 	f, err := os.OpenFile(path, os.O_RDONLY, 0)
-
 	if err != nil {
 		return err
 	}

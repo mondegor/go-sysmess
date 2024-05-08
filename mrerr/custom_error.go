@@ -44,7 +44,7 @@ func NewCustomErrorAppError(code string, err *AppError) *CustomError {
 	}
 }
 
-func NewCustomErrorMessage(code string, message string) *CustomError {
+func NewCustomErrorMessage(code, message string) *CustomError {
 	return &CustomError{
 		code: code,
 		err: New(

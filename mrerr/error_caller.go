@@ -1,10 +1,8 @@
 package mrerr
 
-var (
-	caller = NewCaller(
-		CallerDeep(2),
-		CallerUseShortPath(true),
-	)
+var caller = NewCaller(
+	CallerDeep(2),
+	CallerUseShortPath(true),
 )
 
 // SetCallerOptions - WARNING: use only when starting the main process

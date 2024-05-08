@@ -75,9 +75,7 @@ func (c *Caller) shortFileName(pattern, file string) string {
 		minLen = len(file)
 	}
 
-	var (
-		i, sepIndex int
-	)
+	var i, sepIndex int
 
 	for ; i < minLen; i++ {
 		if pattern[i] != file[i] {
