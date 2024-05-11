@@ -2,31 +2,34 @@ package mrmsg
 
 import (
 	"fmt"
+	"strings"
 )
 
 type (
+	// Data - произвольные данные с возможностью их отображения в виде строки.
 	Data map[string]any
 )
 
+// String - преобразовывает данные в строку.
 func (d Data) String() string {
-	var buf []byte
+	var buf strings.Builder
 	firstItem := true
 
-	buf = append(buf, '{')
+	buf.WriteByte('{')
 
 	for key, value := range d {
 		if firstItem {
 			firstItem = false
 		} else {
-			buf = append(buf, ',', ' ')
+			buf.Write([]byte{',', ' '})
 		}
 
-		buf = append(buf, key...)
-		buf = append(buf, ':', ' ')
-		buf = append(buf, fmt.Sprintf("%v", value)...)
+		buf.WriteString(key)
+		buf.Write([]byte{':', ' '})
+		buf.WriteString(fmt.Sprintf("%v", value))
 	}
 
-	buf = append(buf, '}')
+	buf.WriteByte('}')
 
-	return string(buf)
+	return buf.String()
 }

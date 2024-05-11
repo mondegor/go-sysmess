@@ -12,7 +12,7 @@ func main() {
 
 	factory := mrerr.NewFactory(
 		"errMyErrorWithParams",
-		mrerr.ErrorKindUser,
+		mrerr.ErrorTypeUser,
 		"my error with '{{ .param1 }}' and '{{ .param2 }}'",
 	).WithAttr("my-attr1", "attr-value1").WithAttr("my-attr2", "attr-value2")
 
@@ -43,7 +43,7 @@ func main() {
 func addSomeItems(list *mrerr.CustomErrorList) {
 	factory := mrerr.NewFactory(
 		"errSomeItems",
-		mrerr.ErrorKindSystem,
+		mrerr.ErrorTypeSystem,
 		"my error with '{{ .param1 }}'",
 	)
 

@@ -5,9 +5,8 @@ import (
 )
 
 type (
-	locByIDsMap   map[uint16]*Locale
-	locByCodesMap map[string]*Locale
-
+	// Translator - загружает и транслирует сообщения, ошибки,
+	// справочники объектов на различные языки.
 	Translator struct {
 		locByIDs      locByIDsMap
 		locByCodes    locByCodesMap
@@ -15,6 +14,7 @@ type (
 		dictionaries  map[string]*MultiLangDictionary
 	}
 
+	// TranslatorOptions - опции транслятора.
 	TranslatorOptions struct {
 		DirPath           string
 		LangCodes         []string
@@ -22,8 +22,12 @@ type (
 		DictionaryDirPath string
 		Dictionaries      []string // optional
 	}
+
+	locByIDsMap   map[uint16]*Locale
+	locByCodesMap map[string]*Locale
 )
 
+// NewTranslator - создаётся объект Translator.
 func NewTranslator(opts TranslatorOptions) (*Translator, error) {
 	if len(opts.LangCodes) == 0 {
 		return nil, fmt.Errorf("opts.LangCodes is required")
@@ -107,11 +111,13 @@ func defaultLangInArray(lang string, langs []string) bool {
 	return false
 }
 
+// DefaultLocale - возвращает языковой объект по умолчанию.
 func (t *Translator) DefaultLocale() *Locale {
 	return t.defaultLocale
 }
 
-// FindFirstLocale - if not exists get default locale
+// FindFirstLocale - возвращает первый языковой объект по указанным языковым кодам.
+// Если ни один языковой код не зарегистрирован, то возвращает языковой объект по умолчанию.
 func (t *Translator) FindFirstLocale(langs ...string) *Locale {
 	for _, lang := range langs {
 		if locale, ok := t.locByCodes[lang]; ok {
@@ -122,6 +128,7 @@ func (t *Translator) FindFirstLocale(langs ...string) *Locale {
 	return t.defaultLocale
 }
 
+// LocaleByID - возвращает языковой объект по его ID.
 func (t *Translator) LocaleByID(langID uint16) (*Locale, error) {
 	if locale, ok := t.locByIDs[langID]; ok {
 		return locale, nil
@@ -130,6 +137,7 @@ func (t *Translator) LocaleByID(langID uint16) (*Locale, error) {
 	return nil, fmt.Errorf("lang with ID=%d is not registered", langID)
 }
 
+// LocaleByCode - возвращает языковой объект по его коду.
 func (t *Translator) LocaleByCode(lang string) (*Locale, error) {
 	if locale, ok := t.locByCodes[lang]; ok {
 		return locale, nil
@@ -138,6 +146,7 @@ func (t *Translator) LocaleByCode(lang string) (*Locale, error) {
 	return nil, fmt.Errorf("lang code '%s' is not registered", lang)
 }
 
+// Dictionary - возвращает мультиязычный справочник по его имени.
 func (t *Translator) Dictionary(name string) (*MultiLangDictionary, error) {
 	if dictionary, ok := t.dictionaries[name]; ok {
 		return dictionary, nil
@@ -146,25 +155,23 @@ func (t *Translator) Dictionary(name string) (*MultiLangDictionary, error) {
 	return nil, fmt.Errorf("dictionary '%s' is not registered", name)
 }
 
+// RegisteredLocales - возвращает список кодов зарегистрированных языков.
 func (t *Translator) RegisteredLocales() []string {
-	keys := make([]string, len(t.locByCodes))
-	i := 0
+	keys := make([]string, 0, len(t.locByCodes))
 
 	for key := range t.locByCodes {
-		keys[i] = key
-		i++
+		keys = append(keys, key)
 	}
 
 	return keys
 }
 
+// RegisteredDictionaries - возвращает список имён зарегистрированных мультиязычных справочников.
 func (t *Translator) RegisteredDictionaries() []string {
-	keys := make([]string, len(t.dictionaries))
-	i := 0
+	keys := make([]string, 0, len(t.dictionaries))
 
 	for key := range t.dictionaries {
-		keys[i] = key
-		i++
+		keys = append(keys, key)
 	}
 
 	return keys

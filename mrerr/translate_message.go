@@ -4,8 +4,16 @@ import (
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
+type (
+	// Translator - интерфейс для работы с переводом ошибок на различные языки.
+	Translator interface {
+		HasErrorCode(code string) bool
+		TranslateError(code, defaultMessage string, args ...mrmsg.NamedArg) mrmsg.ErrorMessage
+	}
+)
+
 // Translate - translate error message for user
-func (e *AppError) Translate(t mrmsg.ErrorTranslator) mrmsg.ErrorMessage {
+func (e *AppError) Translate(t Translator) mrmsg.ErrorMessage {
 	if e.kind == ErrorKindUser || t.HasErrorCode(e.code) {
 		return t.TranslateError(e.code, e.message, e.getNamedArgs()...)
 	}

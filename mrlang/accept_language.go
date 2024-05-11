@@ -11,7 +11,7 @@ const (
 
 var regexpAcceptLanguage = regexp.MustCompile(`^[a-z]{2}(-[a-zA-Z0-9-]+)?$`)
 
-// ParseAcceptLanguage
+// ParseAcceptLanguage - извлечение данных о языках.
 // Sample Accept-Language: ru;q=0.9, fr-CH, fr;q=0.8, en;q=0.7, *;q=0.5
 func ParseAcceptLanguage(s string) []string {
 	length := len(s)

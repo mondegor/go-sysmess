@@ -6,11 +6,14 @@ import (
 )
 
 type (
+	// Dictionary - справочник объектов указанного типа на конкретном языке.
 	Dictionary struct {
 		rows DictionaryMap
 	}
 
-	DictionaryMap map[string]DictionaryItemAttrs // dictionary-name -> [id -> [attr1 -> text1, attr2 -> text2, ...], ...]
+	// DictionaryMap - атрибуты объекта на конкретном языке.
+	// dictionary-name -> [id -> [attr1 -> text1, attr2 -> text2, ...], ...]
+	DictionaryMap map[string]DictionaryItemAttrs
 )
 
 func newDictionary(filePath string) (*Dictionary, error) {
@@ -25,10 +28,12 @@ func newDictionary(filePath string) (*Dictionary, error) {
 	}, nil
 }
 
+// ItemByID - возвращает объект с его атрибутами по ID.
 func (d *Dictionary) ItemByID(id int) DictionaryItemAttrs {
 	return d.ItemByKey(strconv.Itoa(id))
 }
 
+// ItemByKey - возвращает объект с его атрибутами по ключу (строковому ID).
 func (d *Dictionary) ItemByKey(key string) DictionaryItemAttrs {
 	if text, ok := d.rows[key]; ok {
 		return text
@@ -37,13 +42,12 @@ func (d *Dictionary) ItemByKey(key string) DictionaryItemAttrs {
 	return DictionaryItemAttrs{}
 }
 
+// RegisteredItems - возвращает список ключей зарегистрированных объектов.
 func (d *Dictionary) RegisteredItems() []string {
-	keys := make([]string, len(d.rows))
-	i := 0
+	keys := make([]string, 0, len(d.rows))
 
 	for key := range d.rows {
-		keys[i] = key
-		i++
+		keys = append(keys, key)
 	}
 
 	return keys

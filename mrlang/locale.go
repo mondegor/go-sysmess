@@ -8,6 +8,7 @@ import (
 )
 
 type (
+	// Locale - список сообщений и пользовательских ошибок на конкретном языке.
 	Locale struct {
 		langID   uint16
 		langCode string
@@ -29,21 +30,25 @@ var stubLocale = &Locale{
 	errors:   make(map[string]mrmsg.ErrorMessage, 0),
 }
 
+// LangID - возвращает ID языка.
 func (l *Locale) LangID() uint16 {
 	return l.langID
 }
 
+// LangCode - возвращает код языка.
 func (l *Locale) LangCode() string {
 	return l.langCode
 }
 
+// WithContext - возвращает контекст с вложенным в него объектом Locale.
 func (l *Locale) WithContext(ctx context.Context) context.Context {
 	return WithContext(ctx, l)
 }
 
+// TranslateMessage - возвращает сообщение по указанному коду на текущем языке,
+// если код не найден, то возвращает сообщение по умолчанию.
 func (l *Locale) TranslateMessage(code, defaultMessage string, args ...mrmsg.NamedArg) string {
 	value, ok := l.messages[code]
-
 	if !ok {
 		value = defaultMessage
 	}
@@ -55,15 +60,17 @@ func (l *Locale) TranslateMessage(code, defaultMessage string, args ...mrmsg.Nam
 	return value
 }
 
+// HasErrorCode - проверяется зарегистрирован указанный код ошибки в общем справочнике.
 func (l *Locale) HasErrorCode(code string) bool {
 	_, ok := l.errors[code]
 
 	return ok
 }
 
+// TranslateError - возвращает сообщение об ошибке по указанному коду на текущем языке,
+// если код не найден, то возвращает сообщение по умолчанию.
 func (l *Locale) TranslateError(code, defaultMessage string, args ...mrmsg.NamedArg) mrmsg.ErrorMessage {
 	value, ok := l.errors[code]
-
 	if !ok {
 		value = mrmsg.ErrorMessage{Reason: defaultMessage}
 	}

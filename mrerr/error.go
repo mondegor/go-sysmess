@@ -5,28 +5,34 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mondegor/go-sysmess/mrcaller"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 const (
+	// ErrorCodeInternal - обобщённый код ошибки: внутренняя ошибка приложения.
 	ErrorCodeInternal = "errInternal"
-	ErrorCodeSystem   = "errSystem"
+
+	// ErrorCodeSystem - обобщённый код ошибки: системная ошибка приложения.
+	ErrorCodeSystem = "errSystem"
 )
 
 type (
+	// AppError - ошибка с поддержкой параметров и CallStack.
 	AppError struct {
-		code      string
-		kind      ErrorKind
-		traceID   string
-		message   string
-		argsNames []string
-		args      []any
-		attrs     []mrmsg.NamedArg
-		err       error
-		callStack []CallStackRow
+		code       string
+		kind       ErrorKind
+		instanceID string
+		message    string
+		argsNames  []string
+		args       []any
+		attrs      []mrmsg.NamedArg
+		err        error
+		callStack  mrcaller.CallStack
 	}
 )
 
+// New - создаётся объект AppError.
 func New(code, message string, args ...any) *AppError {
 	newErr := &AppError{
 		code:      code,
@@ -36,7 +42,8 @@ func New(code, message string, args ...any) *AppError {
 		args:      args,
 	}
 
-	newErr.setErrorIfArgsNotEqual(1)
+	const skipFrame = 1
+	newErr.setErrorIfArgsNotEqual(skipFrame)
 
 	return newErr
 }
@@ -64,29 +71,49 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkipFrame int) {
 	e.err = argsErrorFactory.new(e.err, nil)
 }
 
+// Code - возвращает код ошибки.
 func (e *AppError) Code() string {
 	return e.code
 }
 
+// Kind - возвращает тип ошибки.
 func (e *AppError) Kind() ErrorKind {
 	return e.kind
 }
 
-func (e *AppError) TraceID() string {
-	return e.traceID
+// InstanceID - возвращает уникальный идентификатор случившейся ошибки.
+// Но только если в фабрике, породившей эту ошибку, был установлен генератор ID ошибок.
+func (e *AppError) InstanceID() string {
+	return e.instanceID
 }
 
-// HasCallStack - including wrapped errors
+// HasCallStack - возвращается, что в ошибке содержится CallStack (включая вложенные ошибки).
+// Но только если в фабрике, породившей эту ошибку, было установлено формирование ID ошибок.
 func (e *AppError) HasCallStack() bool {
-	return e.traceID != ""
+	if !e.callStack.Empty() {
+		return true
+	}
+
+	for err := e.err; err != nil; {
+		if v, ok := err.(*AppError); ok {
+			if !v.callStack.Empty() {
+				return true
+			}
+
+			err = v.err
+		}
+	}
+
+	return false
 }
 
+// Error - возвращает ошибку в виде строки.
 func (e *AppError) Error() string {
 	var buf strings.Builder
 
-	if e.traceID != "" {
+	if e.instanceID != "" {
 		buf.WriteByte('[')
-		buf.WriteString(e.traceID)
+		buf.WriteString(e.instanceID)
 		buf.Write([]byte{']', ' '})
 	}
 
@@ -111,17 +138,19 @@ func (e *AppError) Error() string {
 		buf.WriteByte(')')
 	}
 
-	if len(e.callStack) > 0 {
-		buf.WriteString(" in ")
-
-		for i := range e.callStack {
-			if i > 0 {
+	for iter := e.callStack.NewIterator(); ; {
+		if n, item := iter.Next(); n > 0 {
+			if n == 1 {
+				buf.WriteString(" in ")
+			} else {
 				buf.Write([]byte{' ', ',', ' '})
 			}
 
-			buf.WriteString(e.callStack[i].File)
+			buf.WriteString(item.File())
 			buf.WriteByte(':')
-			buf.WriteString(strconv.Itoa(e.callStack[i].Line))
+			buf.WriteString(strconv.Itoa(item.Line()))
+		} else {
+			break
 		}
 	}
 
@@ -133,6 +162,7 @@ func (e *AppError) Error() string {
 	return buf.String()
 }
 
+// Is - проверяется что ошибка с указанным кодом (для возможности использования errors.Is).
 func (e *AppError) Is(err error) bool {
 	if v, ok := err.(*AppError); ok && e.code == v.code {
 		return true
@@ -141,6 +171,7 @@ func (e *AppError) Is(err error) bool {
 	return false
 }
 
+// Unwrap - возвращает вложенную ошибку (для возможности использования errors.Is).
 func (e *AppError) Unwrap() error {
 	return e.err
 }

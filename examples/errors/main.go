@@ -6,9 +6,10 @@ import (
 	"github.com/mondegor/go-sysmess/mrerr"
 )
 
-var FactoryError = mrerr.NewFactoryWithCaller(
+// FactoryError - пример пользовательской ошибки.
+var FactoryError = mrerr.NewFactory(
 	"errMyErrorWithParams",
-	mrerr.ErrorKindInternal,
+	mrerr.ErrorTypeInternal,
 	"my error with '{{ .param1 }}' and '{{ .param2 }}'",
 )
 
@@ -16,14 +17,11 @@ func main() {
 	err := createErr()
 
 	fmt.Println(err)
-	fmt.Println("trace ID = " + err.TraceID())
 	fmt.Println("Code = " + err.Code())
 	fmt.Println("Kind = " + err.Kind().String()) // 0 - mrerr.ErrorKindInternal
+	fmt.Println("InstanceID = " + err.InstanceID())
 
 	err = createErrLevel2()
-	fmt.Println(err)
-
-	err = createErrDisabledCaller()
 	fmt.Println(err)
 }
 
@@ -36,9 +34,5 @@ func createErrLevel2() *mrerr.AppError {
 }
 
 func createErr2() *mrerr.AppError {
-	return FactoryError.WithCaller(2).New("my-param2", "with Caller 2")
-}
-
-func createErrDisabledCaller() *mrerr.AppError {
-	return FactoryError.DisableCaller().New("my-param3", "with DisabledCaller")
+	return FactoryError.WithCallerSkipFrame(2).New("my-param2", "with Caller 2")
 }

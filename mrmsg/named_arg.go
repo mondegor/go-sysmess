@@ -6,12 +6,14 @@ import (
 )
 
 type (
+	// NamedArg - именованный аргумент используемый в сообщениях.
 	NamedArg struct {
 		Name  string
 		Value any
 	}
 )
 
+// ValueString - преобразовывает значение аргумента в строку.
 func (a *NamedArg) ValueString() string {
 	switch val := a.Value.(type) {
 	case string:

@@ -5,9 +5,11 @@ import (
 )
 
 type (
+	// CustomErrorList - список пользовательских ошибок.
 	CustomErrorList []*CustomError
 )
 
+// Error - возвращает список ошибок в виде строки.
 func (l CustomErrorList) Error() string {
 	var buf strings.Builder
 

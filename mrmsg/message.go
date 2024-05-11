@@ -14,6 +14,7 @@ const (
 
 var regexpArgName = regexp.MustCompile(`^\.[A-Za-z][A-Za-z0-9]*$`)
 
+// Render - возвращает сформированное сообщение со вставленными в неё параметрами.
 func Render(message string, args []NamedArg) string {
 	value, err := render(message, args)
 	if err != nil {
@@ -41,14 +42,15 @@ func render(message string, args []NamedArg) (string, error) {
 
 	var msg bytes.Buffer
 
-	err = templ.Execute(&msg, data)
-	if err != nil {
+	if err = templ.Execute(&msg, data); err != nil {
 		return "", err
 	}
 
 	return msg.String(), nil
 }
 
+// CheckParse - если указанное сообщение содержит параметры,
+// то проверяется их корректность.
 func CheckParse(message string) error {
 	var args []NamedArg
 
@@ -61,6 +63,7 @@ func CheckParse(message string) error {
 	return err
 }
 
+// ParseArgsNames - извлечение параметров из указанного сообщения.
 func ParseArgsNames(message string) []string {
 	var argsNames []string
 	var keys map[string]bool

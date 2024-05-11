@@ -1,13 +1,10 @@
 package mrerr
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"errors"
 	"fmt"
-	"strconv"
-	"time"
 
+	"github.com/mondegor/go-sysmess/mrcaller"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -16,54 +13,42 @@ const (
 )
 
 type (
+	// AppErrorFactory - фабрика ошибок, с поддержкой типов, параметров,
+	// формирования CallStack, с возможностью wrap ошибок.
 	AppErrorFactory struct {
 		code            string
 		kind            ErrorKind
 		message         string
 		argsNames       []string
 		attrs           []mrmsg.NamedArg
-		withCaller      bool
+		generateID      func() string
+		caller          func(skip int) mrcaller.CallStack
 		callerSkipFrame int
 	}
 )
 
-func NewFactory(code string, kind ErrorKind, message string) *AppErrorFactory {
-	return newFactory(code, kind, message, false)
-}
-
-func NewFactoryWithCaller(code string, kind ErrorKind, message string) *AppErrorFactory {
-	return newFactory(code, kind, message, true)
-}
-
-func newFactory(code string, kind ErrorKind, message string, withCaller bool) *AppErrorFactory {
+// NewFactory - создаётся объект AppErrorFactory.
+func NewFactory(code string, etype ErrorType, message string) *AppErrorFactory {
 	return &AppErrorFactory{
-		code:            code,
-		kind:            kind,
-		message:         message,
-		argsNames:       mrmsg.ParseArgsNames(message),
-		withCaller:      withCaller,
-		callerSkipFrame: 3, // skip AppError: init + new + New
+		code:       code,
+		kind:       etype.Kind,
+		message:    message,
+		argsNames:  mrmsg.ParseArgsNames(message),
+		generateID: etype.GenerateIDFunc,
+		caller:     etype.CallerFunc,
 	}
 }
 
-func (e *AppErrorFactory) WithCaller(skipFrame ...int) *AppErrorFactory {
+// WithCallerSkipFrame - возвращает AppErrorFactory с установленным
+// пропуском функций, которые не должны попасть в CallStack.
+func (e *AppErrorFactory) WithCallerSkipFrame(skip int) *AppErrorFactory {
 	c := *e
-	c.withCaller = true
-
-	if len(skipFrame) > 0 {
-		c.callerSkipFrame += skipFrame[0]
-	}
+	c.callerSkipFrame += skip
 
 	return &c
 }
 
-func (e *AppErrorFactory) DisableCaller() *AppErrorFactory {
-	c := *e
-	c.withCaller = false
-
-	return &c
-}
-
+// WithAttr - возвращает AppErrorFactory с прикреплённым к нему именованным параметром.
 func (e *AppErrorFactory) WithAttr(name string, value any) *AppErrorFactory {
 	if name == "" {
 		name = attrNameByDefault
@@ -81,10 +66,12 @@ func (e *AppErrorFactory) WithAttr(name string, value any) *AppErrorFactory {
 	return &c
 }
 
+// New - создаётся объект AppError с использованием параметров фабрики.
 func (e *AppErrorFactory) New(args ...any) *AppError {
 	return e.new(nil, args)
 }
 
+// Wrap - возвращает ошибку с вложенной в неё указанной ошибки.
 func (e *AppErrorFactory) Wrap(err error, args ...any) *AppError {
 	if err == nil {
 		err = fmt.Errorf("specified error is nil, wrapping is not necessary")
@@ -93,6 +80,7 @@ func (e *AppErrorFactory) Wrap(err error, args ...any) *AppError {
 	return e.new(err, args)
 }
 
+// Code - возвращает код ошибки.
 func (e *AppErrorFactory) Code() string {
 	return e.code
 }
@@ -119,32 +107,32 @@ func (e *AppErrorFactory) new(err error, args []any) *AppError {
 }
 
 func (e *AppErrorFactory) init(newErr *AppError) {
-	newErr.setErrorIfArgsNotEqual(3)
+	const skipFrame = 3
+	newErr.setErrorIfArgsNotEqual(skipFrame)
+
+	hasInstanceID := false
+	hasCallStack := false
 
 	if newErr.err != nil {
-		appErr, ok := newErr.err.(*AppError)
+		if wrappedErr, ok := newErr.err.(*AppError); ok {
+			// instanceID is raising to the top
+			if wrappedErr.instanceID != "" {
+				newErr.instanceID = wrappedErr.instanceID
+				wrappedErr.instanceID = ""
+				hasInstanceID = true
+			}
 
-		// raising to the top
-		if ok && appErr.traceID != "" {
-			newErr.traceID = appErr.traceID
-			appErr.traceID = ""
-			return
+			if !wrappedErr.callStack.Empty() {
+				hasCallStack = true
+			}
 		}
 	}
 
-	if e.withCaller {
-		newErr.traceID = e.generateTraceID()
-		newErr.callStack = caller.CallStack(e.callerSkipFrame)
-	}
-}
-
-// 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f
-func (e *AppErrorFactory) generateTraceID() string {
-	value := make([]byte, 4)
-
-	if _, err := rand.Read(value); err != nil {
-		value = []byte{0x0, 0xee, 0xee, 0x0}
+	if e.generateID != nil && !hasInstanceID {
+		newErr.instanceID = e.generateID()
 	}
 
-	return strconv.FormatInt(time.Now().Unix(), 16) + "-" + hex.EncodeToString(value)
+	if e.caller != nil && !hasCallStack {
+		newErr.callStack = e.caller(e.callerSkipFrame)
+	}
 }
