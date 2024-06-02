@@ -52,10 +52,11 @@ func render(message string, args []NamedArg) (string, error) {
 // CheckParse - если указанное сообщение содержит параметры,
 // то проверяется их корректность.
 func CheckParse(message string) error {
-	var args []NamedArg
+	argsNames := ParseArgsNames(message)
+	args := make([]NamedArg, len(argsNames))
 
-	for _, arg := range ParseArgsNames(message) {
-		args = append(args, NamedArg{arg, arg})
+	for i, arg := range argsNames {
+		args[i] = NamedArg{arg, arg}
 	}
 
 	_, err := render(message, args)

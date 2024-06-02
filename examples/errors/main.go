@@ -34,5 +34,5 @@ func createErrLevel2() *mrerr.AppError {
 }
 
 func createErr2() *mrerr.AppError {
-	return FactoryError.WithCallerSkipFrame(2).New("my-param2", "with Caller 2")
+	return FactoryError.New("my-param2", "with Caller 2")
 }

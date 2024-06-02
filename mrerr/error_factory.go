@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/mrcaller"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -14,16 +13,15 @@ const (
 
 type (
 	// AppErrorFactory - фабрика ошибок, с поддержкой типов, параметров,
-	// формирования CallStack, с возможностью wrap ошибок.
+	// формирования стека вызовов и с возможностью wrap ошибок.
 	AppErrorFactory struct {
-		code            string
-		kind            ErrorKind
-		message         string
-		argsNames       []string
-		attrs           []mrmsg.NamedArg
-		generateID      func() string
-		caller          func(skip int) mrcaller.CallStack
-		callerSkipFrame int
+		code       string
+		kind       ErrorKind
+		message    string
+		argsNames  []string
+		attrs      []mrmsg.NamedArg
+		generateID IDGeneratorFunc
+		caller     CallerFunc
 	}
 )
 
@@ -37,15 +35,6 @@ func NewFactory(code string, etype ErrorType, message string) *AppErrorFactory {
 		generateID: etype.GenerateIDFunc,
 		caller:     etype.CallerFunc,
 	}
-}
-
-// WithCallerSkipFrame - возвращает AppErrorFactory с установленным
-// пропуском функций, которые не должны попасть в CallStack.
-func (e *AppErrorFactory) WithCallerSkipFrame(skip int) *AppErrorFactory {
-	c := *e
-	c.callerSkipFrame += skip
-
-	return &c
 }
 
 // WithAttr - возвращает AppErrorFactory с прикреплённым к нему именованным параметром.
@@ -85,7 +74,7 @@ func (e *AppErrorFactory) Code() string {
 	return e.code
 }
 
-// Is - see: AppError::Is
+// Is - see: AppError::Is.
 func (e *AppErrorFactory) Is(err error) bool {
 	return errors.Is(err, &AppError{code: e.code})
 }
@@ -107,14 +96,14 @@ func (e *AppErrorFactory) new(err error, args []any) *AppError {
 }
 
 func (e *AppErrorFactory) init(newErr *AppError) {
-	const skipFrame = 3
-	newErr.setErrorIfArgsNotEqual(skipFrame)
+	newErr.setErrorIfArgsNotEqual()
 
 	hasInstanceID := false
-	hasCallStack := false
+	hasStackTrace := false
 
 	if newErr.err != nil {
-		if wrappedErr, ok := newErr.err.(*AppError); ok {
+		// WARNING: newErr.err должна быть именно типа *AppError, а не вложенные в неё ошибки
+		if wrappedErr, ok := newErr.err.(*AppError); ok { //nolint:errorlint
 			// instanceID is raising to the top
 			if wrappedErr.instanceID != "" {
 				newErr.instanceID = wrappedErr.instanceID
@@ -122,8 +111,11 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 				hasInstanceID = true
 			}
 
-			if !wrappedErr.callStack.Empty() {
-				hasCallStack = true
+			// устанавливается фиктивный стек вызовов,
+			// для запрета генерации стека вызовов родительским ошибкам
+			if wrappedErr.stackTrace != nil {
+				newErr.stackTrace = &stackTrace{} // TODO: ввести отдельный флаг, что стек отсутствует
+				hasStackTrace = true
 			}
 		}
 	}
@@ -132,7 +124,7 @@ func (e *AppErrorFactory) init(newErr *AppError) {
 		newErr.instanceID = e.generateID()
 	}
 
-	if e.caller != nil && !hasCallStack {
-		newErr.callStack = e.caller(e.callerSkipFrame)
+	if e.caller != nil && !hasStackTrace {
+		newErr.stackTrace = e.caller()
 	}
 }

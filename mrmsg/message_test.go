@@ -6,6 +6,8 @@ import (
 )
 
 func Test_render(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		message string
@@ -57,7 +59,11 @@ func Test_render(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := render(tt.message, tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("render() error = %v, wantErr %v", err, tt.wantErr)
@@ -71,6 +77,8 @@ func Test_render(t *testing.T) {
 }
 
 func TestParseArgsNames(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		message string
@@ -108,7 +116,11 @@ func TestParseArgsNames(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := ParseArgsNames(tt.message); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseArgsNames() = %v, want %v", got, tt.want)
 			}

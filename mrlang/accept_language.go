@@ -48,10 +48,8 @@ func ParseAcceptLanguage(s string) []string {
 
 			if len(lang) > 2 {
 				addLang(lang[0:2] + "_" + lang[3:]) // ru-RU -> ru_RU
-			} else {
-				if addLang(lang) { // ru + ru_RU
-					addLang(lang + "_" + strings.ToUpper(lang))
-				}
+			} else if addLang(lang) { // ru + ru_RU
+				addLang(lang + "_" + strings.ToUpper(lang))
 			}
 		}
 
@@ -60,5 +58,5 @@ func ParseAcceptLanguage(s string) []string {
 		}
 	}
 
-	return []string{}
+	return nil
 }

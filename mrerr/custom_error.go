@@ -20,7 +20,8 @@ func NewCustomError(code string, err error) *CustomError {
 		return NewCustomErrorMessage(code, "err is nil")
 	}
 
-	appArr, ok := err.(*AppError)
+	// WARNING: err должна быть именно типа *AppError, а не вложенные в неё ошибки
+	appArr, ok := err.(*AppError) //nolint:errorlint
 	if !ok {
 		appArr = New(
 			customErrorCodePrefix+code,

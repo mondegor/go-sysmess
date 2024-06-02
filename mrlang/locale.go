@@ -112,18 +112,18 @@ func checkLocale(filePath string, cfg *localeConfig) error {
 
 	for messCode, value := range cfg.Messages {
 		if err := mrmsg.CheckParse(value); err != nil {
-			return fmt.Errorf("message with code '%s' has error '%s' in locale %s", messCode, err, filePath)
+			return fmt.Errorf("message with code '%s' has error in locale %s: %w", messCode, filePath, err)
 		}
 	}
 
 	for errCode, value := range cfg.Errors {
 		if err := mrmsg.CheckParse(value.Reason); err != nil {
-			return fmt.Errorf("error.Reason with code '%s' has error '%s' in locale %s", errCode, err, filePath)
+			return fmt.Errorf("error.Reason with code '%s' has error in locale %s: %w", errCode, filePath, err)
 		}
 
 		for n, detail := range value.Details {
 			if err := mrmsg.CheckParse(detail); err != nil {
-				return fmt.Errorf("error.Details[%d] with code '%s' has error '%s' in locale %s", n, errCode, err, filePath)
+				return fmt.Errorf("error.Details[%d] with code '%s' has error in locale %s: %w", n, errCode, filePath, err)
 			}
 		}
 	}

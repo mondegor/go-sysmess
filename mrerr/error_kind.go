@@ -1,7 +1,5 @@
 package mrerr
 
-import "github.com/mondegor/go-sysmess/mrcaller"
-
 const (
 	// ErrorKindInternal - внутренняя ошибка приложения (например: обращение по nil указателю).
 	ErrorKindInternal ErrorKind = iota
@@ -20,24 +18,38 @@ type (
 	// ErrorType - тип ошибки (вид ошибки + дополнительные свойства).
 	ErrorType struct {
 		Kind           ErrorKind
-		GenerateIDFunc func() string
-		CallerFunc     func(skip int) mrcaller.CallStack
+		GenerateIDFunc IDGeneratorFunc
+		CallerFunc     CallerFunc
 	}
 
-	// ErrorOptions - опции используемые для создания типа ошибки.
+	// ErrorOptions - опции для создания ErrorType.
 	ErrorOptions struct {
-		Kind           ErrorKind
-		HasIDGenerator bool
-		HasCaller      bool
+		Kind            ErrorKind
+		WithIDGenerator bool
+		WithCaller      bool
+	}
+
+	// IDGeneratorFunc - генерация уникальных ID ошибок.
+	IDGeneratorFunc func() string
+
+	// CallerFunc - функция получения стека вызовов.
+	CallerFunc func() StackTracer
+
+	// StackTracer - предоставляет доступ к стеку вызовов.
+	StackTracer interface {
+		Count() int
+		FileLine(index int) (file string, line int)
 	}
 )
 
 var (
-	// GlobalIDGenerator - глобальный объект для генерации ID экземпляра ошибки.
-	GlobalIDGenerator ErrorIDGenerator = NewIDGenerator()
+	// GlobalIDGeneratorFunc - глобальный объект для генерации ID экземпляра ошибки,
+	// который может быть переопределён.
+	GlobalIDGeneratorFunc IDGeneratorFunc = generateInstanceID
 
-	// GlobalCaller - глобальный объект для формирования CallStack.
-	GlobalCaller = mrcaller.New()
+	// GlobalCallerFunc - глобальный объект для формирования текущего стека вызовов,
+	// который может быть переопределён.
+	GlobalCallerFunc CallerFunc = func() StackTracer { return newStackTrace() }
 
 	// PrepareErrorTypeFunc - формирует тип ошибки на основе указанных для неё опций.
 	PrepareErrorTypeFunc = func(opts ErrorOptions) ErrorType {
@@ -45,15 +57,15 @@ var (
 			Kind: opts.Kind,
 		}
 
-		if opts.HasIDGenerator {
+		if opts.WithIDGenerator {
 			etype.GenerateIDFunc = func() string {
-				return GlobalIDGenerator.GenerateID()
+				return GlobalIDGeneratorFunc()
 			}
 		}
 
-		if opts.HasCaller {
-			etype.CallerFunc = func(skip int) mrcaller.CallStack {
-				return GlobalCaller.CallStack(skip + 1)
+		if opts.WithCaller {
+			etype.CallerFunc = func() StackTracer {
+				return GlobalCallerFunc()
 			}
 		}
 
@@ -62,9 +74,9 @@ var (
 
 	// ErrorTypeInternal - базовые настройки для типа "внутренняя ошибка приложения".
 	ErrorTypeInternal = PrepareErrorTypeFunc(ErrorOptions{
-		Kind:           ErrorKindInternal,
-		HasIDGenerator: true,
-		HasCaller:      true,
+		Kind:            ErrorKindInternal,
+		WithIDGenerator: true,
+		WithCaller:      true,
 	})
 
 	// ErrorTypeInternalNotice - настройки для типа "внутреннее предупреждение",
@@ -75,9 +87,9 @@ var (
 
 	// ErrorTypeSystem - базовые настройки для типа "системная ошибка приложения".
 	ErrorTypeSystem = PrepareErrorTypeFunc(ErrorOptions{
-		Kind:           ErrorKindSystem,
-		HasIDGenerator: true,
-		HasCaller:      true,
+		Kind:            ErrorKindSystem,
+		WithIDGenerator: true,
+		WithCaller:      true,
 	})
 
 	// ErrorTypeUser - базовые настройки для типа "пользовательская ошибка".
@@ -88,9 +100,9 @@ var (
 	// ErrorTypeUserWithCaller - настройки для типа "пользовательская ошибка",
 	// при котором требуется иноформация для фиксации ошибки.
 	ErrorTypeUserWithCaller = PrepareErrorTypeFunc(ErrorOptions{
-		Kind:           ErrorKindUser,
-		HasIDGenerator: true,
-		HasCaller:      true,
+		Kind:            ErrorKindUser,
+		WithIDGenerator: true,
+		WithCaller:      true,
 	})
 )
 

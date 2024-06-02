@@ -1,25 +1,18 @@
 package mrcaller
 
 import (
-	"path/filepath"
 	"runtime"
 )
 
 const (
 	callStackMaxDepth = 32
-	callStackBreak    = "src/runtime/proc.go"
 )
 
 type (
-	// Caller - обёртка runtime.Callers для более удобного формирования CallStack.
+	// Caller - обёртка runtime.Callers для более удобного формирования стека вызовов.
 	Caller struct {
-		depth        int  // глубина отображения CallStack
-		useShortPath bool // при true обрезает начало путей файлов
-
-		// Префикс пути, который будет обрезан у имён файлов при выводе CallStack.
-		// Если значение пустое, то используется родительский путь от первого файла в CallStack.
-		// (используется только при useShortPath = true)
-		rootPath string
+		depth                int                              // максимальное кол-во элементов в стеке вызовов
+		filterStackTraceFunc func(frames []uintptr) []uintptr // функция фильтрации стека вызовов
 	}
 )
 
@@ -28,21 +21,47 @@ func New(opts ...CallerOption) *Caller {
 	c := &Caller{}
 	c.applyOptions(opts)
 
+	const minDepth = 1
+	if c.depth < minDepth {
+		c.depth = minDepth
+	} else if c.depth > callStackMaxDepth {
+		c.depth = callStackMaxDepth
+	}
+
+	if c.filterStackTraceFunc == nil {
+		c.filterStackTraceFunc = func(frames []uintptr) []uintptr {
+			return frames
+		}
+	}
+
 	return c
 }
 
-// CallStack - формирует CallStack для текущего вызова и возвращает его.
-func (c *Caller) CallStack(skip int) CallStack {
+// StackTrace - формирует стек вызовов для текущего вызова функции и возвращает его.
+func (c *Caller) StackTrace() *StackTrace {
 	var pcs [callStackMaxDepth]uintptr
-	n := runtime.Callers(skip+1, pcs[:])
+	n := runtime.Callers(2, pcs[:])
+	fpcs := c.filterStackTraceFunc(pcs[0:n])
 
-	if n > c.depth+1 {
-		n = c.depth + 1
+	if len(fpcs) > c.depth {
+		fpcs = fpcs[0:c.depth]
 	}
 
-	return CallStack{
-		stack:  pcs[0:n],
-		prefix: c.filesPrefix(runtimeFrame(pcs[0])),
+	items := make([]StackItem, len(fpcs))
+
+	for i := 0; i < len(fpcs); i++ {
+		frame := runtimeFrame(fpcs[i])
+		file, line := frame.FileLine()
+
+		items[i] = StackItem{
+			Name: frame.Name(),
+			File: file,
+			Line: line,
+		}
+	}
+
+	return &StackTrace{
+		items: items,
 	}
 }
 
@@ -50,22 +69,4 @@ func (c *Caller) applyOptions(opts []CallerOption) {
 	for _, f := range opts {
 		f(c)
 	}
-}
-
-func (c *Caller) filesPrefix(fr runtimeFrame) string {
-	if !c.useShortPath {
-		return ""
-	}
-
-	file, _ := fr.FileLine()
-
-	if isBreak(file) {
-		return ""
-	}
-
-	if c.rootPath == "" {
-		return filepath.ToSlash(filepath.Dir(filepath.Dir(file))) + "/"
-	}
-
-	return c.rootPath
 }

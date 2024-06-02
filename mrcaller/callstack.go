@@ -1,61 +1,45 @@
 package mrcaller
 
 import (
-	"strings"
+	"fmt"
 )
 
 type (
-	// CallStack объект с уже сформированным стеком вызовов функций.
-	CallStack struct {
-		stack  []uintptr
-		prefix string
+	// StackTrace - объект с уже сформированным стеком вызовов функций.
+	StackTrace struct {
+		items []StackItem
+	}
+
+	// StackItem - объект с уже сформированным стеком вызовов функций.
+	StackItem struct {
+		Name string
+		File string
+		Line int
 	}
 )
 
-// Empty - проверяется, что CallStack пустой или нет.
-func (c *CallStack) Empty() bool {
-	return len(c.stack) == 0
+// Count - возвращается количество элементов в стеке вызовов.
+func (c *StackTrace) Count() int {
+	return len(c.items)
 }
 
-// NewIterator - возвращает итератор для обхода сформированного CallStack.
-func (c *CallStack) NewIterator() CallStackIterator {
-	return CallStackIterator{
-		cs: c,
-	}
+// FileLine - возвращает путь к файлу и номер строки кода,
+// где расположена вызванная функция указанного элемента.
+// Если i превысит кол-во элементов в стеке вызовов, то будет вызвана panic.
+func (c *StackTrace) FileLine(i int) (file string, line int) {
+	c.check(i)
+	return c.items[i].File, c.items[i].Line
 }
 
-func (c *CallStack) callStackItem(pos int) (item CallStackItem, ok bool) {
-	if pos >= len(c.stack) {
-		return CallStackItem{}, false
-	}
-
-	frame := runtimeFrame((c.stack)[pos])
-	file, line := frame.FileLine()
-
-	if isBreak(file) {
-		return CallStackItem{}, false
-	}
-
-	return CallStackItem{
-		frame: frame,
-		file:  c.shortenFilePath(file),
-		line:  line,
-	}, true
+// Item - возвращает имя функции указанного элемента, включая данные из FileLine.
+// Если i превысит кол-во элементов в стеке вызовов, то будет вызвана panic.
+func (c *StackTrace) Item(i int) (name, file string, line int) {
+	c.check(i)
+	return c.items[i].Name, c.items[i].File, c.items[i].Line
 }
 
-func (c *CallStack) shortenFilePath(file string) string {
-	const (
-		replacer     = "..."
-		minPrefixLen = len(replacer) + 1
-	)
-
-	if len(c.prefix) >= minPrefixLen && strings.HasPrefix(file, c.prefix) {
-		return replacer + file[len(c.prefix)-1:]
+func (c *StackTrace) check(i int) {
+	if i < 0 || i >= len(c.items) {
+		panic(fmt.Sprintf("index out of range [%d] with length %d", i, len(c.items)))
 	}
-
-	return file
-}
-
-func isBreak(file string) bool {
-	return file == "" || strings.HasSuffix(file, callStackBreak)
 }

@@ -14,7 +14,7 @@ type (
 		dictionaries  map[string]*MultiLangDictionary
 	}
 
-	// TranslatorOptions - опции транслятора.
+	// TranslatorOptions - опции для создания Translator.
 	TranslatorOptions struct {
 		DirPath           string
 		LangCodes         []string

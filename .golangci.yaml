@@ -1,0 +1,122 @@
+# Options for analysis running.
+run:
+  # Number of operating system threads (`GOMAXPROCS`) that can execute golangci-lint simultaneously.
+  # If it is explicitly set to 0 (i.e. not the default) then golangci-lint will automatically set the value to match Linux container CPU quota.
+  # Default: the number of logical CPUs in the machine
+  concurrency: 4
+
+  # Timeout for analysis, e.g. 30s, 5m.
+  # Default: 1m
+
+  timeout: 5m
+  # Define the Go version limit.
+  # Mainly related to generics support since go1.18.
+  # Default: use Go version from the go.mod file, fallback on the env var `GOVERSION`, fallback on 1.17
+
+  go: "1.18"
+
+# output configuration options
+output:
+  # Sort results by the order defined in `sort-order`.
+  # Default: false
+  sort-results: true
+
+# https://golangci-lint.run/usage/linters/
+linters:
+  # Disable all linters.
+  # Default: false
+  disable-all: true
+
+  # Enable specific linter
+  # https://golangci-lint.run/usage/linters/#enabled-by-default
+  enable:
+    - asciicheck # checks that all code identifiers does not have non-ASCII symbols in the name [fast: true, auto-fix: false]
+    - bodyclose # checks whether HTTP response body is closed successfully [fast: false, auto-fix: false]
+    - dogsled # Checks assignments with too many blank identifiers (e.g. x, _, _, _, := f()) [fast: true, auto-fix: false]
+    - dupl # Tool for code clone detection [fast: true, auto-fix: false]
+    - durationcheck # check for two durations multiplied together [fast: false, auto-fix: false]
+    - errcheck # errcheck is a program for checking for unchecked errors in Go code. These unchecked errors can be critical bugs in some cases [fast: false, auto-fix: false]
+    - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13. [fast: false, auto-fix: false]
+    - exportloopref # checks for pointers to enclosing loop variables [fast: false, auto-fix: false]
+    - forbidigo # Forbids identifiers [fast: false, auto-fix: false]
+    - forcetypeassert # finds forced type assertions [fast: true, auto-fix: false]
+    - gochecknoglobals # Check that no global variables exist. [fast: false, auto-fix: false]
+    - gochecknoinits # Checks that no init functions are present in Go code [fast: true, auto-fix: false]
+    - goconst # Finds repeated strings that could be replaced by a constant [fast: true, auto-fix: false]
+    - gocritic # FIXABLE, Provides diagnostics that check for bugs, performance and style issues. [fast: false, auto-fix: true]
+    - gocyclo # Computes and checks the cyclomatic complexity of functions [fast: true, auto-fix: false]
+    - gofumpt # FIXABLE, Gofumpt checks whether code was gofumpt-ed. [fast: true, auto-fix: true]
+    - goheader # FIXABLE, Checks is file header matches to pattern [fast: true, auto-fix: true]
+    - goimports # FIXABLE, Check import statements are formatted according to the 'goimport' command. Reformat imports in autofix mode. [fast: true, auto-fix: true]
+    - gomodguard # Allow and block list linter for direct Go module dependencies. This is different from depguard where there are different block types for example version constraints and module recommendations. [fast: true, auto-fix: false]
+    - goprintffuncname # Checks that printf-like functions are named with `f` at the end. [fast: true, auto-fix: false]
+    - gosec # Inspects source code for security problems [fast: false, auto-fix: false]
+    - gosimple # Linter for Go source code that specializes in simplifying code [fast: false, auto-fix: false]
+    - importas # Enforces consistent import aliases [fast: false, auto-fix: false]
+    - ineffassign # Detects when assignments to existing variables are not used [fast: true, auto-fix: false]
+    - makezero # Finds slice declarations with non-zero initial length [fast: false, auto-fix: false]
+    - misspell # FIXABLE, Finds commonly misspelled English words [fast: true, auto-fix: true]
+    - nakedret # Checks that functions with naked returns are not longer than a maximum size (can be zero). [fast: true, auto-fix: false]
+    - noctx # Finds sending http request without context.Context [fast: false, auto-fix: false]
+    - nolintlint # FIXABLE, Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: true]
+    - prealloc # Finds slice declarations that could potentially be pre-allocated [fast: true, auto-fix: false]
+    - predeclared # find code that shadows one of Go's predeclared identifiers [fast: true, auto-fix: false]
+    - promlinter # Check Prometheus metrics naming via promlint [fast: true, auto-fix: false]
+    - revive # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. [fast: false, auto-fix: false]
+    - rowserrcheck # checks whether Rows.Err of rows is checked successfully [fast: false, auto-fix: false]
+    - sqlclosecheck # Checks that sql.Rows, sql.Stmt, sqlx.NamedStmt, pgx.Query are closed. [fast: false, auto-fix: false]
+    - staticcheck # It's a set of rules from staticcheck. It's not the same thing as the staticcheck binary. The author of staticcheck doesn't support or approve the use of staticcheck as a library inside golangci-lint. [fast: false, auto-fix: false]
+    - thelper # thelper detects tests helpers which is not start with t.Helper() method. [fast: false, auto-fix: false]
+    - tparallel # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes. [fast: false, auto-fix: false]
+    - unconvert # Remove unnecessary type conversions [fast: false, auto-fix: false]
+    - unparam # Reports unused function parameters [fast: false, auto-fix: false]
+    - unused # Checks Go code for unused constants, variables, functions and types [fast: false, auto-fix: false]
+    - wastedassign # Finds wasted assignment statements [fast: false, auto-fix: false]
+    - whitespace # FIXABLE, Whitespace is a linter that checks for unnecessary newlines at the start and end of functions, if, for, etc. [fast: true, auto-fix: true]
+
+linters-settings:
+  dupl:
+    # Tokens count to trigger issue.
+    # Default: 150
+    threshold: 50
+
+  gofumpt:
+    # Choose whether to use the extra rules.
+    # Default: false
+    extra-rules: true
+
+  goimports:
+    # A comma-separated list of prefixes, which, if set, checks import paths
+    # with the given prefixes are grouped after 3rd-party packages.
+    # Default: ""
+    local-prefixes: github.com/mondegor/go-sysmess
+
+issues:
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - dupl
+        - gosec
+        - gochecknoglobals
+        - forbidigo
+        - forcetypeassert
+        - noctx
+        - revive
+        - unparam
+    - path: mrerr/error_kind\.go
+      linters:
+        - gochecknoglobals
+    - path: mrlang/locale\.go
+      linters:
+        - gochecknoglobals
+
+  # Which dirs to exclude: issues from them won't be reported.
+  # Can use regexp here: `generated.*`, regexp is applied on full path,
+  # including the path prefix if one is set.
+  # Default dirs are skipped independently of this option's value (see exclude-dirs-use-default).
+  # "/" will be replaced by current OS file path separator to properly work on Windows.
+  # Default: []
+  exclude-dirs:
+    - vendor

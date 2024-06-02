@@ -13,30 +13,34 @@ func main() {
 	fmt.Println("RootPath: " + curPath)
 
 	caller := mrcaller.New(
-		mrcaller.CallerDepth(3),
-		// mrcaller.CallerUseShortPath(true),
-		// mrcaller.CallerRootPath(curPath),
+		mrcaller.DepthOption(16),
+		mrcaller.FilterStackTraceOption(
+			mrcaller.FilterStackTraceTrimTop(
+				[]string{
+					"main.funcLevel2",
+					// "main.funcLevel1",
+				},
+			),
+		),
 	)
 
-	callStack := funcLevel1(caller)
+	stackTrace := funcLevel1(caller)
 
-	for iter := callStack.NewIterator(); ; {
-		if n, item := iter.Next(); n > 0 {
-			if n == 1 {
-				fmt.Println("[CallStack] ")
-			}
+	for i := 0; i < stackTrace.Count(); i++ {
+		name, file, line := stackTrace.Item(i)
 
-			fmt.Print(strconv.Itoa(n) + ". " + item.Name() + "(): " + item.File() + ":" + strconv.Itoa(item.Line()) + "\n")
-		} else {
-			break
+		if i == 0 {
+			fmt.Println("[CallStack] ")
 		}
+
+		fmt.Print(strconv.Itoa(i+1) + ". " + name + "(): " + file + ":" + strconv.Itoa(line) + "\n")
 	}
 }
 
-func funcLevel1(caller *mrcaller.Caller) mrcaller.CallStack {
+func funcLevel1(caller *mrcaller.Caller) *mrcaller.StackTrace {
 	return funcLevel2(caller)
 }
 
-func funcLevel2(caller *mrcaller.Caller) mrcaller.CallStack {
-	return caller.CallStack(0)
+func funcLevel2(caller *mrcaller.Caller) *mrcaller.StackTrace {
+	return caller.StackTrace()
 }

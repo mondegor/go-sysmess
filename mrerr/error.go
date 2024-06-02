@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/mrcaller"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -18,7 +17,7 @@ const (
 )
 
 type (
-	// AppError - ошибка с поддержкой параметров и CallStack.
+	// AppError - ошибка с поддержкой параметров, ID экземпляра ошибки и стека вызовов.
 	AppError struct {
 		code       string
 		kind       ErrorKind
@@ -28,7 +27,7 @@ type (
 		args       []any
 		attrs      []mrmsg.NamedArg
 		err        error
-		callStack  mrcaller.CallStack
+		stackTrace StackTracer
 	}
 )
 
@@ -42,13 +41,12 @@ func New(code, message string, args ...any) *AppError {
 		args:      args,
 	}
 
-	const skipFrame = 1
-	newErr.setErrorIfArgsNotEqual(skipFrame)
+	newErr.setErrorIfArgsNotEqual()
 
 	return newErr
 }
 
-func (e *AppError) setErrorIfArgsNotEqual(callerSkipFrame int) {
+func (e *AppError) setErrorIfArgsNotEqual() {
 	if len(e.argsNames) == len(e.args) {
 		return
 	}
@@ -62,10 +60,9 @@ func (e *AppError) setErrorIfArgsNotEqual(callerSkipFrame int) {
 	}
 
 	argsErrorFactory := AppErrorFactory{
-		code:            ErrorCodeInternal,
-		kind:            ErrorKindInternal,
-		message:         fmt.Sprintf(errMessage, e.message),
-		callerSkipFrame: callerSkipFrame,
+		code:    ErrorCodeInternal,
+		kind:    ErrorKindInternal,
+		message: fmt.Sprintf(errMessage, e.message),
 	}
 
 	e.err = argsErrorFactory.new(e.err, nil)
@@ -85,26 +82,6 @@ func (e *AppError) Kind() ErrorKind {
 // Но только если в фабрике, породившей эту ошибку, был установлен генератор ID ошибок.
 func (e *AppError) InstanceID() string {
 	return e.instanceID
-}
-
-// HasCallStack - возвращается, что в ошибке содержится CallStack (включая вложенные ошибки).
-// Но только если в фабрике, породившей эту ошибку, было установлено формирование ID ошибок.
-func (e *AppError) HasCallStack() bool {
-	if !e.callStack.Empty() {
-		return true
-	}
-
-	for err := e.err; err != nil; {
-		if v, ok := err.(*AppError); ok {
-			if !v.callStack.Empty() {
-				return true
-			}
-
-			err = v.err
-		}
-	}
-
-	return false
 }
 
 // Error - возвращает ошибку в виде строки.
@@ -138,19 +115,19 @@ func (e *AppError) Error() string {
 		buf.WriteByte(')')
 	}
 
-	for iter := e.callStack.NewIterator(); ; {
-		if n, item := iter.Next(); n > 0 {
-			if n == 1 {
+	if e.stackTrace != nil {
+		for i := 0; i < e.stackTrace.Count(); i++ {
+			file, line := e.stackTrace.FileLine(i)
+
+			if i == 0 {
 				buf.WriteString(" in ")
 			} else {
 				buf.Write([]byte{' ', ',', ' '})
 			}
 
-			buf.WriteString(item.File())
+			buf.WriteString(file)
 			buf.WriteByte(':')
-			buf.WriteString(strconv.Itoa(item.Line()))
-		} else {
-			break
+			buf.WriteString(strconv.Itoa(line))
 		}
 	}
 
