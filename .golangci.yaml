@@ -105,9 +105,6 @@ issues:
         - noctx
         - revive
         - unparam
-    - path: mrerr/error_kind\.go
-      linters:
-        - gochecknoglobals
     - path: mrlang/locale\.go
       linters:
         - gochecknoglobals

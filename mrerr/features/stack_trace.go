@@ -1,4 +1,4 @@
-package mrerr
+package features
 
 import (
 	"fmt"
@@ -10,12 +10,12 @@ const (
 )
 
 type (
-	stackTrace struct {
+	StackTrace struct {
 		pcs []uintptr
 	}
 )
 
-func newStackTrace() *stackTrace {
+func NewStackTrace() *StackTrace {
 	var pcs [stackTraceMaxDepth]uintptr
 	n := runtime.Callers(6, pcs[:])
 
@@ -23,19 +23,19 @@ func newStackTrace() *stackTrace {
 		n = stackTraceMaxDepth
 	}
 
-	return &stackTrace{
+	return &StackTrace{
 		pcs: pcs[0:n],
 	}
 }
 
 // Count - возвращается количество элементов в стеке вызовов.
-func (s *stackTrace) Count() int {
+func (s *StackTrace) Count() int {
 	return len(s.pcs)
 }
 
 // FileLine - возвращает путь к файлу и номер строки кода,
 // где расположена вызванная функция указанного элемента.
-func (s *stackTrace) FileLine(i int) (file string, line int) {
+func (s *StackTrace) FileLine(i int) (file string, line int) {
 	if i < 0 || i >= len(s.pcs) {
 		panic(fmt.Sprintf("index out of range [%d] with length %d", i, len(s.pcs)))
 	}

@@ -3,6 +3,8 @@ package mrmsg
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_render(t *testing.T) {
@@ -65,13 +67,8 @@ func Test_render(t *testing.T) {
 			t.Parallel()
 
 			got, err := render(tt.message, tt.args)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("render() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("render() got = %v, want %v", got, tt.want)
-			}
+			assert.True(t, (err != nil) == tt.wantErr)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

@@ -29,6 +29,8 @@ func render(message string, args []NamedArg) (string, error) {
 		return "", nil
 	}
 
+	// TODO: можно закешировать парсинг сообщений
+
 	templ, err := template.New("").Parse(message)
 	if err != nil {
 		return "", err

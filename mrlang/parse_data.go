@@ -1,7 +1,6 @@
 package mrlang
 
 import (
-	"log"
 	"os"
 	"strings"
 
@@ -18,11 +17,7 @@ func parseFile(path string, data any) error {
 		return err
 	}
 
-	defer func() {
-		if err := f.Close(); err != nil {
-			log.Println("parseFile: error when closing file:", err)
-		}
-	}()
+	defer f.Close()
 
 	return yaml.NewDecoder(f).Decode(data)
 }

@@ -2,6 +2,8 @@ package mrmsg
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestData_String(t *testing.T) {
@@ -37,7 +39,7 @@ func TestData_String(t *testing.T) {
 		},
 		{
 			name: "data with a few values",
-			d:    map[string]any{"key1": "stringValue", "key2": 1234, "key3": false},
+			d:    map[string]any{"key1": "stringValue", "key3": false, "key2": 1234},
 			want: "{key1: stringValue, key2: 1234, key3: false}",
 		},
 	}
@@ -47,9 +49,8 @@ func TestData_String(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got := tt.d.String(); got != tt.want {
-				t.Errorf("String() = %v, want %v", got, tt.want)
-			}
+			got := tt.d.String()
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

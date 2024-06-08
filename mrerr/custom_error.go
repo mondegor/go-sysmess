@@ -2,73 +2,61 @@ package mrerr
 
 import "fmt"
 
-const (
-	customErrorCodePrefix = "mrerr_"
+type (
+	// CustomError - пользовательская ошибка.
+	CustomError struct {
+		customCode string
+		err        *AppError
+	}
 )
 
-type (
-	// CustomError - ошибка, которую допустимо отображать пользователю.
-	CustomError struct {
-		code string
-		err  *AppError
-	}
+var (
+	errCustomErrorHasNil           = NewProto("errCustomErrorHasNil", ErrorKindUser, "custom error has nil").New()
+	errCustomErrorHasExternalError = NewProto("errCustomErrorHasExternalError", ErrorKindUser, "custom error has an external error")
 )
 
 // NewCustomError - создаётся объект CustomError.
-func NewCustomError(code string, err error) *CustomError {
+func NewCustomError(customCode string, err error) *CustomError {
 	if err == nil {
-		return NewCustomErrorMessage(code, "err is nil")
+		return &CustomError{
+			customCode: customCode,
+			err:        errCustomErrorHasNil,
+		}
 	}
 
-	// WARNING: err должна быть именно типа *AppError, а не вложенные в неё ошибки
-	appArr, ok := err.(*AppError) //nolint:errorlint
-	if !ok {
-		appArr = New(
-			customErrorCodePrefix+code,
-			err.Error(),
-		)
+	// WARNING: верхняя ошибка должна быть типа *AppError
+	if e, ok := err.(*AppError); ok { //nolint:errorlint
+		return &CustomError{
+			customCode: customCode,
+			err:        e,
+		}
+	}
+
+	// WARNING: верхняя ошибка должна быть типа AppErrorProto
+	if e, ok := err.(*AppErrorProto); ok { //nolint:errorlint
+		return &CustomError{
+			customCode: customCode,
+			err:        e.New(),
+		}
 	}
 
 	return &CustomError{
-		code: code,
-		err:  appArr,
+		customCode: customCode,
+		err:        errCustomErrorHasExternalError.Wrap(err),
 	}
 }
 
-// NewCustomErrorAppError - создаётся объект CustomError на основе AppError.
-func NewCustomErrorAppError(code string, err *AppError) *CustomError {
-	if err == nil {
-		return NewCustomErrorMessage(code, "appErr is nil")
-	}
-
-	return &CustomError{
-		code: code,
-		err:  err,
-	}
+// CustomCode - возвращает кастомный код ошибки.
+func (e *CustomError) CustomCode() string {
+	return e.customCode
 }
 
-// NewCustomErrorMessage - создаётся объект CustomError на основе message.
-func NewCustomErrorMessage(code, message string) *CustomError {
-	return &CustomError{
-		code: code,
-		err: New(
-			customErrorCodePrefix+code,
-			message,
-		),
-	}
-}
-
-// Code - возвращает код ошибки.
-func (e *CustomError) Code() string {
-	return e.code
-}
-
-// AppError - возвращает вложенную ошибку, которая породила текущая ошибка.
-func (e *CustomError) AppError() *AppError {
+// Err - возвращает вложенную ошибку привязанную к текущей ошибке.
+func (e *CustomError) Err() *AppError {
 	return e.err
 }
 
 // Error - возвращает ошибку в виде строки.
 func (e *CustomError) Error() string {
-	return fmt.Sprintf("error code=%s: {%s}", e.code, e.err.Error())
+	return fmt.Sprintf("error customCode=%s: {%s}", e.customCode, e.err.Error())
 }

@@ -1,4 +1,4 @@
-package mrerr
+package features
 
 import (
 	"crypto/rand"
@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-// generateInstanceID - возвращает ID для текущей ошибки
+// GenerateInstanceID - возвращает ID для текущей ошибки
 // 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f
-func generateInstanceID() string {
+func GenerateInstanceID() string {
 	var value [4]byte
 
 	if _, err := rand.Read(value[:]); err != nil {
