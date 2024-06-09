@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const testGeneratedErrorID = "test-instance-id"
+
 type mockStackTrace struct{}
 
 func (m *mockStackTrace) Count() int                                 { return 0 }
@@ -20,14 +22,14 @@ func TestNewProto(t *testing.T) {
 		code    string
 		kind    ErrorKind
 		message string
-		want    *AppErrorProto
+		want    *ProtoAppError
 	}{
 		{
 			name:    "test1",
 			code:    "test-code1",
 			kind:    ErrorKindInternal,
 			message: "test-message1",
-			want: &AppErrorProto{
+			want: &ProtoAppError{
 				pureError: pureError{
 					code:    "test-code1",
 					kind:    ErrorKindInternal,
@@ -42,7 +44,7 @@ func TestNewProto(t *testing.T) {
 			code:    "test-code2",
 			kind:    ErrorKindSystem,
 			message: "test-message {{ .key1 }} and {{ .key2 }}",
-			want: &AppErrorProto{
+			want: &ProtoAppError{
 				pureError: pureError{
 					code:      "test-code2",
 					kind:      ErrorKindSystem,
@@ -72,13 +74,13 @@ func TestNewWithExtra(t *testing.T) {
 
 	mockStack := &mockStackTrace{}
 
-	expectedProto := AppErrorProto{
+	expectedProto := ProtoAppError{
 		pureError: pureError{
 			code:    "errTestCode",
 			kind:    ErrorKindUser,
 			message: "test-message",
 		},
-		generateID: func() string { return "test-instance-id" },
+		generateID: func() string { return testGeneratedErrorID },
 		caller:     func() StackTracer { return mockStack },
 	}
 
@@ -93,11 +95,11 @@ func TestNewWithExtra(t *testing.T) {
 	assert.Equal(t, expectedProto.code, got.code)
 	assert.Equal(t, expectedProto.kind, got.kind)
 	assert.Equal(t, expectedProto.message, got.message)
-	assert.True(t, got.generateID != nil)
-	assert.True(t, got.caller != nil)
+	assert.NotNil(t, got.generateID)
+	assert.NotNil(t, got.caller)
 }
 
-func TestAppErrorProto_New(t *testing.T) {
+func TestProtoAppError_New(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -168,7 +170,7 @@ func TestAppErrorProto_New(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			e := &AppErrorProto{
+			e := &ProtoAppError{
 				pureError: pureError{
 					code:      tt.code,
 					kind:      tt.kind,
@@ -184,25 +186,23 @@ func TestAppErrorProto_New(t *testing.T) {
 	}
 }
 
-func TestAppErrorProto_NewWithGenerateID(t *testing.T) {
+func TestProtoAppError_NewWithGenerateID(t *testing.T) {
 	t.Parallel()
 
-	proto := &AppErrorProto{
-		generateID: func() string { return "test-instance-id" },
+	proto := &ProtoAppError{
+		generateID: func() string { return testGeneratedErrorID },
 	}
 
-	wantInstanceID := "test-instance-id"
-
 	got := proto.New()
-	assert.Equal(t, wantInstanceID, got.instanceID)
+	assert.Equal(t, testGeneratedErrorID, got.instanceID)
 }
 
-func TestAppErrorProto_NewWithStackTrace(t *testing.T) {
+func TestProtoAppError_NewWithStackTrace(t *testing.T) {
 	t.Parallel()
 
 	mockStack := &mockStackTrace{}
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		caller: func() StackTracer {
 			return mockStack
 		},
@@ -213,7 +213,7 @@ func TestAppErrorProto_NewWithStackTrace(t *testing.T) {
 	assert.Equal(t, mockStack, got.stackTrace.val)
 }
 
-func TestAppErrorProto_Wrap(t *testing.T) {
+func TestProtoAppError_Wrap(t *testing.T) {
 	t.Parallel()
 
 	testErr := errors.New("test-error")
@@ -268,7 +268,7 @@ func TestAppErrorProto_Wrap(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			e := &AppErrorProto{
+			e := &ProtoAppError{
 				pureError: pureError{
 					code:      tt.code,
 					kind:      tt.kind,
@@ -284,30 +284,28 @@ func TestAppErrorProto_Wrap(t *testing.T) {
 	}
 }
 
-func TestAppErrorProto_WrapWithGenerateID(t *testing.T) {
+func TestProtoAppError_WrapWithGenerateID(t *testing.T) {
 	t.Parallel()
 
-	proto := &AppErrorProto{
-		generateID: func() string { return "test-instance-id" },
+	proto := &ProtoAppError{
+		generateID: func() string { return testGeneratedErrorID },
 	}
 
 	wrappedErr := &AppError{}
 
-	wantInstanceID := "test-instance-id"
-
 	got := proto.Wrap(wrappedErr)
-	assert.Equal(t, wantInstanceID, got.instanceID)
+	assert.Equal(t, testGeneratedErrorID, got.instanceID)
 }
 
-func TestAppErrorProto_WrapWrappedErrWithInstanceID(t *testing.T) {
+func TestProtoAppError_WrapWrappedErrWithInstanceID(t *testing.T) {
 	t.Parallel()
 
-	proto := &AppErrorProto{
-		generateID: func() string { return "test-instance-id" },
+	proto := &ProtoAppError{
+		generateID: func() string { return testGeneratedErrorID },
 	}
 
 	wrappedErr := &AppError{
-		instanceID: "test-instance-id",
+		instanceID: testGeneratedErrorID,
 	}
 
 	got := proto.Wrap(wrappedErr)
@@ -315,14 +313,14 @@ func TestAppErrorProto_WrapWrappedErrWithInstanceID(t *testing.T) {
 	assert.Equal(t, wrappedErr.instanceID, *got.errInstanceID)
 }
 
-func TestAppErrorProto_WrapWrappedErrWithPointerInstanceID(t *testing.T) {
+func TestProtoAppError_WrapWrappedErrWithPointerInstanceID(t *testing.T) {
 	t.Parallel()
 
-	proto := &AppErrorProto{
-		generateID: func() string { return "test-instance-id" },
+	proto := &ProtoAppError{
+		generateID: func() string { return testGeneratedErrorID },
 	}
 
-	instanceID := "test-instance-id"
+	instanceID := testGeneratedErrorID
 	wrappedErr := &AppError{
 		errInstanceID: &instanceID,
 	}
@@ -332,12 +330,12 @@ func TestAppErrorProto_WrapWrappedErrWithPointerInstanceID(t *testing.T) {
 	assert.Equal(t, wrappedErr.errInstanceID, got.errInstanceID)
 }
 
-func TestAppErrorProto_WrapWithStackTrace(t *testing.T) {
+func TestProtoAppError_WrapWithStackTrace(t *testing.T) {
 	t.Parallel()
 
 	mockStack := &mockStackTrace{}
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		caller: func() StackTracer {
 			return mockStack
 		},
@@ -350,12 +348,12 @@ func TestAppErrorProto_WrapWithStackTrace(t *testing.T) {
 	assert.Equal(t, mockStack, got.stackTrace.val)
 }
 
-func TestAppErrorProto_WrapWrappedErrWithHasStackTrace(t *testing.T) {
+func TestProtoAppError_WrapWrappedErrWithHasStackTrace(t *testing.T) {
 	t.Parallel()
 
 	mockStack := &mockStackTrace{}
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		caller: func() StackTracer {
 			return mockStack
 		},
@@ -372,7 +370,7 @@ func TestAppErrorProto_WrapWrappedErrWithHasStackTrace(t *testing.T) {
 	assert.Nil(t, got.stackTrace.val)
 }
 
-func TestAppErrorProto_Error(t *testing.T) {
+func TestProtoAppError_Error(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -410,7 +408,7 @@ func TestAppErrorProto_Error(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			e := &AppErrorProto{
+			e := &ProtoAppError{
 				pureError: pureError{
 					message:   tt.message,
 					argsNames: tt.argsNames,

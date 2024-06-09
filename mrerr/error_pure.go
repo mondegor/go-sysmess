@@ -5,11 +5,8 @@ import (
 )
 
 const (
-	// ErrorCodeInternal - обобщённый код ошибки: внутренняя ошибка приложения.
-	ErrorCodeInternal = "errInternal"
-
-	// ErrorCodeSystem - обобщённый код ошибки: системная ошибка приложения.
-	ErrorCodeSystem = "errSystem"
+	ErrorCodeInternal = "errInternal" // ErrorCodeInternal - обобщённый код ошибки: внутренняя ошибка приложения
+	ErrorCodeSystem   = "errSystem"   // ErrorCodeSystem - обобщённый код ошибки: системная ошибка приложения
 )
 
 type (
@@ -51,7 +48,7 @@ func (e *pureError) Is(err error) bool {
 	return false
 }
 
-// Translate - translate error message for user
+// Translate - возвращает сформированное сообщение предназначенное для пользователя.
 func (e *pureError) Translate(t translator) mrmsg.ErrorMessage {
 	if e.kind == ErrorKindUser || t.HasErrorCode(e.code) {
 		return t.TranslateError(e.code, e.message, e.getNamedArgs()...)

@@ -5,12 +5,12 @@ import (
 )
 
 type (
-	// CustomErrorList - список пользовательских ошибок.
-	CustomErrorList []*CustomError
+	// CustomErrors - список пользовательских ошибок.
+	CustomErrors []*CustomError
 )
 
 // Error - возвращает список ошибок в виде строки.
-func (l CustomErrorList) Error() string {
+func (l CustomErrors) Error() string {
 	var buf strings.Builder
 
 	for i := 0; i < len(l); i++ {

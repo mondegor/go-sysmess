@@ -67,7 +67,7 @@ func Test_render(t *testing.T) {
 			t.Parallel()
 
 			got, err := render(tt.message, tt.args)
-			assert.True(t, (err != nil) == tt.wantErr)
+			assert.Equal(t, tt.wantErr, err != nil)
 			assert.Equal(t, tt.want, got)
 		})
 	}

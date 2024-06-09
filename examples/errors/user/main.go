@@ -19,8 +19,8 @@ func main() {
 	}
 }
 
-func createErrorProto() *mrerr.AppErrorProto {
-	return factory.NewAppErrorProto(
+func createErrorProto() *mrerr.ProtoAppError {
+	return factory.NewProtoAppError(
 		factory.Options{
 			Code:            "errMyUserError",
 			Kind:            mrerr.ErrorKindUser,
@@ -31,7 +31,7 @@ func createErrorProto() *mrerr.AppErrorProto {
 	)
 }
 
-func createErrLevel1(f *mrerr.AppErrorProto) error {
+func createErrLevel1(f *mrerr.ProtoAppError) error {
 	return f.New("MY-PARAM00001", 11111)
 }
 

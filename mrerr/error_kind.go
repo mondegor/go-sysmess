@@ -1,9 +1,9 @@
 package mrerr
 
 const (
-	ErrorKindInternal ErrorKind = iota // ErrorKindInternal - внутренняя ошибка приложения (например: обращение по nil указателю).
-	ErrorKindSystem                    // ErrorKindSystem - системная ошибка приложения (например: проблемы с сетью, с доступом к файлу).
-	ErrorKindUser                      // ErrorKindUser - пользовательская ошибка (например: значение указанного поля некорректно).
+	ErrorKindInternal ErrorKind = iota // ErrorKindInternal - внутренняя ошибка приложения (например: обращение по nil указателю)
+	ErrorKindSystem                    // ErrorKindSystem - системная ошибка приложения (например: проблемы с сетью, с доступом к файлу)
+	ErrorKindUser                      // ErrorKindUser - пользовательская ошибка (например: значение указанного поля некорректно)
 )
 
 type (

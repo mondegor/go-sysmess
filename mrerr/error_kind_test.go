@@ -10,14 +10,14 @@ func TestErrorKind_String(t *testing.T) {
 	t.Parallel()
 
 	kind := ErrorKindInternal
-	assert.Equal(t, kind.String(), "Internal")
+	assert.Equal(t, "Internal", kind.String())
 
 	kind = ErrorKindSystem
-	assert.Equal(t, kind.String(), "System")
+	assert.Equal(t, "System", kind.String())
 
 	kind = ErrorKindUser
-	assert.Equal(t, kind.String(), "User")
+	assert.Equal(t, "User", kind.String())
 
 	kind = ErrorKind(3)
-	assert.Equal(t, kind.String(), "Unknown")
+	assert.Equal(t, "Unknown", kind.String())
 }

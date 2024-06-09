@@ -1,6 +1,7 @@
 package mrlang
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -14,12 +15,17 @@ const (
 func parseFile(path string, data any) error {
 	f, err := os.OpenFile(path, os.O_RDONLY, 0)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse file error: %w", err)
 	}
 
 	defer f.Close()
 
-	return yaml.NewDecoder(f).Decode(data)
+	err = yaml.NewDecoder(f).Decode(data)
+	if err != nil {
+		return fmt.Errorf("decode data error: %w", err)
+	}
+
+	return nil
 }
 
 func getFilePath(dirPath, name string) string {

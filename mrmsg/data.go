@@ -14,7 +14,6 @@ type (
 // String - преобразовывает данные в строку.
 func (d Data) String() string {
 	var buf strings.Builder
-	firstItem := true
 
 	buf.WriteByte('{')
 
@@ -23,8 +22,10 @@ func (d Data) String() string {
 	for k := range d {
 		keys = append(keys, k)
 	}
+
 	sort.Strings(keys)
 
+	firstItem := true
 	for _, key := range keys {
 		if firstItem {
 			firstItem = false

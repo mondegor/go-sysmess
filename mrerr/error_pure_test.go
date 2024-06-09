@@ -5,9 +5,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+
 	mock_mrerr "github.com/mondegor/go-sysmess/mrerr/mock"
 	"github.com/mondegor/go-sysmess/mrmsg"
-	"github.com/stretchr/testify/assert"
 )
 
 //go:generate mockgen -source=error_pure.go -destination=./mock/error_pure.go
@@ -15,7 +16,7 @@ import (
 func Test_pureError_IsTrue(t *testing.T) {
 	t.Parallel()
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		pureError: pureError{
 			code: "test-code",
 		},
@@ -34,7 +35,7 @@ func Test_pureError_IsTrue(t *testing.T) {
 func Test_pureError_IsFalse(t *testing.T) {
 	t.Parallel()
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		pureError: pureError{
 			code: "test-code",
 		},
@@ -61,7 +62,7 @@ func Test_pureError_TranslateKindUser(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		pureError: pureError{
 			code:    "test-code",
 			kind:    ErrorKindUser,
@@ -88,7 +89,7 @@ func Test_pureError_TranslateKindInternal(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		pureError: pureError{
 			code: "test-code",
 			kind: ErrorKindInternal,
@@ -119,7 +120,7 @@ func Test_pureError_TranslateKindInternalHasMessage(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		pureError: pureError{
 			code:    "test-code",
 			kind:    ErrorKindInternal,
@@ -151,7 +152,7 @@ func Test_pureError_TranslateKindSystem(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &AppErrorProto{
+	proto := &ProtoAppError{
 		pureError: pureError{
 			kind: ErrorKindSystem,
 		},

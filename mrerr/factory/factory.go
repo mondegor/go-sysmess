@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	// Options - опции для создания AppErrorProto
+	// Options - опции для создания ProtoAppError.
 	Options struct {
 		Code            string
 		Kind            mrerr.ErrorKind
@@ -16,8 +16,9 @@ type (
 	}
 )
 
-// NewAppErrorProto - создаётся объект AppErrorProto с указанными опциями.
-func NewAppErrorProto(opts Options) *mrerr.AppErrorProto {
+// NewProtoAppError - создаёт объект ProtoAppError с указанными опциями.
+// При этом для генерации ID и стека используются функции из пакета features.
+func NewProtoAppError(opts Options) *mrerr.ProtoAppError {
 	generateIDFunc := features.GenerateInstanceID
 	callerFunc := func() mrerr.StackTracer {
 		return features.NewStackTrace()

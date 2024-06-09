@@ -1,6 +1,7 @@
 package mrlang
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -27,10 +28,10 @@ type (
 	locByCodesMap map[string]*Locale
 )
 
-// NewTranslator - создаётся объект Translator.
+// NewTranslator - создаёт объект Translator.
 func NewTranslator(opts TranslatorOptions) (*Translator, error) {
 	if len(opts.LangCodes) == 0 {
-		return nil, fmt.Errorf("opts.LangCodes is required")
+		return nil, errors.New("opts.LangCodes is required")
 	}
 
 	if opts.DefaultLang == "" {

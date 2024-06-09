@@ -16,7 +16,7 @@ type (
 	}
 )
 
-// New - создаётся объект Caller.
+// New - создаёт объект Caller.
 func New(opts ...CallerOption) *Caller {
 	c := &Caller{}
 	c.applyOptions(opts)

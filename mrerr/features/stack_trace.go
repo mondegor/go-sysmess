@@ -10,11 +10,13 @@ const (
 )
 
 type (
+	// StackTrace - стек вызов функций.
 	StackTrace struct {
 		pcs []uintptr
 	}
 )
 
+// NewStackTrace - создаёт объект StackTrace.
 func NewStackTrace() *StackTrace {
 	var pcs [stackTraceMaxDepth]uintptr
 	n := runtime.Callers(6, pcs[:])

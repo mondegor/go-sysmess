@@ -6,7 +6,8 @@ import (
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
-func WithExtra(proto *AppErrorProto, generateID func() string, caller func() StackTracer) *AppErrorProto {
+// WithExtra - создаёт новую ошибку на основе указанной с указанными генераторами.
+func WithExtra(proto *ProtoAppError, generateID func() string, caller func() StackTracer) *ProtoAppError {
 	c := *proto
 	c.generateID = generateID
 	c.caller = caller
@@ -14,8 +15,8 @@ func WithExtra(proto *AppErrorProto, generateID func() string, caller func() Sta
 	return &c
 }
 
-// Cast - преобразует в ошибку AppError без вызова generateID и caller
-func Cast(proto *AppErrorProto) *AppError {
+// Cast - преобразует в ошибку AppError без вызова generateID и caller.
+func Cast(proto *ProtoAppError) *AppError {
 	return &AppError{
 		pureError: proto.pureError,
 	}

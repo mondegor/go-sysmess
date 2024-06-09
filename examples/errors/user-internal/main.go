@@ -27,8 +27,8 @@ func main() {
 	}
 }
 
-func createErrorInternalProto() *mrerr.AppErrorProto {
-	return factory.NewAppErrorProto(
+func createErrorInternalProto() *mrerr.ProtoAppError {
+	return factory.NewProtoAppError(
 		factory.Options{
 			Code:            "errMyInternalError",
 			Kind:            mrerr.ErrorKindInternal,
@@ -39,8 +39,8 @@ func createErrorInternalProto() *mrerr.AppErrorProto {
 	)
 }
 
-func createErrorUserProto() *mrerr.AppErrorProto {
-	return factory.NewAppErrorProto(
+func createErrorUserProto() *mrerr.ProtoAppError {
+	return factory.NewProtoAppError(
 		factory.Options{
 			Code:            "errMyUserError",
 			Kind:            mrerr.ErrorKindUser,
@@ -51,15 +51,15 @@ func createErrorUserProto() *mrerr.AppErrorProto {
 	)
 }
 
-func createErrUser(f *mrerr.AppErrorProto, err error) error {
+func createErrUser(f *mrerr.ProtoAppError, err error) error {
 	return f.Wrap(err, "My-param-for-user-error-00001", 11111)
 }
 
-func createErrInternal(f *mrerr.AppErrorProto) error {
+func createErrInternal(f *mrerr.ProtoAppError) error {
 	return createErrInternal2(f)
 }
 
-func createErrInternal2(f *mrerr.AppErrorProto) error {
+func createErrInternal2(f *mrerr.ProtoAppError) error {
 	return f.New("My-param-for-Internal-error")
 }
 

@@ -7,8 +7,8 @@ import (
 )
 
 type (
-	// AppErrorProto - ошибка с поддержкой параметров, ID экземпляра ошибки и стека вызовов.
-	AppErrorProto struct {
+	// ProtoAppError - прототип ошибки с поддержкой параметров, ID экземпляра ошибки и стека вызовов.
+	ProtoAppError struct {
 		pureError
 		generateID func() string
 		caller     func() StackTracer
@@ -21,14 +21,14 @@ type (
 	}
 )
 
-// вспомогательная ошибка, чтобы отметить, что Wrap применяется для Nil ошибки
+// errSpecifiedErrorIsNil - вспомогательная ошибка, чтобы отметить, что Wrap применяется для Nil ошибки.
 var errSpecifiedErrorIsNil = errors.New("[WARNING!!! specified error is nil, wrapping is not necessary]")
 
-// NewProto - создаёт объект AppErrorProto.
-func NewProto(code string, kind ErrorKind, message string) *AppErrorProto {
+// NewProto - создаёт объект ProtoAppError.
+func NewProto(code string, kind ErrorKind, message string) *ProtoAppError {
 	argsNames := mrmsg.ParseArgsNames(message)
 
-	return &AppErrorProto{
+	return &ProtoAppError{
 		pureError: pureError{
 			code:      code,
 			kind:      kind,
@@ -42,7 +42,8 @@ func NewProto(code string, kind ErrorKind, message string) *AppErrorProto {
 	}
 }
 
-func NewProtoWithExtra(code string, kind ErrorKind, message string, generateID func() string, caller func() StackTracer) *AppErrorProto {
+// NewProtoWithExtra - создаёт объект ProtoAppError с дополнительными параметрами.
+func NewProtoWithExtra(code string, kind ErrorKind, message string, generateID func() string, caller func() StackTracer) *ProtoAppError {
 	proto := NewProto(code, kind, message)
 	proto.generateID = generateID
 	proto.caller = caller
@@ -51,8 +52,8 @@ func NewProtoWithExtra(code string, kind ErrorKind, message string, generateID f
 }
 
 // New - всегда создаёт новую копию текущего объекта,
-// при этом вызываются функции generateID и stackTrace.caller
-func (e *AppErrorProto) New(args ...any) *AppError {
+// при этом вызываются функции generateID и stackTrace.caller.
+func (e *ProtoAppError) New(args ...any) *AppError {
 	c := &AppError{
 		pureError: e.pureError,
 	}
@@ -75,7 +76,12 @@ func (e *AppErrorProto) New(args ...any) *AppError {
 	return c
 }
 
-func (e *AppErrorProto) Wrap(err error, args ...any) *AppError {
+// Wrap - создаёт новую ошибку на основе прототипа и оборачивает
+// в неё указанную. Если указанная ошибка типа AppError, то проверяется
+// был ли у этой ошибки сгенерированы ID и стек, и если да, то
+// у новой ошибки эти параметры не генерятся, даже если соответствующие
+// генераторы установлены для этой ошибки.
+func (e *ProtoAppError) Wrap(err error, args ...any) *AppError {
 	if err == nil {
 		err = errSpecifiedErrorIsNil
 	}
@@ -91,7 +97,6 @@ func (e *AppErrorProto) Wrap(err error, args ...any) *AppError {
 		c.args = makeArgs(args, len(c.argsNames))
 	}
 
-	// WARNING: c.err должна быть именно типа *AppErrorProto, а не вложенные в неё ошибки
 	if wrappedErr, ok := c.err.(*AppError); ok { //nolint:errorlint
 		// instanceID is raising to the top
 		if wrappedErr.errInstanceID != nil {
@@ -120,6 +125,6 @@ func (e *AppErrorProto) Wrap(err error, args ...any) *AppError {
 }
 
 // Error - возвращает ошибку в виде строки.
-func (e *AppErrorProto) Error() string {
+func (e *ProtoAppError) Error() string {
 	return mrmsg.Render(e.message, e.getNamedArgs())
 }

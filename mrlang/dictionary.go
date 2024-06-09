@@ -12,7 +12,7 @@ type (
 	}
 
 	// DictionaryMap - атрибуты объекта на конкретном языке.
-	// dictionary-name -> [id -> [attr1 -> text1, attr2 -> text2, ...], ...]
+	// dictionary-name -> [id -> [attr1 -> text1, attr2 -> text2, ...], ...].
 	DictionaryMap map[string]DictionaryItemAttrs
 )
 

@@ -3,7 +3,7 @@ package mrerr
 import "fmt"
 
 type (
-	// CustomError - пользовательская ошибка.
+	// CustomError - пользовательская ошибка с персональным кодом.
 	CustomError struct {
 		customCode string
 		err        *AppError
@@ -15,7 +15,7 @@ var (
 	errCustomErrorHasExternalError = NewProto("errCustomErrorHasExternalError", ErrorKindUser, "custom error has an external error")
 )
 
-// NewCustomError - создаётся объект CustomError.
+// NewCustomError - создаёт объект CustomError.
 func NewCustomError(customCode string, err error) *CustomError {
 	if err == nil {
 		return &CustomError{
@@ -24,7 +24,6 @@ func NewCustomError(customCode string, err error) *CustomError {
 		}
 	}
 
-	// WARNING: верхняя ошибка должна быть типа *AppError
 	if e, ok := err.(*AppError); ok { //nolint:errorlint
 		return &CustomError{
 			customCode: customCode,
@@ -32,8 +31,7 @@ func NewCustomError(customCode string, err error) *CustomError {
 		}
 	}
 
-	// WARNING: верхняя ошибка должна быть типа AppErrorProto
-	if e, ok := err.(*AppErrorProto); ok { //nolint:errorlint
+	if e, ok := err.(*ProtoAppError); ok { //nolint:errorlint
 		return &CustomError{
 			customCode: customCode,
 			err:        e.New(),
@@ -46,7 +44,7 @@ func NewCustomError(customCode string, err error) *CustomError {
 	}
 }
 
-// CustomCode - возвращает кастомный код ошибки.
+// CustomCode - возвращает персональный код ошибки.
 func (e *CustomError) CustomCode() string {
 	return e.customCode
 }

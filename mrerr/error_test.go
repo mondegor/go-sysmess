@@ -4,8 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/mondegor/go-sysmess/mrmsg"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 func TestAppError_WithAttr(t *testing.T) {

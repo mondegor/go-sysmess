@@ -35,7 +35,9 @@ linters:
     - dogsled # Checks assignments with too many blank identifiers (e.g. x, _, _, _, := f()) [fast: true, auto-fix: false]
     - dupl # Tool for code clone detection [fast: true, auto-fix: false]
     - durationcheck # check for two durations multiplied together [fast: false, auto-fix: false]
+    # - err113 # Go linter to check the errors handling expressions [fast: false, auto-fix: false]
     - errcheck # errcheck is a program for checking for unchecked errors in Go code. These unchecked errors can be critical bugs in some cases [fast: false, auto-fix: false]
+    - errname # Checks that sentinel errors are prefixed with the `Err` and error types are suffixed with the `Error`. [fast: false, auto-fix: false]
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13. [fast: false, auto-fix: false]
     - exportloopref # checks for pointers to enclosing loop variables [fast: false, auto-fix: false]
     - forbidigo # Forbids identifiers [fast: false, auto-fix: false]
@@ -45,6 +47,7 @@ linters:
     - goconst # Finds repeated strings that could be replaced by a constant [fast: true, auto-fix: false]
     - gocritic # FIXABLE, Provides diagnostics that check for bugs, performance and style issues. [fast: false, auto-fix: true]
     - gocyclo # Computes and checks the cyclomatic complexity of functions [fast: true, auto-fix: false]
+    - godot #: Check if comments end in a period [fast: true, auto-fix: true]
     - gofumpt # FIXABLE, Gofumpt checks whether code was gofumpt-ed. [fast: true, auto-fix: true]
     - goheader # FIXABLE, Checks is file header matches to pattern [fast: true, auto-fix: true]
     - goimports # FIXABLE, Check import statements are formatted according to the 'goimport' command. Reformat imports in autofix mode. [fast: true, auto-fix: true]
@@ -54,11 +57,15 @@ linters:
     - gosimple # Linter for Go source code that specializes in simplifying code [fast: false, auto-fix: false]
     - importas # Enforces consistent import aliases [fast: false, auto-fix: false]
     - ineffassign # Detects when assignments to existing variables are not used [fast: true, auto-fix: false]
+    - lll # Reports long lines [fast: true, auto-fix: false]
     - makezero # Finds slice declarations with non-zero initial length [fast: false, auto-fix: false]
     - misspell # FIXABLE, Finds commonly misspelled English words [fast: true, auto-fix: true]
     - nakedret # Checks that functions with naked returns are not longer than a maximum size (can be zero). [fast: true, auto-fix: false]
+    - nestif # Reports deeply nested if statements [fast: true, auto-fix: false]
+    - nlreturn # nlreturn checks for a new line before return and branch statements to increase code clarity [fast: true, auto-fix: false]
     - noctx # Finds sending http request without context.Context [fast: false, auto-fix: false]
     - nolintlint # FIXABLE, Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: true]
+    - perfsprint # Checks that fmt.Sprintf can be replaced with a faster alternative. [fast: false, auto-fix: false]
     - prealloc # Finds slice declarations that could potentially be pre-allocated [fast: true, auto-fix: false]
     - predeclared # find code that shadows one of Go's predeclared identifiers [fast: true, auto-fix: false]
     - promlinter # Check Prometheus metrics naming via promlint [fast: true, auto-fix: false]
@@ -66,6 +73,8 @@ linters:
     - rowserrcheck # checks whether Rows.Err of rows is checked successfully [fast: false, auto-fix: false]
     - sqlclosecheck # Checks that sql.Rows, sql.Stmt, sqlx.NamedStmt, pgx.Query are closed. [fast: false, auto-fix: false]
     - staticcheck # It's a set of rules from staticcheck. It's not the same thing as the staticcheck binary. The author of staticcheck doesn't support or approve the use of staticcheck as a library inside golangci-lint. [fast: false, auto-fix: false]
+    - testifylint #: Checks usage of github.com/stretchr/testify. [fast: false, auto-fix: false]
+    # - testpackage #: linter that makes you use a separate _test package [fast: true, auto-fix: false]
     - thelper # thelper detects tests helpers which is not start with t.Helper() method. [fast: false, auto-fix: false]
     - tparallel # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes. [fast: false, auto-fix: false]
     - unconvert # Remove unnecessary type conversions [fast: false, auto-fix: false]
@@ -73,6 +82,8 @@ linters:
     - unused # Checks Go code for unused constants, variables, functions and types [fast: false, auto-fix: false]
     - wastedassign # Finds wasted assignment statements [fast: false, auto-fix: false]
     - whitespace # FIXABLE, Whitespace is a linter that checks for unnecessary newlines at the start and end of functions, if, for, etc. [fast: true, auto-fix: true]
+    - wrapcheck # Checks that errors returned from external packages are wrapped [fast: false, auto-fix: false]
+    - wsl # add or remove empty lines [fast: true, auto-fix: false]
 
 linters-settings:
   dupl:
@@ -91,7 +102,36 @@ linters-settings:
     # Default: ""
     local-prefixes: github.com/mondegor/go-sysmess
 
+  lll:
+    # Max line length, lines longer will be reported.
+    # '\t' is counted as 1 character by default, and can be changed with the tab-width option.
+    # Default: 120.
+    line-length: 160
+    # Tab width in spaces.
+    # Default: 1
+    tab-width: 1
+
 issues:
+  # The list of ids of default excludes to include or disable.
+  # https://golangci-lint.run/usage/false-positives/#default-exclusions
+  # Default: []
+  include:
+    #- EXC0001 # [errcheck: 'Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*print(f|ln)?|os\.(Un)?Setenv). is not checked'
+    #- EXC0002 # [golint] '(comment on exported (method|function|type|const)|should have( a package)? comment|comment should be of the form)'
+    #- EXC0003 # [golint] 'func name will be used as test\.Test.* by other packages, and that stutters; consider calling this'
+    #- EXC0004 # [govet] '(possible misuse of unsafe.Pointer|should have signature)'
+    #- EXC0005 # [staticcheck] 'SA4011'
+    #- EXC0006 # [gosec] 'G103: Use of unsafe calls should be audited'
+    #- EXC0007 # [gosec] 'G204: Subprocess launched with variable'
+    #- EXC0008 # [gosec] 'G104'
+    #- EXC0009 # [gosec] '(G301|G302|G307): Expect (directory permissions to be 0750|file permissions to be 0600) or less'
+    #- EXC0010 # [gosec] 'G304: Potential file inclusion via variable'
+    #- EXC0011 # [stylecheck] '(ST1000|ST1020|ST1021|ST1022)'
+    - EXC0012 # [revive] 'exported (.+) should have comment( \(or a comment on this block\))? or be unexported'
+    #- EXC0013 # [revive] 'package comment should be of the form "(.+)..."'
+    - EXC0014 # [revive] 'comment on exported (.+) should be of the form "(.+)..."'
+    #- EXC0015 # [revive] 'should have a package comment' (default true)
+
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
     # Exclude some linters from running on tests files.
@@ -104,8 +144,10 @@ issues:
         - forcetypeassert
         - noctx
         - revive
-        - unparam
-    - path: mrlang/locale\.go
+        - unparam # end
+        - exhaustruct
+        - funlen
+    - path: mrlang/locale\.go # TODO: требует рефакторинга
       linters:
         - gochecknoglobals
 

@@ -22,8 +22,8 @@ func main() {
 	}
 }
 
-func createErrorProto() *mrerr.AppErrorProto {
-	return factory.NewAppErrorProto(
+func createErrorProto() *mrerr.ProtoAppError {
+	return factory.NewProtoAppError(
 		factory.Options{
 			Code:            "errMySystemError",
 			Kind:            mrerr.ErrorKindSystem,
@@ -34,15 +34,15 @@ func createErrorProto() *mrerr.AppErrorProto {
 	)
 }
 
-func createErrLevel1(f *mrerr.AppErrorProto) error {
+func createErrLevel1(f *mrerr.ProtoAppError) error {
 	return f.New("MY-PARAM00001", 11111)
 }
 
-func createErrLevel2(f *mrerr.AppErrorProto) error {
+func createErrLevel2(f *mrerr.ProtoAppError) error {
 	return createErr2(f)
 }
 
-func createErr2(f *mrerr.AppErrorProto) error {
+func createErr2(f *mrerr.ProtoAppError) error {
 	return f.New("MY-PARAM00002", 22222)
 }
 

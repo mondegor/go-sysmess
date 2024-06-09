@@ -29,6 +29,7 @@ type (
 	}
 )
 
+// WithAttr - возвращает новую ошибку с прикреплённым к нему именованным атрибутом.
 func (e *AppError) WithAttr(name string, value any) *AppError {
 	c := *e
 	c.attrs = appendAttr(c.attrs, name, value)

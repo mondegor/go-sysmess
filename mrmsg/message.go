@@ -2,6 +2,7 @@ package mrmsg
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"regexp"
 	"strings"
@@ -33,7 +34,7 @@ func render(message string, args []NamedArg) (string, error) {
 
 	templ, err := template.New("").Parse(message)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("parse message error: %w", err)
 	}
 
 	data := make(map[string]string, len(args))
@@ -45,7 +46,7 @@ func render(message string, args []NamedArg) (string, error) {
 	var msg bytes.Buffer
 
 	if err = templ.Execute(&msg, data); err != nil {
-		return "", err
+		return "", fmt.Errorf("execute template error: %w", err)
 	}
 
 	return msg.String(), nil
@@ -68,8 +69,10 @@ func CheckParse(message string) error {
 
 // ParseArgsNames - извлечение параметров из указанного сообщения.
 func ParseArgsNames(message string) []string {
-	var argsNames []string
-	var keys map[string]bool
+	var (
+		argsNames []string
+		keys      map[string]bool
+	)
 
 	for {
 		pos1 := strings.Index(message, leftDelim)

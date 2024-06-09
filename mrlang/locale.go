@@ -72,7 +72,9 @@ func (l *Locale) HasErrorCode(code string) bool {
 func (l *Locale) TranslateError(code, defaultMessage string, args ...mrmsg.NamedArg) mrmsg.ErrorMessage {
 	value, ok := l.errors[code]
 	if !ok {
-		value = mrmsg.ErrorMessage{Reason: defaultMessage}
+		value = mrmsg.ErrorMessage{
+			Reason: defaultMessage,
+		}
 	}
 
 	if len(args) > 0 {

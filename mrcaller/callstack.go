@@ -10,7 +10,7 @@ type (
 		items []StackItem
 	}
 
-	// StackItem - объект с уже сформированным стеком вызовов функций.
+	// StackItem - элемент объекта StackTrace с вызовом конкретной функции.
 	StackItem struct {
 		Name string
 		File string
@@ -28,6 +28,7 @@ func (c *StackTrace) Count() int {
 // Если i превысит кол-во элементов в стеке вызовов, то будет вызвана panic.
 func (c *StackTrace) FileLine(i int) (file string, line int) {
 	c.check(i)
+
 	return c.items[i].File, c.items[i].Line
 }
 
@@ -35,6 +36,7 @@ func (c *StackTrace) FileLine(i int) (file string, line int) {
 // Если i превысит кол-во элементов в стеке вызовов, то будет вызвана panic.
 func (c *StackTrace) Item(i int) (name, file string, line int) {
 	c.check(i)
+
 	return c.items[i].Name, c.items[i].File, c.items[i].Line
 }
 

@@ -14,7 +14,7 @@ func main() {
 	customError := mrerr.NewCustomError("formFieldEmail", errors.New("error in email"))
 	fmt.Println(customError)
 
-	proto := factory.NewAppErrorProto(
+	proto := factory.NewProtoAppError(
 		factory.Options{
 			Code:    "errMyErrorWithParams",
 			Kind:    mrerr.ErrorKindUser,
@@ -22,7 +22,7 @@ func main() {
 		},
 	)
 
-	list := mrerr.CustomErrorList{
+	list := mrerr.CustomErrors{
 		customError,
 		mrerr.NewCustomError("formFieldPhone1", proto.New("p1-11", "p2-11").WithAttr("my-attr1", "attr-value1")),
 	}
@@ -39,8 +39,8 @@ func main() {
 	}
 }
 
-func addSomeItems(list *mrerr.CustomErrorList) {
-	proto := factory.NewAppErrorProto(
+func addSomeItems(list *mrerr.CustomErrors) {
+	proto := factory.NewProtoAppError(
 		factory.Options{
 			Code:            "errSomeItems",
 			Kind:            mrerr.ErrorKindSystem,

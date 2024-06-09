@@ -7,8 +7,7 @@ import (
 	"time"
 )
 
-// GenerateInstanceID - возвращает ID для текущей ошибки
-// 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f
+// GenerateInstanceID - возвращает ID для текущей ошибки.
 func GenerateInstanceID() string {
 	var value [4]byte
 
@@ -16,5 +15,6 @@ func GenerateInstanceID() string {
 		value = [4]byte{0x0, 0xee, 0xee, 0x0} // suffix: 00eeee00
 	}
 
+	// 'hex(unix time)' - 'hex(4 rand bytes)' -> 64e9c0f1-1e97228f
 	return strconv.FormatInt(time.Now().Unix(), 16) + "-" + hex.EncodeToString(value[:])
 }
