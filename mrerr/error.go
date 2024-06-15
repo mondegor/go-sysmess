@@ -68,7 +68,7 @@ func (e *AppError) Error() string {
 			buf.WriteString(messageTooManyArguments)
 		}
 
-		buf.WriteString(mrmsg.Render(e.message, e.getNamedArgs()))
+		buf.WriteString(mrmsg.MustRender(e.message, e.getNamedArgs()))
 	}
 
 	if len(e.attrs) > 0 {
@@ -88,7 +88,9 @@ func (e *AppError) Error() string {
 	}
 
 	if e.stackTrace.val != nil {
-		for i := 0; i < e.stackTrace.val.Count(); i++ {
+		cnt := e.stackTrace.val.Count()
+
+		for i := 0; i < cnt; i++ {
 			file, line := e.stackTrace.val.FileLine(i)
 
 			if i == 0 {

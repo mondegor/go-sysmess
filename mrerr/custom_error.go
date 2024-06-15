@@ -1,6 +1,8 @@
 package mrerr
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type (
 	// CustomError - пользовательская ошибка с персональным кодом.
@@ -11,42 +13,57 @@ type (
 )
 
 var (
-	errCustomErrorHasNil           = NewProto("errCustomErrorHasNil", ErrorKindUser, "custom error has nil").New()
-	errCustomErrorHasExternalError = NewProto("errCustomErrorHasExternalError", ErrorKindUser, "custom error has an external error")
+	// ErrCustomErrorHasInternalError - пользовательская ошибка содержит внутреннюю или системную ошибку.
+	ErrCustomErrorHasInternalError = NewProto(
+		"errCustomErrorHasInternalError", ErrorKindInternal, "custom error has an internal error")
+
+	// ErrCustomErrorHasNoWrappedError - пользовательская ошибка содержит необработанную ошибку.
+	ErrCustomErrorHasNoWrappedError = NewProto(
+		"errCustomErrorHasNoWrappedError", ErrorKindInternal, "custom error has no wrapped error")
 )
 
-// NewCustomError - создаёт объект CustomError.
+// NewCustomError - создаёт объект CustomError, аргумент err должен содержать ошибку.
 func NewCustomError(customCode string, err error) *CustomError {
-	if err == nil {
+	newError := func(customCode string, err *AppError) *CustomError {
 		return &CustomError{
 			customCode: customCode,
-			err:        errCustomErrorHasNil,
+			err:        err,
 		}
+	}
+
+	if err == nil {
+		return newError(customCode, ErrErrorIsNilPointer.New())
 	}
 
 	if e, ok := err.(*AppError); ok { //nolint:errorlint
-		return &CustomError{
-			customCode: customCode,
-			err:        e,
+		if e.Kind() == ErrorKindUser {
+			return newError(customCode, e)
 		}
+
+		return newError(customCode, ErrCustomErrorHasInternalError.Wrap(err))
 	}
 
 	if e, ok := err.(*ProtoAppError); ok { //nolint:errorlint
-		return &CustomError{
-			customCode: customCode,
-			err:        e.New(),
+		if e.Kind() == ErrorKindUser {
+			return newError(customCode, e.New())
 		}
+
+		return newError(customCode, ErrCustomErrorHasInternalError.Wrap(err))
 	}
 
-	return &CustomError{
-		customCode: customCode,
-		err:        errCustomErrorHasExternalError.Wrap(err),
-	}
+	return newError(customCode, ErrCustomErrorHasNoWrappedError.Wrap(err))
 }
 
 // CustomCode - возвращает персональный код ошибки.
 func (e *CustomError) CustomCode() string {
 	return e.customCode
+}
+
+// IsValid - возвращает true, если внутри содержится
+// пользовательская ошибка, все остальные ошибки считаются невалидными,
+// программисту необходимо позаботиться их обернуть в пользовательский вид ошибки.
+func (e *CustomError) IsValid() bool {
+	return e.err.Kind() == ErrorKindUser
 }
 
 // Err - возвращает вложенную ошибку привязанную к текущей ошибке.

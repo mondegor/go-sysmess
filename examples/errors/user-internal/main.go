@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-	"github.com/mondegor/go-sysmess/mrerr/factory"
+	"github.com/mondegor/go-sysmess/mrerr/mrerrfactory"
 )
 
 // main - пример user ошибки с вложенной internal ошибкой.
@@ -28,26 +28,18 @@ func main() {
 }
 
 func createErrorInternalProto() *mrerr.ProtoAppError {
-	return factory.NewProtoAppError(
-		factory.Options{
-			Code:            "errMyInternalError",
-			Kind:            mrerr.ErrorKindInternal,
-			Message:         "my internal error with param {{ .param1 }}",
-			WithIDGenerator: true,
-			WithCaller:      true,
-		},
+	return mrerrfactory.NewProtoAppErrorByDefault(
+		"errMyInternalError",
+		mrerr.ErrorKindInternal,
+		"my internal error with param {{ .param1 }}",
 	)
 }
 
 func createErrorUserProto() *mrerr.ProtoAppError {
-	return factory.NewProtoAppError(
-		factory.Options{
-			Code:            "errMyUserError",
-			Kind:            mrerr.ErrorKindUser,
-			Message:         "my user error with param {{ .param1 }} and param {{ .param2 }}",
-			WithIDGenerator: false,
-			WithCaller:      false,
-		},
+	return mrerrfactory.NewProtoAppErrorByDefault(
+		"errMyUserError",
+		mrerr.ErrorKindUser,
+		"my user error with param {{ .param1 }} and param {{ .param2 }}",
 	)
 }
 

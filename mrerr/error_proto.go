@@ -1,10 +1,10 @@
 package mrerr
 
 import (
-	"errors"
-
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
+
+//go:generate mockgen -source=error_proto.go -destination=./mock/error_proto.go
 
 type (
 	// ProtoAppError - прототип ошибки с поддержкой параметров, ID экземпляра ошибки и стека вызовов.
@@ -21,8 +21,9 @@ type (
 	}
 )
 
-// errSpecifiedErrorIsNil - вспомогательная ошибка, чтобы отметить, что Wrap применяется для Nil ошибки.
-var errSpecifiedErrorIsNil = errors.New("[WARNING!!! specified error is nil, wrapping is not necessary]")
+// ErrErrorIsNilPointer - указанная ошибка - nil pointer.
+var ErrErrorIsNilPointer = NewProto(
+	"errErrorIsNilPointer", ErrorKindInternal, "specified error is nil")
 
 // NewProto - создаёт объект ProtoAppError.
 func NewProto(code string, kind ErrorKind, message string) *ProtoAppError {
@@ -83,7 +84,7 @@ func (e *ProtoAppError) New(args ...any) *AppError {
 // генераторы установлены для этой ошибки.
 func (e *ProtoAppError) Wrap(err error, args ...any) *AppError {
 	if err == nil {
-		err = errSpecifiedErrorIsNil
+		err = ErrErrorIsNilPointer.New()
 	}
 
 	c := &AppError{
@@ -126,5 +127,5 @@ func (e *ProtoAppError) Wrap(err error, args ...any) *AppError {
 
 // Error - возвращает ошибку в виде строки.
 func (e *ProtoAppError) Error() string {
-	return mrmsg.Render(e.message, e.getNamedArgs())
+	return mrmsg.MustRender(e.message, e.getNamedArgs())
 }

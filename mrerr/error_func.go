@@ -7,16 +7,19 @@ import (
 )
 
 // WithExtra - создаёт новую ошибку на основе указанной с указанными генераторами.
-func WithExtra(proto *ProtoAppError, generateID func() string, caller func() StackTracer) *ProtoAppError {
-	c := *proto
-	c.generateID = generateID
-	c.caller = caller
+func WithExtra(proto ProtoAppError, generateID func() string, caller func() StackTracer) ProtoAppError {
+	proto.generateID = generateID
+	proto.caller = caller
 
-	return &c
+	return proto
 }
 
 // Cast - преобразует в ошибку AppError без вызова generateID и caller.
 func Cast(proto *ProtoAppError) *AppError {
+	if proto == nil {
+		return ErrErrorIsNilPointer.New()
+	}
+
 	return &AppError{
 		pureError: proto.pureError,
 	}

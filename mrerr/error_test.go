@@ -1,11 +1,14 @@
-package mrerr
+package mrerr_test
 
 import (
 	"errors"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mondegor/go-sysmess/mrerr"
+	mock_mrerr "github.com/mondegor/go-sysmess/mrerr/mock"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -16,29 +19,25 @@ func TestAppError_WithAttr(t *testing.T) {
 		name       string
 		paramName  string
 		paramValue any
-		want       []mrmsg.NamedArg
+		want       string
 	}{
 		{
 			name:       "test1",
 			paramName:  "",
 			paramValue: nil,
-			want: []mrmsg.NamedArg{
-				{
-					Name:  attrNameByDefault,
-					Value: nil,
-				},
-			},
+			want:       "unnamed=<nil>",
 		},
 		{
 			name:       "test2",
 			paramName:  "test-name",
 			paramValue: "test-value",
-			want: []mrmsg.NamedArg{
-				{
-					Name:  "test-name",
-					Value: "test-value",
-				},
-			},
+			want:       "test-name=test-value",
+		},
+		{
+			name:       "test3",
+			paramName:  "test-name",
+			paramValue: 12345,
+			want:       "test-name=12345",
 		},
 	}
 	for _, tt := range tests {
@@ -47,54 +46,10 @@ func TestAppError_WithAttr(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			e := &AppError{}
+			e := &mrerr.AppError{}
 
 			got := e.WithAttr(tt.paramName, tt.paramValue)
-			assert.Equal(t, tt.want, got.attrs)
-		})
-	}
-}
-
-func TestAppError_InstanceID(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name          string
-		instanceID    string
-		errInstanceID *string
-		want          string
-	}{
-		{
-			name:          "test1",
-			instanceID:    "",
-			errInstanceID: nil,
-			want:          "",
-		},
-		{
-			name:          "test2",
-			instanceID:    "test-id",
-			errInstanceID: nil,
-			want:          "test-id",
-		},
-		{
-			name:          "test3",
-			instanceID:    "",
-			errInstanceID: func(s string) *string { return &s }("test-id"),
-			want:          "test-id",
-		},
-	}
-	for _, tt := range tests {
-		tt := tt
-
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			e := &AppError{
-				instanceID:    tt.instanceID,
-				errInstanceID: tt.errInstanceID,
-			}
-			got := e.InstanceID()
-			assert.Equal(t, tt.want, got)
+			assert.ErrorContains(t, got, tt.want)
 		})
 	}
 }
@@ -105,7 +60,6 @@ func TestAppError_Error(t *testing.T) {
 	tests := []struct {
 		name       string
 		message    string
-		argsNames  []string
 		args       []any
 		instanceID string
 		attrs      []mrmsg.NamedArg
@@ -113,19 +67,13 @@ func TestAppError_Error(t *testing.T) {
 		want       string
 	}{
 		{
-			name:       "test1",
-			message:    "my-message",
-			argsNames:  nil,
-			args:       nil,
-			instanceID: "",
-			attrs:      nil,
-			err:        nil,
-			want:       "my-message",
+			name:    "test1",
+			message: "my-message",
+			want:    "my-message",
 		},
 		{
 			name:       "test2",
 			message:    "my-message {{ .key1 }} - {{ .key2 }}",
-			argsNames:  []string{"key1", "key2"},
 			args:       []any{"value1", "value2"},
 			instanceID: "test-id",
 			attrs: []mrmsg.NamedArg{
@@ -142,11 +90,10 @@ func TestAppError_Error(t *testing.T) {
 			want: "[test-id] my-message value1 - value2 (attr1=value2, attr1=value2): test external error",
 		},
 		{
-			name:      "test3",
-			message:   "my-message {{ .key1 }} - {{ .key2 }}",
-			argsNames: []string{"key1", "key2"},
-			args:      []any{"value1", "value2", "value3"},
-			want:      "[WARNING!!! too many arguments in error message] my-message value1 - value2",
+			name:    "test3",
+			message: "my-message {{ .key1 }} - {{ .key2 }}",
+			args:    []any{"value1", "value2", "value3"},
+			want:    "[WARNING!!! too many arguments in error message] my-message value1 - value2",
 		},
 	}
 	for _, tt := range tests {
@@ -155,18 +102,213 @@ func TestAppError_Error(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			e := &AppError{
-				pureError: pureError{
-					message:   tt.message,
-					argsNames: tt.argsNames,
-					args:      tt.args,
-				},
-				instanceID: tt.instanceID,
-				attrs:      tt.attrs,
-				err:        tt.err,
+			var appErr *mrerr.AppError
+
+			e := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, tt.message, func() string { return tt.instanceID }, nil)
+
+			if tt.err != nil {
+				appErr = e.Wrap(tt.err, tt.args...)
+			} else {
+				appErr = e.New(tt.args...)
 			}
-			got := e.Error()
+
+			for _, attr := range tt.attrs {
+				appErr = appErr.WithAttr(attr.Name, attr.Value)
+			}
+
+			got := appErr.Error()
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+func TestAppError_NewWithInstanceID(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		instanceID string
+		want       string
+	}{
+		{
+			name:       "test1",
+			instanceID: "",
+			want:       "",
+		},
+		{
+			name:       "test2",
+			instanceID: "test-id",
+			want:       "test-id",
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			e := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return tt.instanceID }, nil).New()
+			got := e.InstanceID()
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestAppError_WrapWithInstanceID(t *testing.T) {
+	t.Parallel()
+
+	e1 := errors.New("wrapped-error")
+	e2 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id" }, nil).Wrap(e1)
+
+	got := e2.InstanceID()
+	assert.Equal(t, "test-id", got)
+}
+
+func TestAppError_WrapWithWrappedInstanceID(t *testing.T) {
+	t.Parallel()
+
+	e1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id" }, nil).New()
+	e2 := mrerr.NewProto("", mrerr.ErrorKindInternal, "").Wrap(e1)
+
+	got := e2.InstanceID()
+	assert.Equal(t, "test-id", got)
+}
+
+func TestAppError_WrapWithTripleInstanceID(t *testing.T) {
+	t.Parallel()
+
+	e1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id1" }, nil).New()
+	e2 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id2" }, nil).Wrap(e1)
+	e3 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id3" }, nil).Wrap(e2)
+
+	got := e3.InstanceID()
+	assert.Equal(t, "test-id1", got)
+}
+
+func TestAppError_NewWithStackTrace(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
+
+	proto := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+
+	mockStackTracer.
+		EXPECT().
+		Count().
+		Return(1)
+
+	mockStackTracer.
+		EXPECT().
+		FileLine(0).
+		Return("file-test", 15)
+
+	got := proto.New()
+	assert.ErrorContains(t, got, "in file-test:15")
+}
+
+func TestAppError_WrapWithStackTrace(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
+
+	proto := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+
+	mockStackTracer.
+		EXPECT().
+		Count().
+		Return(1)
+
+	mockStackTracer.
+		EXPECT().
+		FileLine(0).
+		Return("file-test", 15)
+
+	got := proto.Wrap(errors.New("test-error"))
+	assert.ErrorContains(t, got, "in file-test:15")
+}
+
+func TestAppError_WrapWithStackTraceTwoLines(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
+
+	proto := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+
+	mockStackTracer.
+		EXPECT().
+		Count().
+		Return(2)
+
+	mockStackTracer.
+		EXPECT().
+		FileLine(0).
+		Return("file-test1", 15)
+
+	mockStackTracer.
+		EXPECT().
+		FileLine(1).
+		Return("file-test2", 30)
+
+	got := proto.Wrap(errors.New("test-error"))
+	assert.ErrorContains(t, got, "in file-test1:15 , file-test2:30")
+}
+
+func TestAppError_WrapWithWrappedStackTrace(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
+
+	proto1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+	proto2 := mrerr.NewProto("", mrerr.ErrorKindInternal, "")
+
+	mockStackTracer.
+		EXPECT().
+		Count().
+		Return(1)
+
+	mockStackTracer.
+		EXPECT().
+		FileLine(0).
+		Return("file-test", 15)
+
+	got := proto2.Wrap(proto1.New())
+	assert.ErrorContains(t, got, "in file-test:15")
+}
+
+func TestAppError_WrapWithDoubleStackTrace(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStackTracer1 := mock_mrerr.NewMockStackTracer(ctrl)
+	mockStackTracer2 := mock_mrerr.NewMockStackTracer(ctrl)
+
+	proto1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer1 })
+	proto2 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer2 })
+
+	mockStackTracer1.
+		EXPECT().
+		Count().
+		Return(1)
+
+	mockStackTracer1.
+		EXPECT().
+		FileLine(0).
+		Return("file-test", 15)
+
+	got := proto2.Wrap(proto1.New())
+	assert.ErrorContains(t, got, "in file-test:15")
 }

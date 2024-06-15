@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-	"github.com/mondegor/go-sysmess/mrerr/factory"
+	"github.com/mondegor/go-sysmess/mrerr/mrerrfactory"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -14,12 +14,10 @@ func main() {
 	customError := mrerr.NewCustomError("formFieldEmail", errors.New("error in email"))
 	fmt.Println(customError)
 
-	proto := factory.NewProtoAppError(
-		factory.Options{
-			Code:    "errMyErrorWithParams",
-			Kind:    mrerr.ErrorKindUser,
-			Message: "my error with '{{ .param1 }}' and '{{ .param2 }}'",
-		},
+	proto := mrerrfactory.NewProtoAppErrorByDefault(
+		"errMyErrorWithParams",
+		mrerr.ErrorKindUser,
+		"my error with '{{ .param1 }}' and '{{ .param2 }}'",
 	)
 
 	list := mrerr.CustomErrors{
@@ -40,14 +38,10 @@ func main() {
 }
 
 func addSomeItems(list *mrerr.CustomErrors) {
-	proto := factory.NewProtoAppError(
-		factory.Options{
-			Code:            "errSomeItems",
-			Kind:            mrerr.ErrorKindSystem,
-			Message:         "my error with '{{ .param1 }}'",
-			WithIDGenerator: true,
-			WithCaller:      true,
-		},
+	proto := mrerrfactory.NewProtoAppErrorByDefault(
+		"errSomeItems",
+		mrerr.ErrorKindSystem,
+		"my error with '{{ .param1 }}'",
 	)
 
 	*list = append(*list, mrerr.NewCustomError("formField5", nil))

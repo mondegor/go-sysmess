@@ -1,6 +1,15 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-06-15
+### Added
+- Добавлено несколько новых линтеров;
+- Добавлена `NewProtoAppErrorByDefault` и обновлена `NewProtoAppError`;
+
+### Changed
+- Доработан `CustomError`, добавлен к нему метод `IsValid()`, покрыт тестами;
+- Обновлены примеры использования `ProtoAppError` и `CustomError`;
+
 ## 2024-06-09
 ### Changed
 - Переработан пакет ошибок:

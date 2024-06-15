@@ -54,7 +54,7 @@ func (l *Locale) TranslateMessage(code, defaultMessage string, args ...mrmsg.Nam
 	}
 
 	if len(args) > 0 {
-		value = mrmsg.Render(value, args)
+		value = mrmsg.MustRender(value, args)
 	}
 
 	return value
@@ -78,10 +78,10 @@ func (l *Locale) TranslateError(code, defaultMessage string, args ...mrmsg.Named
 	}
 
 	if len(args) > 0 {
-		value.Reason = mrmsg.Render(value.Reason, args)
+		value.Reason = mrmsg.MustRender(value.Reason, args)
 
 		for i := 0; i < len(value.Details); i++ {
-			value.Details[i] = mrmsg.Render(value.Details[i], args)
+			value.Details[i] = mrmsg.MustRender(value.Details[i], args)
 		}
 	}
 

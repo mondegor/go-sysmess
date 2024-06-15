@@ -1,4 +1,4 @@
-package mrerr
+package mrerr_test
 
 import (
 	"errors"
@@ -7,26 +7,24 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mondegor/go-sysmess/mrerr"
+
 	mock_mrerr "github.com/mondegor/go-sysmess/mrerr/mock"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 //go:generate mockgen -source=error_pure.go -destination=./mock/error_pure.go
 
+const (
+	expectedCode    = "test-code"
+	expectedMessage = "test-message"
+)
+
 func Test_pureError_IsTrue(t *testing.T) {
 	t.Parallel()
 
-	proto := &ProtoAppError{
-		pureError: pureError{
-			code: "test-code",
-		},
-	}
-
-	err := &AppError{
-		pureError: pureError{
-			code: "test-code",
-		},
-	}
+	proto := mrerr.NewProto("test-code", mrerr.ErrorKindUser, "")
+	err := proto.New()
 
 	got := proto.Is(err)
 	assert.True(t, got)
@@ -35,17 +33,8 @@ func Test_pureError_IsTrue(t *testing.T) {
 func Test_pureError_IsFalse(t *testing.T) {
 	t.Parallel()
 
-	proto := &ProtoAppError{
-		pureError: pureError{
-			code: "test-code",
-		},
-	}
-
-	err := &AppError{
-		pureError: pureError{
-			code: "test-code2",
-		},
-	}
+	proto := mrerr.NewProto(expectedCode, mrerr.ErrorKindUser, "")
+	err := mrerr.NewProto("test-code2", mrerr.ErrorKindUser, "").New()
 
 	got := proto.Is(err)
 	assert.False(t, got)
@@ -62,23 +51,16 @@ func Test_pureError_TranslateKindUser(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &ProtoAppError{
-		pureError: pureError{
-			code:    "test-code",
-			kind:    ErrorKindUser,
-			message: "test-message",
-		},
-	}
-
-	expected := mrmsg.ErrorMessage{Reason: "test"}
+	proto := mrerr.NewProto(expectedCode, mrerr.ErrorKindUser, expectedMessage)
+	expectedReason := mrmsg.ErrorMessage{Reason: "test"}
 
 	mockTranslator.
 		EXPECT().
-		TranslateError(proto.code, proto.message).
-		Return(expected)
+		TranslateError(expectedCode, expectedMessage).
+		Return(expectedReason)
 
 	got := proto.Translate(mockTranslator)
-	assert.Equal(t, expected, got)
+	assert.Equal(t, expectedReason, got)
 }
 
 func Test_pureError_TranslateKindInternal(t *testing.T) {
@@ -89,27 +71,21 @@ func Test_pureError_TranslateKindInternal(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &ProtoAppError{
-		pureError: pureError{
-			code: "test-code",
-			kind: ErrorKindInternal,
-		},
-	}
-
-	expected := mrmsg.ErrorMessage{Reason: "test"}
+	proto := mrerr.NewProto(expectedCode, mrerr.ErrorKindInternal, "")
+	expectedReason := mrmsg.ErrorMessage{Reason: "test"}
 
 	mockTranslator.
 		EXPECT().
-		HasErrorCode(proto.code).
+		HasErrorCode(expectedCode).
 		Return(false)
 
 	mockTranslator.
 		EXPECT().
-		TranslateError(ErrorCodeInternal, ErrorCodeInternal).
-		Return(expected)
+		TranslateError(mrerr.ErrorCodeUnexpectedInternal, mrerr.ErrorCodeUnexpectedInternal).
+		Return(expectedReason)
 
 	got := proto.Translate(mockTranslator)
-	assert.Equal(t, expected, got)
+	assert.Equal(t, expectedReason, got)
 }
 
 func Test_pureError_TranslateKindInternalHasMessage(t *testing.T) {
@@ -120,28 +96,21 @@ func Test_pureError_TranslateKindInternalHasMessage(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &ProtoAppError{
-		pureError: pureError{
-			code:    "test-code",
-			kind:    ErrorKindInternal,
-			message: "test-message",
-		},
-	}
-
-	expected := mrmsg.ErrorMessage{Reason: "test"}
+	proto := mrerr.NewProto(expectedCode, mrerr.ErrorKindInternal, expectedMessage)
+	expectedReason := mrmsg.ErrorMessage{Reason: "test"}
 
 	mockTranslator.
 		EXPECT().
-		HasErrorCode(proto.code).
+		HasErrorCode(expectedCode).
 		Return(true)
 
 	mockTranslator.
 		EXPECT().
-		TranslateError(proto.code, proto.message).
-		Return(expected)
+		TranslateError(expectedCode, expectedMessage).
+		Return(expectedReason)
 
 	got := proto.Translate(mockTranslator)
-	assert.Equal(t, expected, got)
+	assert.Equal(t, expectedReason, got)
 }
 
 func Test_pureError_TranslateKindSystem(t *testing.T) {
@@ -152,24 +121,19 @@ func Test_pureError_TranslateKindSystem(t *testing.T) {
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
-	proto := &ProtoAppError{
-		pureError: pureError{
-			kind: ErrorKindSystem,
-		},
-	}
-
-	expected := mrmsg.ErrorMessage{Reason: "test"}
+	proto := mrerr.NewProto(expectedCode, mrerr.ErrorKindSystem, "")
+	expectedReason := mrmsg.ErrorMessage{Reason: "test"}
 
 	mockTranslator.
 		EXPECT().
-		HasErrorCode(proto.code).
+		HasErrorCode(expectedCode).
 		Return(false)
 
 	mockTranslator.
 		EXPECT().
-		TranslateError(ErrorCodeSystem, ErrorCodeSystem).
-		Return(expected)
+		TranslateError(mrerr.ErrorCodeUnexpectedSystem, mrerr.ErrorCodeUnexpectedSystem).
+		Return(expectedReason)
 
 	got := proto.Translate(mockTranslator)
-	assert.Equal(t, expected, got)
+	assert.Equal(t, expectedReason, got)
 }

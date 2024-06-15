@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -15,17 +16,21 @@ const (
 
 var regexpArgName = regexp.MustCompile(`^\.[A-Za-z][A-Za-z0-9]*$`)
 
-// Render - возвращает сформированное сообщение со вставленными в неё параметрами.
-func Render(message string, args []NamedArg) string {
-	value, err := render(message, args)
+// MustRender - возвращает сформированное сообщение со вставленными в неё параметрами.
+// В случае ошибки логирует эту ошибку и возвращает сообщение без параметров.
+func MustRender(message string, args []NamedArg) string {
+	value, err := Render(message, args)
 	if err != nil {
+		log.Printf("'%s' message rendering failed: %v", message, err)
+
 		return message
 	}
 
 	return value
 }
 
-func render(message string, args []NamedArg) (string, error) {
+// Render - возвращает сформированное сообщение со вставленными в неё параметрами.
+func Render(message string, args []NamedArg) (string, error) {
 	if message == "" {
 		return "", nil
 	}
@@ -62,7 +67,7 @@ func CheckParse(message string) error {
 		args[i] = NamedArg{arg, arg}
 	}
 
-	_, err := render(message, args)
+	_, err := Render(message, args)
 
 	return err
 }

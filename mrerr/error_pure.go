@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	ErrorCodeInternal = "errInternal" // ErrorCodeInternal - обобщённый код ошибки: внутренняя ошибка приложения
-	ErrorCodeSystem   = "errSystem"   // ErrorCodeSystem - обобщённый код ошибки: системная ошибка приложения
+	ErrorCodeUnexpectedInternal = "errUnexpectedInternal" // ErrorCodeUnexpectedInternal - обобщённый код ошибки: внутренняя ошибка приложения
+	ErrorCodeUnexpectedSystem   = "errUnexpectedSystem"   // ErrorCodeUnexpectedSystem - обобщённый код ошибки: системная ошибка приложения
 )
 
 type (
@@ -54,11 +54,13 @@ func (e *pureError) Translate(t translator) mrmsg.ErrorMessage {
 		return t.TranslateError(e.code, e.message, e.getNamedArgs()...)
 	}
 
+	// если об ошибке с указанным кодом ничего не знает translator,
+	// то берётся текст соответствующей стандартной ошибки
 	if e.kind == ErrorKindSystem {
-		return t.TranslateError(ErrorCodeSystem, ErrorCodeSystem)
+		return t.TranslateError(ErrorCodeUnexpectedSystem, ErrorCodeUnexpectedSystem)
 	}
 
-	return t.TranslateError(ErrorCodeInternal, ErrorCodeInternal)
+	return t.TranslateError(ErrorCodeUnexpectedInternal, ErrorCodeUnexpectedInternal)
 }
 
 func (e *pureError) getNamedArgs() []mrmsg.NamedArg {

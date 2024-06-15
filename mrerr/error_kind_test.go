@@ -1,23 +1,25 @@
-package mrerr
+package mrerr_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mondegor/go-sysmess/mrerr"
 )
 
 func TestErrorKind_String(t *testing.T) {
 	t.Parallel()
 
-	kind := ErrorKindInternal
+	kind := mrerr.ErrorKindInternal
 	assert.Equal(t, "Internal", kind.String())
 
-	kind = ErrorKindSystem
+	kind = mrerr.ErrorKindSystem
 	assert.Equal(t, "System", kind.String())
 
-	kind = ErrorKindUser
+	kind = mrerr.ErrorKindUser
 	assert.Equal(t, "User", kind.String())
 
-	kind = ErrorKind(3)
+	kind = mrerr.ErrorKind(3)
 	assert.Equal(t, "Unknown", kind.String())
 }

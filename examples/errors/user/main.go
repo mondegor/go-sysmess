@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-	"github.com/mondegor/go-sysmess/mrerr/factory"
+	"github.com/mondegor/go-sysmess/mrerr/mrerrfactory"
 )
 
 // main - пример user ошибки с параметром в сообщении, без уникального ID и без stack trace.
@@ -20,14 +20,10 @@ func main() {
 }
 
 func createErrorProto() *mrerr.ProtoAppError {
-	return factory.NewProtoAppError(
-		factory.Options{
-			Code:            "errMyUserError",
-			Kind:            mrerr.ErrorKindUser,
-			Message:         "my user error with param {{ .param1 }} and param {{ .param2 }}",
-			WithIDGenerator: false,
-			WithCaller:      false,
-		},
+	return mrerrfactory.NewProtoAppErrorByDefault(
+		"errMyUserError",
+		mrerr.ErrorKindUser,
+		"my user error with param {{ .param1 }} and param {{ .param2 }}",
 	)
 }
 

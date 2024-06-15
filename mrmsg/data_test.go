@@ -1,9 +1,11 @@
-package mrmsg
+package mrmsg_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 func TestData_String(t *testing.T) {
@@ -11,7 +13,7 @@ func TestData_String(t *testing.T) {
 
 	tests := []struct {
 		name string
-		d    Data
+		d    mrmsg.Data
 		want string
 	}{
 		{
