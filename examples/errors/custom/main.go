@@ -60,6 +60,7 @@ func echo(err error, tr *Translator) {
 }
 
 type (
+	// Translator - Объект для работы с переводом ошибок на различные языки.
 	Translator struct{}
 )
 

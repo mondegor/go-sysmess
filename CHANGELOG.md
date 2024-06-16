@@ -1,10 +1,15 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-06-16
+### Changed
+- Настроен линтер `reviev` (`.golangci.yaml`);
+
 ## 2024-06-15
 ### Added
 - Добавлено несколько новых линтеров;
 - Добавлена `NewProtoAppErrorByDefault` и обновлена `NewProtoAppError`;
+- Подключены линтеры с их настройками (`.golangci.yaml`);
 
 ### Changed
 - Доработан `CustomError`, добавлен к нему метод `IsValid()`, покрыт тестами;
