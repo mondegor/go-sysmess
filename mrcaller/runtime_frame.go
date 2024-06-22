@@ -21,7 +21,7 @@ func (f runtimeFrame) Name() string {
 func (f runtimeFrame) FileLine() (file string, line int) {
 	fn := runtime.FuncForPC(f.pc())
 	if fn == nil {
-		return "", 0
+		return "???", 0
 	}
 
 	return fn.FileLine(f.pc())

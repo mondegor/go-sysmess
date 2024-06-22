@@ -10,14 +10,20 @@ type (
 	// ProtoAppError - прототип ошибки с поддержкой параметров, ID экземпляра ошибки и стека вызовов.
 	ProtoAppError struct {
 		pureError
-		generateID func() string
-		caller     func() StackTracer
+		caller    func() StackTracer
+		onCreated func(err *AppError) (instanceID string)
+	}
+
+	// ProtoExtra - дополнительные опции для создания ProtoAppError.
+	ProtoExtra struct {
+		Caller    func() StackTracer
+		OnCreated func(err *AppError) (instanceID string)
 	}
 
 	// StackTracer - предоставляет доступ к стеку вызовов.
 	StackTracer interface {
 		Count() int
-		FileLine(index int) (file string, line int)
+		Item(index int) (name, file string, line int)
 	}
 )
 
@@ -44,16 +50,16 @@ func NewProto(code string, kind ErrorKind, message string) *ProtoAppError {
 }
 
 // NewProtoWithExtra - создаёт объект ProtoAppError с дополнительными параметрами.
-func NewProtoWithExtra(code string, kind ErrorKind, message string, generateID func() string, caller func() StackTracer) *ProtoAppError {
+func NewProtoWithExtra(code string, kind ErrorKind, message string, extra ProtoExtra) *ProtoAppError {
 	proto := NewProto(code, kind, message)
-	proto.generateID = generateID
-	proto.caller = caller
+	proto.caller = extra.Caller
+	proto.onCreated = extra.OnCreated
 
 	return proto
 }
 
 // New - всегда создаёт новую копию текущего объекта,
-// при этом вызываются функции generateID и stackTrace.caller.
+// при этом вызываются функции caller и onCreated если они были установлены.
 func (e *ProtoAppError) New(args ...any) *AppError {
 	c := &AppError{
 		pureError: e.pureError,
@@ -65,13 +71,13 @@ func (e *ProtoAppError) New(args ...any) *AppError {
 		c.args = makeArgs(args, len(c.argsNames))
 	}
 
-	if e.generateID != nil {
-		c.instanceID = e.generateID()
-	}
-
 	if e.caller != nil {
 		c.stackTrace.val = e.caller()
 		c.stackTrace.has = true
+	}
+
+	if e.onCreated != nil {
+		c.instanceID = e.onCreated(c)
 	}
 
 	return c
@@ -113,13 +119,13 @@ func (e *ProtoAppError) Wrap(err error, args ...any) *AppError {
 		}
 	}
 
-	if e.generateID != nil && c.errInstanceID == nil {
-		c.instanceID = e.generateID()
-	}
-
 	if e.caller != nil && !c.stackTrace.has {
 		c.stackTrace.val = e.caller()
 		c.stackTrace.has = true
+	}
+
+	if e.onCreated != nil && c.errInstanceID == nil {
+		c.instanceID = e.onCreated(c)
 	}
 
 	return c

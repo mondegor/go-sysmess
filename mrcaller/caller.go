@@ -12,6 +12,7 @@ type (
 	// Caller - обёртка runtime.Callers для более удобного формирования стека вызовов.
 	Caller struct {
 		depth                int                              // максимальное кол-во элементов в стеке вызовов
+		showFuncName         bool                             // формирование имени функций в стеке вызовов
 		filterStackTraceFunc func(frames []uintptr) []uintptr // функция фильтрации стека вызовов
 	}
 )
@@ -54,9 +55,12 @@ func (c *Caller) StackTrace() *StackTrace {
 		file, line := frame.FileLine()
 
 		items[i] = StackItem{
-			Name: frame.Name(),
 			File: file,
 			Line: line,
+		}
+
+		if c.showFuncName {
+			items[i].Name = frame.Name()
 		}
 	}
 

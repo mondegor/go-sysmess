@@ -6,12 +6,28 @@ import (
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
-// WithExtra - создаёт новую ошибку на основе указанной с указанными генераторами.
-func WithExtra(proto ProtoAppError, generateID func() string, caller func() StackTracer) ProtoAppError {
-	proto.generateID = generateID
-	proto.caller = caller
+// WithExtra - создаёт новую ProtoAppError на основе указанной с дополнительными параметрами.
+func WithExtra(proto ProtoAppError, extra ProtoExtra) ProtoAppError {
+	proto.caller = extra.Caller
+	proto.onCreated = extra.OnCreated
 
 	return proto
+}
+
+// WithoutStackTrace - возвращает ошибку без стека вызовов.
+func WithoutStackTrace(err *AppError) *AppError {
+	if err == nil {
+		return ErrErrorIsNilPointer.New()
+	}
+
+	if err.stackTrace.val == nil {
+		return err
+	}
+
+	c := *err
+	c.stackTrace.val = nil
+
+	return &c
 }
 
 // Cast - преобразует в ошибку AppError без вызова generateID и caller.

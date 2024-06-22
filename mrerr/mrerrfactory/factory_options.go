@@ -6,26 +6,31 @@ import (
 )
 
 // NewProtoAppError - создаёт объект ProtoAppError с указанными опциями.
-// При этом для генерации ID и стека используются функции из пакета features.
-func NewProtoAppError(code string, kind mrerr.ErrorKind, message string, withIDGenerator, withCaller bool) *mrerr.ProtoAppError {
-	generateIDFunc := features.GenerateInstanceID
+// При этом генерации стека вызовов и генерации ID используются функции из пакета features.
+func NewProtoAppError(code string, kind mrerr.ErrorKind, message string, withCaller, withIDGenerator bool) *mrerr.ProtoAppError {
 	callerFunc := func() mrerr.StackTracer {
 		return features.NewStackTrace()
 	}
 
-	if !withIDGenerator {
-		generateIDFunc = nil
+	onCreateFunc := func(_ *mrerr.AppError) (instanceID string) {
+		return features.GenerateInstanceID()
 	}
 
 	if !withCaller {
 		callerFunc = nil
 	}
 
+	if !withIDGenerator {
+		onCreateFunc = nil
+	}
+
 	return mrerr.NewProtoWithExtra(
 		code,
 		kind,
 		message,
-		generateIDFunc,
-		callerFunc,
+		mrerr.ProtoExtra{
+			Caller:    callerFunc,
+			OnCreated: onCreateFunc,
+		},
 	)
 }

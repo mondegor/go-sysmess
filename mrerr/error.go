@@ -91,12 +91,18 @@ func (e *AppError) Error() string {
 		cnt := e.stackTrace.val.Count()
 
 		for i := 0; i < cnt; i++ {
-			file, line := e.stackTrace.val.FileLine(i)
+			name, file, line := e.stackTrace.val.Item(i)
 
 			if i == 0 {
 				buf.WriteString(" in ")
 			} else {
 				buf.Write([]byte{' ', ',', ' '})
+			}
+
+			if name != "" {
+				buf.WriteByte('[')
+				buf.WriteString(name)
+				buf.Write([]byte{']', ' '})
 			}
 
 			buf.WriteString(file)

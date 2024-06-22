@@ -104,7 +104,15 @@ func TestAppError_Error(t *testing.T) {
 
 			var appErr *mrerr.AppError
 
-			e := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, tt.message, func() string { return tt.instanceID }, nil)
+			e := mrerr.NewProtoWithExtra(
+				"",
+				mrerr.ErrorKindInternal,
+				tt.message,
+				mrerr.ProtoExtra{
+					Caller:    nil,
+					OnCreated: func(err *mrerr.AppError) string { return tt.instanceID },
+				},
+			)
 
 			if tt.err != nil {
 				appErr = e.Wrap(tt.err, tt.args...)
@@ -147,7 +155,15 @@ func TestAppError_NewWithInstanceID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			e := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return tt.instanceID }, nil).New()
+			e := mrerr.NewProtoWithExtra(
+				"",
+				mrerr.ErrorKindInternal,
+				"",
+				mrerr.ProtoExtra{
+					Caller:    nil,
+					OnCreated: func(err *mrerr.AppError) string { return tt.instanceID },
+				},
+			).New()
 			got := e.InstanceID()
 			assert.Equal(t, tt.want, got)
 		})
@@ -158,7 +174,15 @@ func TestAppError_WrapWithInstanceID(t *testing.T) {
 	t.Parallel()
 
 	e1 := errors.New("wrapped-error")
-	e2 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id" }, nil).Wrap(e1)
+	e2 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    nil,
+			OnCreated: func(err *mrerr.AppError) string { return "test-id" },
+		},
+	).Wrap(e1)
 
 	got := e2.InstanceID()
 	assert.Equal(t, "test-id", got)
@@ -167,7 +191,15 @@ func TestAppError_WrapWithInstanceID(t *testing.T) {
 func TestAppError_WrapWithWrappedInstanceID(t *testing.T) {
 	t.Parallel()
 
-	e1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id" }, nil).New()
+	e1 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    nil,
+			OnCreated: func(err *mrerr.AppError) string { return "test-id" },
+		},
+	).New()
 	e2 := mrerr.NewProto("", mrerr.ErrorKindInternal, "").Wrap(e1)
 
 	got := e2.InstanceID()
@@ -177,9 +209,35 @@ func TestAppError_WrapWithWrappedInstanceID(t *testing.T) {
 func TestAppError_WrapWithTripleInstanceID(t *testing.T) {
 	t.Parallel()
 
-	e1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id1" }, nil).New()
-	e2 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id2" }, nil).Wrap(e1)
-	e3 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", func() string { return "test-id3" }, nil).Wrap(e2)
+	e1 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    nil,
+			OnCreated: func(err *mrerr.AppError) string { return "test-id1" },
+		},
+	).New()
+
+	e2 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    nil,
+			OnCreated: func(err *mrerr.AppError) string { return "test-id2" },
+		},
+	).Wrap(e1)
+
+	e3 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    nil,
+			OnCreated: func(err *mrerr.AppError) string { return "test-id3" },
+		},
+	).Wrap(e2)
 
 	got := e3.InstanceID()
 	assert.Equal(t, "test-id1", got)
@@ -193,7 +251,15 @@ func TestAppError_NewWithStackTrace(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+	proto := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    func() mrerr.StackTracer { return mockStackTracer },
+			OnCreated: nil,
+		},
+	)
 
 	mockStackTracer.
 		EXPECT().
@@ -202,11 +268,11 @@ func TestAppError_NewWithStackTrace(t *testing.T) {
 
 	mockStackTracer.
 		EXPECT().
-		FileLine(0).
-		Return("file-test", 15)
+		Item(0).
+		Return("fun-name", "file-test", 15)
 
 	got := proto.New()
-	assert.ErrorContains(t, got, "in file-test:15")
+	assert.ErrorContains(t, got, "in [fun-name] file-test:15")
 }
 
 func TestAppError_WrapWithStackTrace(t *testing.T) {
@@ -217,7 +283,15 @@ func TestAppError_WrapWithStackTrace(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+	proto := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    func() mrerr.StackTracer { return mockStackTracer },
+			OnCreated: nil,
+		},
+	)
 
 	mockStackTracer.
 		EXPECT().
@@ -226,11 +300,11 @@ func TestAppError_WrapWithStackTrace(t *testing.T) {
 
 	mockStackTracer.
 		EXPECT().
-		FileLine(0).
-		Return("file-test", 15)
+		Item(0).
+		Return("fun-name", "file-test", 15)
 
 	got := proto.Wrap(errors.New("test-error"))
-	assert.ErrorContains(t, got, "in file-test:15")
+	assert.ErrorContains(t, got, "in [fun-name] file-test:15")
 }
 
 func TestAppError_WrapWithStackTraceTwoLines(t *testing.T) {
@@ -241,7 +315,15 @@ func TestAppError_WrapWithStackTraceTwoLines(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+	proto := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    func() mrerr.StackTracer { return mockStackTracer },
+			OnCreated: nil,
+		},
+	)
 
 	mockStackTracer.
 		EXPECT().
@@ -250,16 +332,16 @@ func TestAppError_WrapWithStackTraceTwoLines(t *testing.T) {
 
 	mockStackTracer.
 		EXPECT().
-		FileLine(0).
-		Return("file-test1", 15)
+		Item(0).
+		Return("fun-name1", "file-test1", 15)
 
 	mockStackTracer.
 		EXPECT().
-		FileLine(1).
-		Return("file-test2", 30)
+		Item(1).
+		Return("fun-name2", "file-test2", 30)
 
 	got := proto.Wrap(errors.New("test-error"))
-	assert.ErrorContains(t, got, "in file-test1:15 , file-test2:30")
+	assert.ErrorContains(t, got, "in [fun-name1] file-test1:15 , [fun-name2] file-test2:30")
 }
 
 func TestAppError_WrapWithWrappedStackTrace(t *testing.T) {
@@ -270,7 +352,16 @@ func TestAppError_WrapWithWrappedStackTrace(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer })
+	proto1 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    func() mrerr.StackTracer { return mockStackTracer },
+			OnCreated: nil,
+		},
+	)
+
 	proto2 := mrerr.NewProto("", mrerr.ErrorKindInternal, "")
 
 	mockStackTracer.
@@ -280,11 +371,11 @@ func TestAppError_WrapWithWrappedStackTrace(t *testing.T) {
 
 	mockStackTracer.
 		EXPECT().
-		FileLine(0).
-		Return("file-test", 15)
+		Item(0).
+		Return("fun-name", "file-test", 15)
 
 	got := proto2.Wrap(proto1.New())
-	assert.ErrorContains(t, got, "in file-test:15")
+	assert.ErrorContains(t, got, "in [fun-name] file-test:15")
 }
 
 func TestAppError_WrapWithDoubleStackTrace(t *testing.T) {
@@ -296,8 +387,25 @@ func TestAppError_WrapWithDoubleStackTrace(t *testing.T) {
 	mockStackTracer1 := mock_mrerr.NewMockStackTracer(ctrl)
 	mockStackTracer2 := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto1 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer1 })
-	proto2 := mrerr.NewProtoWithExtra("", mrerr.ErrorKindInternal, "", nil, func() mrerr.StackTracer { return mockStackTracer2 })
+	proto1 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    func() mrerr.StackTracer { return mockStackTracer1 },
+			OnCreated: nil,
+		},
+	)
+
+	proto2 := mrerr.NewProtoWithExtra(
+		"",
+		mrerr.ErrorKindInternal,
+		"",
+		mrerr.ProtoExtra{
+			Caller:    func() mrerr.StackTracer { return mockStackTracer2 },
+			OnCreated: nil,
+		},
+	)
 
 	mockStackTracer1.
 		EXPECT().
@@ -306,9 +414,9 @@ func TestAppError_WrapWithDoubleStackTrace(t *testing.T) {
 
 	mockStackTracer1.
 		EXPECT().
-		FileLine(0).
-		Return("file-test", 15)
+		Item(0).
+		Return("fun-name", "file-test", 15)
 
 	got := proto2.Wrap(proto1.New())
-	assert.ErrorContains(t, got, "in file-test:15")
+	assert.ErrorContains(t, got, "in [fun-name] file-test:15")
 }

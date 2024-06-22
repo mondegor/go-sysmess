@@ -11,6 +11,11 @@ func DepthOption(value int) CallerOption {
 	return func(c *Caller) { c.depth = value }
 }
 
+// ShowFuncNameOption - устанавливает опцию noname для Caller.
+func ShowFuncNameOption(value bool) CallerOption {
+	return func(c *Caller) { c.showFuncName = value }
+}
+
 // FilterStackTraceOption - функцию фильтрации стека вызовов.
 func FilterStackTraceOption(fn func(frames []uintptr) []uintptr) CallerOption {
 	return func(c *Caller) { c.filterStackTraceFunc = fn }

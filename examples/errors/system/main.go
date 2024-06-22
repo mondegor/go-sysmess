@@ -27,8 +27,8 @@ func createErrorProto() *mrerr.ProtoAppError {
 		"errMySystemError",
 		mrerr.ErrorKindSystem,
 		"my system error with param {{ .param1 }} and param {{ .param2 }}",
-		true,
 		false,
+		true,
 	)
 }
 

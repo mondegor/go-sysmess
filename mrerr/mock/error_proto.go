@@ -47,17 +47,18 @@ func (mr *MockStackTracerMockRecorder) Count() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockStackTracer)(nil).Count))
 }
 
-// FileLine mocks base method.
-func (m *MockStackTracer) FileLine(index int) (string, int) {
+// Item mocks base method.
+func (m *MockStackTracer) Item(index int) (string, string, int) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FileLine", index)
+	ret := m.ctrl.Call(m, "Item", index)
 	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(int)
-	return ret0, ret1
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(int)
+	return ret0, ret1, ret2
 }
 
-// FileLine indicates an expected call of FileLine.
-func (mr *MockStackTracerMockRecorder) FileLine(index interface{}) *gomock.Call {
+// Item indicates an expected call of Item.
+func (mr *MockStackTracerMockRecorder) Item(index interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FileLine", reflect.TypeOf((*MockStackTracer)(nil).FileLine), index)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Item", reflect.TypeOf((*MockStackTracer)(nil).Item), index)
 }

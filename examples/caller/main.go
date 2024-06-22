@@ -14,8 +14,9 @@ func main() {
 
 	caller := mrcaller.New(
 		mrcaller.DepthOption(16),
+		mrcaller.ShowFuncNameOption(true),
 		mrcaller.FilterStackTraceOption(
-			mrcaller.FilterStackTraceTrimTop(
+			mrcaller.FilterStackTraceTrimUpper(
 				[]string{
 					"main.funcLevel2",
 					// "main.funcLevel1",

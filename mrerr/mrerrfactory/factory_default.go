@@ -7,23 +7,28 @@ import (
 
 // NewProtoAppErrorByDefault - создаёт стандартный прототип ошибки ProtoAppError,
 // а если указан один из видов ErrorKindInternal или ErrorKindSystem,
-// то к ним добавляется генерация ID и стека вызовов из пакета features.
+// то к ним добавляется генерация стека вызовов и генерация ID из пакета features.
 func NewProtoAppErrorByDefault(code string, kind mrerr.ErrorKind, message string) *mrerr.ProtoAppError {
-	generateIDFunc := features.GenerateInstanceID
 	callerFunc := func() mrerr.StackTracer {
 		return features.NewStackTrace()
 	}
 
+	onCreateFunc := func(_ *mrerr.AppError) (instanceID string) {
+		return features.GenerateInstanceID()
+	}
+
 	if kind == mrerr.ErrorKindUser {
-		generateIDFunc = nil
 		callerFunc = nil
+		onCreateFunc = nil
 	}
 
 	return mrerr.NewProtoWithExtra(
 		code,
 		kind,
 		message,
-		generateIDFunc,
-		callerFunc,
+		mrerr.ProtoExtra{
+			Caller:    callerFunc,
+			OnCreated: onCreateFunc,
+		},
 	)
 }

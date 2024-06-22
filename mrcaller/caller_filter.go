@@ -1,27 +1,39 @@
 package mrcaller
 
-// FilterStackTraceTrimTop - функция срезает верхнюю часть стека вызовов,
-// которая не несёт в себе информативности. В массиве borders указываются
+const (
+	lowerBound = "runtime.main"
+)
+
+// FilterStackTraceTrimUpper - функция срезает верхнюю часть стека вызовов,
+// которая не несёт в себе информативности. В массиве bounds указываются
 // все названия функций и стек будет срезан по самой нижней из них.
-func FilterStackTraceTrimTop(borders []string) func(frames []uintptr) []uintptr {
-	borderMap := make(map[string]bool, len(borders))
-	for _, item := range borders {
-		borderMap[item] = true
+func FilterStackTraceTrimUpper(bounds []string) func(frames []uintptr) []uintptr {
+	boundMap := make(map[string]bool, len(bounds))
+	for _, item := range bounds {
+		boundMap[item] = true
 	}
 
 	return func(frames []uintptr) []uintptr {
-		for i := len(frames) - 1; i >= 0; i-- {
+		length := len(frames)
+
+		for i := length - 1; i >= 0; i-- {
 			item := runtimeFrame(frames[i]).Name()
 
-			if _, ok := borderMap[item]; ok {
-				if i < len(frames)-1 {
-					return frames[i+1:]
+			if length == len(frames) && lowerBound == item {
+				length = i // исключая нижнюю границу
+
+				continue
+			}
+
+			if _, ok := boundMap[item]; ok {
+				if i < length-1 {
+					return frames[i+1 : length]
 				}
 
 				return nil
 			}
 		}
 
-		return frames
+		return frames[:length]
 	}
 }
