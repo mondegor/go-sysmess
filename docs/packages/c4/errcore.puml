@@ -1,0 +1,13 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+' title Подсистема обработки ошибок
+
+Boundary(errcore, "Подсистема ErrCore") {
+  !include components/c4/errcore/error_manager.iuml
+  !include components/c4/errcore/error_handler.iuml
+  !include components/c4/errcore/sentry_handler.iuml
+  !include components/c4/errcore/logger.iuml
+}
+
+@enduml

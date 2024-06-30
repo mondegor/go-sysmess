@@ -1,0 +1,1 @@
+Component(proto_error, "ProtoAppError", "sysmess", "Создаёт новые AppError на месте возникновения ошибок. Оборачивает уже имеющиеся ошибки.")

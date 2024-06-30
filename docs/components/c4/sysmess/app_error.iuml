@@ -1,0 +1,1 @@
+Component(app_error, "AppError", "sysmess", "Содержит информацию об ошибке с выданным ID и формированным StackTrace")

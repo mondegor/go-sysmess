@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+'LAYOUT_LEFT_RIGHT()
+LAYOUT_WITH_LEGEND()
+
+' title Верхнеуровневая архитектура системы обработки ошибок
+
+!include components/c4/ext/sentry.iuml
+!include components/c4/ext/user.iuml
+!include components/c4/ext/developer.iuml
+
+Container_Boundary(project, "Абстрактный проект") {
+  !include components/c4/app.iuml
+  !include components/c4/sysmess.iuml
+  !include components/c4/err_core.iuml
+}
+
+Rel(app, sysmess, "Создаёт типы ошибок используемые системой на основе ProtoAppError")
+Rel(app, err_core, "Регистрирует типы ошибок при помощи ManagerError, привязывает необходимые для них обработчики: IDGenerator, StackTraceCaller, SentryHandler")
+Rel(app, err_core, "Настраивает персональный для системы ErrorHandler")
+
+Rel(app, sysmess, "Создаёт новые AppError, оборачивает существующие")
+Rel(sysmess, err_core, "Формирует события о возникновении ошибок, устанавливает ошибкам их персональный ID и стек вызовов")
+Rel(err_core, sentry, "Отправляет информацию об ошибках в момент их формирования")
+
+Rel(app, err_core, "Передаёт ошибки в ErrorHandler для их фиксации с их персональным ID")
+Rel(app, user, "Сообщает пользователю об ошибках с их персональным ID")
+
+Rel(developer, sentry, "Анализирует ошибки")
+Rel(developer, app, "Устраняет проблемы, на основе анализа создаёт новые типы ошибок")
+
+Rel(user, developer, "Сообщает о проблеме через внешние каналы, указывая персональным ID")
+
+@enduml

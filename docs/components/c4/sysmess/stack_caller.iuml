@@ -1,0 +1,1 @@
+Component(stack_caller, "StackTraceCaller", "sysmess", "Формирует стек вызова функций в момент обращения к нему")

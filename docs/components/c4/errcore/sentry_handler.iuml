@@ -1,0 +1,1 @@
+Component(sentry_handler, "SentryHandler", "errcore", "Отвечает за отправку ошибок в Sentry")
