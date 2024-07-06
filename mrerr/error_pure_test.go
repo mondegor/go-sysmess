@@ -47,7 +47,9 @@ func Test_pureError_TranslateKindUser(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
@@ -67,7 +69,9 @@ func Test_pureError_TranslateKindInternal(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
@@ -92,7 +96,9 @@ func Test_pureError_TranslateKindInternalHasMessage(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 
@@ -117,7 +123,9 @@ func Test_pureError_TranslateKindSystem(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockTranslator := mock_mrerr.NewMocktranslator(ctrl)
 

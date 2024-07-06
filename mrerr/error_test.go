@@ -247,7 +247,9 @@ func TestAppError_NewWithStackTrace(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
@@ -279,7 +281,9 @@ func TestAppError_WrapWithStackTrace(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
@@ -311,7 +315,9 @@ func TestAppError_WrapWithStackTraceTwoLines(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
@@ -348,7 +354,9 @@ func TestAppError_WrapWithWrappedStackTrace(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
@@ -382,7 +390,9 @@ func TestAppError_WrapWithDoubleStackTrace(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
 
 	mockStackTracer1 := mock_mrerr.NewMockStackTracer(ctrl)
 	mockStackTracer2 := mock_mrerr.NewMockStackTracer(ctrl)
