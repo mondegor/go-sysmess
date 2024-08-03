@@ -29,6 +29,6 @@ func (a *NamedArg) ValueString() string {
 		return strconv.FormatInt(val, 10)
 
 	default:
-		return fmt.Sprintf("%v", val)
+		return fmt.Sprintf("%+v", val)
 	}
 }
