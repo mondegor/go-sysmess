@@ -1,4 +1,4 @@
-# Описание GoSysMess v0.10.11
+# Описание GoSysMess v0.10.12
 Этот репозиторий содержит описание библиотеки GoSysMess.
 
 ## Статус библиотеки
@@ -11,7 +11,7 @@
   (более подробно см. ниже);
 
 ## Подключение библиотеки
-`go get -u github.com/mondegor/go-sysmess@v0.10.11`
+`go get -u github.com/mondegor/go-sysmess@v0.10.12`
 
 ## Установка библиотеки для её локальной разработки
 
@@ -28,7 +28,7 @@
 - `mrcmd go help` - выводит список всех доступных go команд (docker версия);
 - `mrcmd go-dev help` // выводит список всех доступных go-dev команд (локальная версия);
 - `mrcmd go-dev fmt` // исправляет форматирование кода (gofumpt -l -w -extra ./)
-- `mrcmd go-dev goimports-fix` // исправление imports, если это требуется (goimports -d -local ${GO_DEV_LOCAL_PACKAGE} ./)
+- `mrcmd go-dev goimports-fix` // исправление imports, если это требуется (goimports -d -local ${GO_DEV_IMPORTS_LOCAL_PREFIXES} ./)
 - `mrcmd go-dev check` // статический анализ кода библиотеки (линтеры: govet, staticcheck, errcheck)
 - `mrcmd go-dev test` // запуск тестов библиотеки
 - `mrcmd golangci-lint check` // запуск линтеров для проверки кода (на основе `.golangci.yaml`)

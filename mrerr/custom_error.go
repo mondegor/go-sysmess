@@ -66,7 +66,7 @@ func (e *CustomError) IsValid() bool {
 	return e.err.Kind() == ErrorKindUser
 }
 
-// Err - возвращает вложенную ошибку привязанную к текущей ошибке.
+// Err - возвращает вложенную ошибку, привязанную к текущей ошибке.
 func (e *CustomError) Err() *AppError {
 	return e.err
 }
