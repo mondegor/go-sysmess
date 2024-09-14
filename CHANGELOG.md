@@ -1,6 +1,13 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-09-14
+### Changed
+- Переименованы CallerOption:
+  - `DepthOption` -> `WithDepth`;
+  - `ShowFuncNameOption` -> `WithShowFuncName`;
+  - `FilterStackTraceOption` -> `WithFilterStackTrace`;
+
 ## 2024-09-08
 ### Changed
 - Поправлены .env переменные под новую версию `mrcmd`;

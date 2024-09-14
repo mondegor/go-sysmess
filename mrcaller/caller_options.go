@@ -5,18 +5,24 @@ type (
 	CallerOption func(c *Caller)
 )
 
-// DepthOption - устанавливает опцию depth для Caller.
+// WithDepth - устанавливает опцию depth для Caller.
 // Если value меньше 1 или больше callStackMaxDepth, то устанавливается 1.
-func DepthOption(value int) CallerOption {
-	return func(c *Caller) { c.depth = value }
+func WithDepth(value int) CallerOption {
+	return func(c *Caller) {
+		c.depth = value
+	}
 }
 
-// ShowFuncNameOption - устанавливает опцию noname для Caller.
-func ShowFuncNameOption(value bool) CallerOption {
-	return func(c *Caller) { c.showFuncName = value }
+// WithShowFuncName - устанавливает опцию noname для Caller.
+func WithShowFuncName(value bool) CallerOption {
+	return func(c *Caller) {
+		c.showFuncName = value
+	}
 }
 
-// FilterStackTraceOption - функцию фильтрации стека вызовов.
-func FilterStackTraceOption(fn func(frames []uintptr) []uintptr) CallerOption {
-	return func(c *Caller) { c.filterStackTraceFunc = fn }
+// WithFilterStackTrace - функцию фильтрации стека вызовов.
+func WithFilterStackTrace(fn func(frames []uintptr) []uintptr) CallerOption {
+	return func(c *Caller) {
+		c.filterStackTraceFunc = fn
+	}
 }

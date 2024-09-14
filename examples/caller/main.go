@@ -13,9 +13,9 @@ func main() {
 	fmt.Println("RootPath: " + curPath)
 
 	caller := mrcaller.New(
-		mrcaller.DepthOption(16),
-		mrcaller.ShowFuncNameOption(true),
-		mrcaller.FilterStackTraceOption(
+		mrcaller.WithDepth(16),
+		mrcaller.WithShowFuncName(true),
+		mrcaller.WithFilterStackTrace(
 			mrcaller.FilterStackTraceTrimUpper(
 				[]string{
 					"main.funcLevel2",

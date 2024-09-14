@@ -70,7 +70,7 @@ func (c *Caller) StackTrace() *StackTrace {
 }
 
 func (c *Caller) applyOptions(opts []CallerOption) {
-	for _, f := range opts {
-		f(c)
+	for _, opt := range opts {
+		opt(c)
 	}
 }
