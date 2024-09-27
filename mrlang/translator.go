@@ -41,9 +41,9 @@ func NewTranslator(opts TranslatorOptions) (*Translator, error) {
 	}
 
 	tr := Translator{
-		locByIDs:     make(locByIDsMap, 0),
-		locByCodes:   make(locByCodesMap, 0),
-		dictionaries: make(map[string]*MultiLangDictionary, 0),
+		locByIDs:     make(locByIDsMap),
+		locByCodes:   make(locByCodesMap),
+		dictionaries: make(map[string]*MultiLangDictionary),
 	}
 
 	for _, langCode := range opts.LangCodes {
@@ -80,8 +80,8 @@ func NewTranslator(opts TranslatorOptions) (*Translator, error) {
 
 		multiDict := MultiLangDictionary{
 			name:           dicName,
-			dicByLangIDs:   make(dicByLangIDsMap, 0),
-			dicByLangCodes: make(dicByLangCodesMap, 0),
+			dicByLangIDs:   make(dicByLangIDsMap),
+			dicByLangCodes: make(dicByLangCodesMap),
 		}
 
 		for _, langCode := range opts.LangCodes {

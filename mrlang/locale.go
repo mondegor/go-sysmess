@@ -26,8 +26,8 @@ type (
 var stubLocale = &Locale{
 	langID:   0,
 	langCode: "stub-locale",
-	messages: make(map[string]string, 0),
-	errors:   make(map[string]mrmsg.ErrorMessage, 0),
+	messages: make(map[string]string),
+	errors:   make(map[string]mrmsg.ErrorMessage),
 }
 
 // LangID - возвращает ID языка.

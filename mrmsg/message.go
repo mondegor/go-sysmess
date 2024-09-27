@@ -111,7 +111,7 @@ func ParseArgsNames(message string) []string {
 		name = name[1:] // left trim .
 
 		if keys == nil {
-			keys = make(map[string]bool, 1)
+			keys = make(map[string]bool)
 		} else {
 			if _, ok := keys[name]; ok {
 				continue
