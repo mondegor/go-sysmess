@@ -85,7 +85,7 @@ func Test_pureError_TranslateKindInternal(t *testing.T) {
 
 	mockTranslator.
 		EXPECT().
-		TranslateError(mrerr.ErrorCodeUnexpectedInternal, mrerr.ErrorCodeUnexpectedInternal).
+		TranslateError(mrerr.ErrorCodeInternal, mrerr.ErrorCodeInternal).
 		Return(expectedReason)
 
 	got := proto.Translate(mockTranslator)
@@ -139,7 +139,7 @@ func Test_pureError_TranslateKindSystem(t *testing.T) {
 
 	mockTranslator.
 		EXPECT().
-		TranslateError(mrerr.ErrorCodeUnexpectedSystem, mrerr.ErrorCodeUnexpectedSystem).
+		TranslateError(mrerr.ErrorCodeSystem, mrerr.ErrorCodeSystem).
 		Return(expectedReason)
 
 	got := proto.Translate(mockTranslator)

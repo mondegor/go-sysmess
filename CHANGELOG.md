@@ -1,6 +1,13 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-10-06
+### Changed
+- Переименованы:
+  - `ErrorCodeUnexpectedInternal` -> `ErrorCodeInternal`;
+  - `ErrorCodeUnexpectedSystem` -> `ErrorCodeSystem`;
+- Включена проверка наличия глобальных переменных в тестах; 
+
 ## 2024-09-29
 ### Changed
 - Добавлена директория `.cache` в `.gitignore`, скорректирована документация;
