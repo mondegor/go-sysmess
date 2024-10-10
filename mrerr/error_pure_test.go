@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-
 	mock_mrerr "github.com/mondegor/go-sysmess/mrerr/mock"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
