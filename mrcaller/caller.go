@@ -5,13 +5,15 @@ import (
 )
 
 const (
-	callStackMaxDepth = 32
+	defaultDepth        = 1
+	defaultShowFuncName = false
+	callStackMaxDepth   = 32
 )
 
 type (
 	// Caller - обёртка runtime.Callers для более удобного формирования стека вызовов.
 	Caller struct {
-		depth                int                              // максимальное кол-во элементов в стеке вызовов
+		depth                uint8                            // максимальное кол-во элементов в стеке вызовов
 		showFuncName         bool                             // формирование имени функций в стеке вызовов
 		filterStackTraceFunc func(frames []uintptr) []uintptr // функция фильтрации стека вызовов
 	}
@@ -19,20 +21,16 @@ type (
 
 // New - создаёт объект Caller.
 func New(opts ...CallerOption) *Caller {
-	c := &Caller{}
-	c.applyOptions(opts)
-
-	const minDepth = 1
-	if c.depth < minDepth {
-		c.depth = minDepth
-	} else if c.depth > callStackMaxDepth {
-		c.depth = callStackMaxDepth
+	c := &Caller{
+		depth:        defaultDepth,
+		showFuncName: defaultShowFuncName,
+		filterStackTraceFunc: func(frames []uintptr) []uintptr {
+			return frames
+		},
 	}
 
-	if c.filterStackTraceFunc == nil {
-		c.filterStackTraceFunc = func(frames []uintptr) []uintptr {
-			return frames
-		}
+	for _, opt := range opts {
+		opt(c)
 	}
 
 	return c
@@ -44,7 +42,7 @@ func (c *Caller) StackTrace() *StackTrace {
 	n := runtime.Callers(2, pcs[:])
 	fpcs := c.filterStackTraceFunc(pcs[0:n])
 
-	if len(fpcs) > c.depth {
+	if len(fpcs) > int(c.depth) {
 		fpcs = fpcs[0:c.depth]
 	}
 
@@ -66,11 +64,5 @@ func (c *Caller) StackTrace() *StackTrace {
 
 	return &StackTrace{
 		items: items,
-	}
-}
-
-func (c *Caller) applyOptions(opts []CallerOption) {
-	for _, opt := range opts {
-		opt(c)
 	}
 }

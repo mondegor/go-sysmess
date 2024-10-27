@@ -68,7 +68,7 @@ func Test_render(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := mrmsg.Render(tt.message, tt.args)
+			got, err := mrmsg.RenderWithNamedArgs(tt.message, tt.args)
 			assert.Equal(t, tt.wantErr, err != nil)
 			assert.Equal(t, tt.want, got)
 		})

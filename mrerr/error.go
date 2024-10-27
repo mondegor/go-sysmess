@@ -68,7 +68,7 @@ func (e *AppError) Error() string {
 			buf.WriteString(messageTooManyArguments)
 		}
 
-		buf.WriteString(mrmsg.MustRender(e.message, e.getNamedArgs()))
+		buf.WriteString(mrmsg.MustRenderWithNamedArgs(e.message, e.getNamedArgs()))
 	}
 
 	if len(e.attrs) > 0 {

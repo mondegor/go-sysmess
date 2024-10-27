@@ -54,7 +54,7 @@ func (l *Locale) TranslateMessage(code, defaultMessage string, args ...mrmsg.Nam
 	}
 
 	if len(args) > 0 {
-		value = mrmsg.MustRender(value, args)
+		value = mrmsg.MustRenderWithNamedArgs(value, args)
 	}
 
 	return value
@@ -78,10 +78,10 @@ func (l *Locale) TranslateError(code, defaultMessage string, args ...mrmsg.Named
 	}
 
 	if len(args) > 0 {
-		value.Reason = mrmsg.MustRender(value.Reason, args)
+		value.Reason = mrmsg.MustRenderWithNamedArgs(value.Reason, args)
 
 		for i := 0; i < len(value.Details); i++ {
-			value.Details[i] = mrmsg.MustRender(value.Details[i], args)
+			value.Details[i] = mrmsg.MustRenderWithNamedArgs(value.Details[i], args)
 		}
 	}
 
@@ -113,18 +113,18 @@ func checkLocale(filePath string, cfg *localeConfig) error {
 	}
 
 	for messCode, value := range cfg.Messages {
-		if err := mrmsg.CheckParse(value); err != nil {
+		if err := mrmsg.CheckRender(value); err != nil {
 			return fmt.Errorf("message with code '%s' has error in locale %s: %w", messCode, filePath, err)
 		}
 	}
 
 	for errCode, value := range cfg.Errors {
-		if err := mrmsg.CheckParse(value.Reason); err != nil {
+		if err := mrmsg.CheckRender(value.Reason); err != nil {
 			return fmt.Errorf("error.Reason with code '%s' has error in locale %s: %w", errCode, filePath, err)
 		}
 
 		for n, detail := range value.Details {
-			if err := mrmsg.CheckParse(detail); err != nil {
+			if err := mrmsg.CheckRender(detail); err != nil {
 				return fmt.Errorf("error.Details[%d] with code '%s' has error in locale %s: %w", n, errCode, filePath, err)
 			}
 		}

@@ -25,7 +25,7 @@ func TestAppError_WithAttr(t *testing.T) {
 			name:       "test1",
 			paramName:  "",
 			paramValue: nil,
-			want:       "unnamed=<nil>",
+			want:       "unnamed=<NIL>",
 		},
 		{
 			name:       "test2",

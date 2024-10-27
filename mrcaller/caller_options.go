@@ -6,10 +6,11 @@ type (
 )
 
 // WithDepth - устанавливает опцию depth для Caller.
-// Если value меньше 1 или больше callStackMaxDepth, то устанавливается 1.
-func WithDepth(value int) CallerOption {
+func WithDepth(value uint8) CallerOption {
 	return func(c *Caller) {
-		c.depth = value
+		if value > 0 && value <= callStackMaxDepth {
+			c.depth = value
+		}
 	}
 }
 
@@ -23,6 +24,8 @@ func WithShowFuncName(value bool) CallerOption {
 // WithFilterStackTrace - функцию фильтрации стека вызовов.
 func WithFilterStackTrace(fn func(frames []uintptr) []uintptr) CallerOption {
 	return func(c *Caller) {
-		c.filterStackTraceFunc = fn
+		if fn != nil {
+			c.filterStackTraceFunc = fn
+		}
 	}
 }

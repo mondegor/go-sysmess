@@ -34,10 +34,10 @@ func TestData_String(t *testing.T) {
 		{
 			name: "data with structure value",
 			d: map[string]any{"key1": struct {
-				key1 string
-				key2 int
+				key2 string
+				key3 int
 			}{"value", 1234}},
-			want: "{key1: {value 1234}}",
+			want: "{key1: {key2:value key3:1234}}",
 		},
 		{
 			name: "data with a few values",

@@ -133,5 +133,5 @@ func (e *ProtoAppError) Wrap(err error, args ...any) *AppError {
 
 // Error - возвращает ошибку в виде строки.
 func (e *ProtoAppError) Error() string {
-	return mrmsg.MustRender(e.message, e.getNamedArgs())
+	return mrmsg.MustRenderWithNamedArgs(e.message, e.getNamedArgs())
 }

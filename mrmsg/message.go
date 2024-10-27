@@ -16,21 +16,8 @@ const (
 
 var regexpArgName = regexp.MustCompile(`^\.[A-Za-z][A-Za-z0-9]*$`)
 
-// MustRender - возвращает сформированное сообщение со вставленными в неё параметрами.
-// В случае ошибки логирует эту ошибку и возвращает сообщение без параметров.
-func MustRender(message string, args []NamedArg) string {
-	value, err := Render(message, args)
-	if err != nil {
-		log.Printf("'%s' message rendering failed: %v", message, err)
-
-		return message
-	}
-
-	return value
-}
-
-// Render - возвращает сформированное сообщение со вставленными в неё параметрами.
-func Render(message string, args []NamedArg) (string, error) {
+// Render - возвращает сформированное сообщение со вставленными в него значениями переменных.
+func Render(message string, vars map[string]string) (string, error) {
 	if message == "" {
 		return "", nil
 	}
@@ -42,34 +29,91 @@ func Render(message string, args []NamedArg) (string, error) {
 		return "", fmt.Errorf("parse message error: %w", err)
 	}
 
-	data := make(map[string]string, len(args))
-
-	for _, item := range args {
-		data[item.Name] = item.ValueString()
-	}
-
 	var msg bytes.Buffer
 
-	if err = templ.Execute(&msg, data); err != nil {
+	if err = templ.Execute(&msg, vars); err != nil {
 		return "", fmt.Errorf("execute template error: %w", err)
 	}
 
 	return msg.String(), nil
 }
 
-// CheckParse - если указанное сообщение содержит параметры,
-// то проверяется их корректность.
-func CheckParse(message string) error {
-	argsNames := ParseArgsNames(message)
-	args := make([]NamedArg, len(argsNames))
+// MustRender - возвращает сформированное сообщение со вставленными в него значениями переменных.
+// В случае ошибки логирует причину и возвращает сообщение без вставленных переменных.
+func MustRender(message string, vars map[string]string) string {
+	value, err := Render(message, vars)
+	if err != nil {
+		log.Print(fmt.Errorf("MustRender: '%s' message rendering failed: %w", message, err).Error())
 
-	for i, arg := range argsNames {
-		args[i] = NamedArg{arg, arg}
+		return message
 	}
 
-	_, err := Render(message, args)
+	return value
+}
 
-	return err
+// RenderWithNamedArgs - возвращает сформированное сообщение со вставленными в него именованными параметрами.
+func RenderWithNamedArgs(message string, args []NamedArg) (string, error) {
+	vars := make(map[string]string, len(args))
+
+	for _, arg := range args {
+		vars[arg.Name] = arg.ValueString()
+	}
+
+	return Render(message, vars)
+}
+
+// MustRenderWithNamedArgs - возвращает сформированное сообщение со вставленными в него именованными параметрами.
+// В случае ошибки логирует причину и возвращает сообщение без вставленных параметров.
+func MustRenderWithNamedArgs(message string, args []NamedArg) string {
+	value, err := RenderWithNamedArgs(message, args)
+	if err != nil {
+		log.Print(fmt.Errorf("MustRenderWithNamedArgs: '%s' message rendering failed: %w", message, err).Error())
+
+		return message
+	}
+
+	return value
+}
+
+// RenderWithData - возвращает сформированное сообщение со вставленными в него данными.
+func RenderWithData(message string, data Data) (string, error) {
+	vars := make(map[string]string, len(data))
+
+	for key := range data {
+		vars[key] = ToString(data[key])
+	}
+
+	return Render(message, vars)
+}
+
+// MustRenderWithData - возвращает сформированное сообщение со вставленными в него данными.
+// В случае ошибки логирует причину и возвращает сообщение без вставленных данных.
+func MustRenderWithData(message string, data Data) string {
+	value, err := RenderWithData(message, data)
+	if err != nil {
+		log.Print(fmt.Errorf("MustRenderWithData: '%s' message rendering failed: %w", message, err).Error())
+
+		return message
+	}
+
+	return value
+}
+
+// CheckRender - если указанное сообщение содержит параметры,
+// то проверяется их корректность.
+func CheckRender(message string) error {
+	names := ParseArgsNames(message)
+	vars := make(map[string]string, len(names))
+
+	for _, name := range names {
+		vars[name] = name
+	}
+
+	if _, err := Render(message, vars); err != nil {
+		return fmt.Errorf("check render error: %w", err)
+	}
+
+	return nil
 }
 
 // ParseArgsNames - извлечение параметров из указанного сообщения.
@@ -113,6 +157,7 @@ func ParseArgsNames(message string) []string {
 		if keys == nil {
 			keys = make(map[string]bool)
 		} else {
+			// если название аргумента уже попадалось, то оно пропускается
 			if _, ok := keys[name]; ok {
 				continue
 			}

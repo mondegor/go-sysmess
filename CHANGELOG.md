@@ -1,6 +1,21 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-10-27
+### Added
+- Добавлены значения по умолчанию для опций `mrcaller.Caller`;
+- Добавлена вспомогательная функция `mrmsg.ToString()` для перевода значения переменной в строку;
+- Добавлен метод `mrmsg.Data.ValueString()`;
+- Добавлена другая функция `mrmsg.Render` с параметром для переменных `map[string]string`;
+- Добавлена функция `mrmsg.RenderWithData` с параметром для переменных `mrmsg.Data`;
+
+### Changed
+- Переименованы:
+  - `mrmsg.Render` -> `mrmsg.RenderWithNamedArgs`;
+  - `mrmsg.MustRender` -> `mrmsg.MustRenderWithNamedArgs`;
+  - `mrmsg.CheckParse` -> `mrmsg.CheckRender`;
+- Метод `mrmsg.NamedArg.ValueString()` теперь работает на базе `mrmsg.ToString()`;
+
 ## 2024-10-11
 ### Added
 - Подключён и настроен линтер `gci`;
