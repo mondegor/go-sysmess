@@ -5,16 +5,18 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-	"github.com/mondegor/go-sysmess/mrerr/mrerrfactory"
+	"github.com/mondegor/go-sysmess/mrerr/features"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 func main() {
+	mrerr.InitDefaultOptions(features.DefaultOptionsHandler())
+
 	tr := Translator{}
 	customError := mrerr.NewCustomError("formFieldEmail", errors.New("error in email"))
 	fmt.Println(customError)
 
-	proto := mrerrfactory.NewProtoAppErrorByDefault(
+	proto := mrerr.NewProto(
 		"errMyErrorWithParams",
 		mrerr.ErrorKindUser,
 		"my error with '{{ .param1 }}' and '{{ .param2 }}'",
@@ -38,7 +40,7 @@ func main() {
 }
 
 func addSomeItems(list *mrerr.CustomErrors) {
-	proto := mrerrfactory.NewProtoAppErrorByDefault(
+	proto := mrerr.NewProto(
 		"errSomeItems",
 		mrerr.ErrorKindSystem,
 		"my error with '{{ .param1 }}'",

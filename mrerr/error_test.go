@@ -104,14 +104,13 @@ func TestAppError_Error(t *testing.T) {
 
 			var appErr *mrerr.AppError
 
-			e := mrerr.NewProtoWithExtra(
+			e := mrerr.NewProto(
 				"",
 				mrerr.ErrorKindInternal,
 				tt.message,
-				mrerr.ProtoExtra{
-					Caller:    nil,
-					OnCreated: func(err *mrerr.AppError) string { return tt.instanceID },
-				},
+				mrerr.WithProtoOnCreated(
+					func(err *mrerr.AppError) string { return tt.instanceID },
+				),
 			)
 
 			if tt.err != nil {
@@ -155,14 +154,13 @@ func TestAppError_NewWithInstanceID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			e := mrerr.NewProtoWithExtra(
+			e := mrerr.NewProto(
 				"",
 				mrerr.ErrorKindInternal,
 				"",
-				mrerr.ProtoExtra{
-					Caller:    nil,
-					OnCreated: func(err *mrerr.AppError) string { return tt.instanceID },
-				},
+				mrerr.WithProtoOnCreated(
+					func(err *mrerr.AppError) string { return tt.instanceID },
+				),
 			).New()
 			got := e.InstanceID()
 			assert.Equal(t, tt.want, got)
@@ -174,14 +172,13 @@ func TestAppError_WrapWithInstanceID(t *testing.T) {
 	t.Parallel()
 
 	e1 := errors.New("wrapped-error")
-	e2 := mrerr.NewProtoWithExtra(
+	e2 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    nil,
-			OnCreated: func(err *mrerr.AppError) string { return "test-id" },
-		},
+		mrerr.WithProtoOnCreated(
+			func(err *mrerr.AppError) string { return "test-id" },
+		),
 	).Wrap(e1)
 
 	got := e2.InstanceID()
@@ -191,14 +188,13 @@ func TestAppError_WrapWithInstanceID(t *testing.T) {
 func TestAppError_WrapWithWrappedInstanceID(t *testing.T) {
 	t.Parallel()
 
-	e1 := mrerr.NewProtoWithExtra(
+	e1 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    nil,
-			OnCreated: func(err *mrerr.AppError) string { return "test-id" },
-		},
+		mrerr.WithProtoOnCreated(
+			func(err *mrerr.AppError) string { return "test-id" },
+		),
 	).New()
 	e2 := mrerr.NewProto("", mrerr.ErrorKindInternal, "").Wrap(e1)
 
@@ -209,34 +205,31 @@ func TestAppError_WrapWithWrappedInstanceID(t *testing.T) {
 func TestAppError_WrapWithTripleInstanceID(t *testing.T) {
 	t.Parallel()
 
-	e1 := mrerr.NewProtoWithExtra(
+	e1 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    nil,
-			OnCreated: func(err *mrerr.AppError) string { return "test-id1" },
-		},
+		mrerr.WithProtoOnCreated(
+			func(err *mrerr.AppError) string { return "test-id1" },
+		),
 	).New()
 
-	e2 := mrerr.NewProtoWithExtra(
+	e2 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    nil,
-			OnCreated: func(err *mrerr.AppError) string { return "test-id2" },
-		},
+		mrerr.WithProtoOnCreated(
+			func(err *mrerr.AppError) string { return "test-id2" },
+		),
 	).Wrap(e1)
 
-	e3 := mrerr.NewProtoWithExtra(
+	e3 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    nil,
-			OnCreated: func(err *mrerr.AppError) string { return "test-id3" },
-		},
+		mrerr.WithProtoOnCreated(
+			func(err *mrerr.AppError) string { return "test-id3" },
+		),
 	).Wrap(e2)
 
 	got := e3.InstanceID()
@@ -253,14 +246,13 @@ func TestAppError_NewWithStackTrace(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto := mrerr.NewProtoWithExtra(
+	proto := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    func() mrerr.StackTracer { return mockStackTracer },
-			OnCreated: nil,
-		},
+		mrerr.WithProtoCaller(
+			func() mrerr.StackTracer { return mockStackTracer },
+		),
 	)
 
 	mockStackTracer.
@@ -287,14 +279,13 @@ func TestAppError_WrapWithStackTrace(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto := mrerr.NewProtoWithExtra(
+	proto := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    func() mrerr.StackTracer { return mockStackTracer },
-			OnCreated: nil,
-		},
+		mrerr.WithProtoCaller(
+			func() mrerr.StackTracer { return mockStackTracer },
+		),
 	)
 
 	mockStackTracer.
@@ -321,14 +312,13 @@ func TestAppError_WrapWithStackTraceTwoLines(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto := mrerr.NewProtoWithExtra(
+	proto := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    func() mrerr.StackTracer { return mockStackTracer },
-			OnCreated: nil,
-		},
+		mrerr.WithProtoCaller(
+			func() mrerr.StackTracer { return mockStackTracer },
+		),
 	)
 
 	mockStackTracer.
@@ -360,14 +350,13 @@ func TestAppError_WrapWithWrappedStackTrace(t *testing.T) {
 
 	mockStackTracer := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto1 := mrerr.NewProtoWithExtra(
+	proto1 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    func() mrerr.StackTracer { return mockStackTracer },
-			OnCreated: nil,
-		},
+		mrerr.WithProtoCaller(
+			func() mrerr.StackTracer { return mockStackTracer },
+		),
 	)
 
 	proto2 := mrerr.NewProto("", mrerr.ErrorKindInternal, "")
@@ -397,24 +386,22 @@ func TestAppError_WrapWithDoubleStackTrace(t *testing.T) {
 	mockStackTracer1 := mock_mrerr.NewMockStackTracer(ctrl)
 	mockStackTracer2 := mock_mrerr.NewMockStackTracer(ctrl)
 
-	proto1 := mrerr.NewProtoWithExtra(
+	proto1 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    func() mrerr.StackTracer { return mockStackTracer1 },
-			OnCreated: nil,
-		},
+		mrerr.WithProtoCaller(
+			func() mrerr.StackTracer { return mockStackTracer1 },
+		),
 	)
 
-	proto2 := mrerr.NewProtoWithExtra(
+	proto2 := mrerr.NewProto(
 		"",
 		mrerr.ErrorKindInternal,
 		"",
-		mrerr.ProtoExtra{
-			Caller:    func() mrerr.StackTracer { return mockStackTracer2 },
-			OnCreated: nil,
-		},
+		mrerr.WithProtoCaller(
+			func() mrerr.StackTracer { return mockStackTracer2 },
+		),
 	)
 
 	mockStackTracer1.

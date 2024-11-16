@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-	"github.com/mondegor/go-sysmess/mrerr/mrerrfactory"
+	"github.com/mondegor/go-sysmess/mrerr/features"
 )
 
 // main - пример user ошибки с вложенной internal ошибкой.
@@ -28,15 +28,17 @@ func main() {
 }
 
 func createErrorInternalProto() *mrerr.ProtoAppError {
-	return mrerrfactory.NewProtoAppErrorByDefault(
+	return mrerr.NewProto(
 		"errMyInternalError",
 		mrerr.ErrorKindInternal,
 		"my internal error with param {{ .param1 }}",
+		features.WithProtoCaller(),
+		features.WithProtoOnCreated(),
 	)
 }
 
 func createErrorUserProto() *mrerr.ProtoAppError {
-	return mrerrfactory.NewProtoAppErrorByDefault(
+	return mrerr.NewProto(
 		"errMyUserError",
 		mrerr.ErrorKindUser,
 		"my user error with param {{ .param1 }} and param {{ .param2 }}",

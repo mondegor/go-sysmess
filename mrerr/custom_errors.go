@@ -15,7 +15,7 @@ func (l CustomErrors) Error() string {
 
 	for i := 0; i < len(l); i++ {
 		if i > 0 {
-			buf.WriteString("\n")
+			buf.WriteByte('\n')
 		}
 
 		buf.WriteString(l[i].Error())

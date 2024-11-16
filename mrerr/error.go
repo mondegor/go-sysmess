@@ -55,11 +55,11 @@ func (e *AppError) Error() string {
 	if e.instanceID != "" {
 		buf.WriteByte('[')
 		buf.WriteString(e.instanceID)
-		buf.Write([]byte{']', ' '})
+		buf.WriteString("] ")
 	}
 
 	// buf.WriteString(e.code)
-	// buf.Write([]byte{':', ' '})
+	// buf.WriteString(": ")
 
 	if len(e.argsNames) == 0 {
 		buf.WriteString(e.message)
@@ -72,15 +72,15 @@ func (e *AppError) Error() string {
 	}
 
 	if len(e.attrs) > 0 {
-		buf.Write([]byte{' ', '('})
+		buf.WriteString(" (")
 
 		for i, attr := range e.attrs {
 			if i > 0 {
-				buf.Write([]byte{',', ' '})
+				buf.WriteString(", ")
 			}
 
 			buf.WriteString(attr.Name)
-			buf.Write([]byte{'='})
+			buf.WriteByte('=')
 			buf.WriteString(attr.ValueString())
 		}
 
@@ -96,13 +96,13 @@ func (e *AppError) Error() string {
 			if i == 0 {
 				buf.WriteString(" in ")
 			} else {
-				buf.Write([]byte{' ', ',', ' '})
+				buf.WriteString(" , ")
 			}
 
 			if name != "" {
 				buf.WriteByte('[')
 				buf.WriteString(name)
-				buf.Write([]byte{']', ' '})
+				buf.WriteString("] ")
 			}
 
 			buf.WriteString(file)
@@ -112,7 +112,7 @@ func (e *AppError) Error() string {
 	}
 
 	if e.err != nil {
-		buf.Write([]byte{':', ' '})
+		buf.WriteString(": ")
 		buf.WriteString(e.err.Error())
 	}
 

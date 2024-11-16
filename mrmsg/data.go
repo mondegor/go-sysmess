@@ -39,11 +39,11 @@ func (d Data) String() string {
 		if firstItem {
 			firstItem = false
 		} else {
-			buf.Write([]byte{',', ' '})
+			buf.WriteString(", ")
 		}
 
 		buf.WriteString(key)
-		buf.Write([]byte{':', ' '})
+		buf.WriteString(": ")
 		buf.WriteString(ToString(d[key]))
 	}
 

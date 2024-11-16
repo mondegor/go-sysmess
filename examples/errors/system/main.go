@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-	"github.com/mondegor/go-sysmess/mrerr/mrerrfactory"
+	"github.com/mondegor/go-sysmess/mrerr/features"
 )
 
 // main - пример system ошибки с параметром в сообщении, c уникальным ID, но без stack trace.
@@ -23,12 +23,11 @@ func main() {
 }
 
 func createErrorProto() *mrerr.ProtoAppError {
-	return mrerrfactory.NewProtoAppError(
+	return mrerr.NewProto(
 		"errMySystemError",
 		mrerr.ErrorKindSystem,
 		"my system error with param {{ .param1 }} and param {{ .param2 }}",
-		false,
-		true,
+		features.WithProtoOnCreated(),
 	)
 }
 

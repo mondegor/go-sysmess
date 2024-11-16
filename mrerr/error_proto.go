@@ -14,16 +14,19 @@ type (
 		onCreated func(err *AppError) (instanceID string)
 	}
 
-	// ProtoExtra - дополнительные опции для создания ProtoAppError.
-	ProtoExtra struct {
-		Caller    func() StackTracer
-		OnCreated func(err *AppError) (instanceID string)
-	}
-
 	// StackTracer - предоставляет доступ к стеку вызовов.
 	StackTracer interface {
 		Count() int
 		Item(index int) (name, file string, line int)
+	}
+
+	// protoAppError - объект используемый только в момент создания Proto ошибки
+	// для того чтобы явно заданные опции не сбрасывались в значения по умолчанию.
+	protoAppError struct {
+		p                *ProtoAppError
+		changedCode      bool
+		changedCaller    bool
+		changedOnCreated bool
 	}
 )
 
@@ -32,30 +35,46 @@ var ErrErrorIsNilPointer = NewProto(
 	"errErrorIsNilPointer", ErrorKindInternal, "specified error is nil")
 
 // NewProto - создаёт объект ProtoAppError.
-func NewProto(code string, kind ErrorKind, message string) *ProtoAppError {
+func NewProto(code string, kind ErrorKind, message string, opts ...ProtoOption) *ProtoAppError {
 	argsNames := mrmsg.ParseArgsNames(message)
 
-	return &ProtoAppError{
-		pureError: pureError{
-			code:      code,
-			kind:      kind,
-			message:   message,
-			argsNames: argsNames,
+	wp := protoAppError{
+		p: &ProtoAppError{
+			pureError: pureError{
+				code:      code,
+				kind:      kind,
+				message:   message,
+				argsNames: argsNames,
 
-			// параметризованные сообщения по умолчанию
-			// используют фиктивные значения параметров
-			args: makeArgs(nil, len(argsNames)),
+				// параметризованные сообщения по умолчанию
+				// используют фиктивные значения параметров
+				args: makeArgs(nil, len(argsNames)),
+			},
 		},
 	}
-}
 
-// NewProtoWithExtra - создаёт объект ProtoAppError с дополнительными параметрами.
-func NewProtoWithExtra(code string, kind ErrorKind, message string, extra ProtoExtra) *ProtoAppError {
-	proto := NewProto(code, kind, message)
-	proto.caller = extra.Caller
-	proto.onCreated = extra.OnCreated
+	for _, opt := range opts {
+		opt(&wp)
+	}
 
-	return proto
+	proto.mu.Lock()
+	defer proto.mu.Unlock()
+
+	// сначала происходит сбор создаваемых глобальных Proto ошибок в момент запуска приложения
+	// чтобы их инициализировать нужными опциями, которые определяются приложением позже
+	// это будет происходить до тех пор, пока не будет вызвана функция InitDefaultOptions()
+	// далее опции по умолчанию применяются сразу, но, как правило, функция NewProto() уже не вызывается
+	if proto.defaultOptions == nil {
+		proto.delayed = append(proto.delayed, wp)
+	} else {
+		// устанавливаются опции по умолчанию,
+		// но только если они не были явно установлены ранее
+		for _, opt := range proto.defaultOptions.Options(code, kind) {
+			opt(&wp)
+		}
+	}
+
+	return wp.p
 }
 
 // New - всегда создаёт новую копию текущего объекта,
@@ -83,11 +102,10 @@ func (e *ProtoAppError) New(args ...any) *AppError {
 	return c
 }
 
-// Wrap - создаёт новую ошибку на основе прототипа и оборачивает
-// в неё указанную. Если указанная ошибка типа AppError, то проверяется
-// был ли у этой ошибки сгенерированы ID и стек, и если да, то
-// у новой ошибки эти параметры не генерятся, даже если соответствующие
-// генераторы установлены для этой ошибки.
+// Wrap - создаёт новую ошибку на основе прототипа и оборачивает в неё указанную.
+// Если указанная ошибка типа AppError, то проверяется, был ли у этой ошибки
+// сгенерированы ID и стек, и если да, то у новой ошибки эти параметры не генерятся,
+// даже если соответствующие генераторы установлены для этой ошибки.
 func (e *ProtoAppError) Wrap(err error, args ...any) *AppError {
 	if err == nil {
 		err = ErrErrorIsNilPointer.New()

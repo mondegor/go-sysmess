@@ -17,15 +17,6 @@ func TestNewProto(t *testing.T) {
 	assert.ErrorContains(t, got, "test-message")
 }
 
-func TestNewProtoWithExtra(t *testing.T) {
-	t.Parallel()
-
-	got := mrerr.NewProtoWithExtra("test-code", mrerr.ErrorKindSystem, "test-message", mrerr.ProtoExtra{})
-	assert.Equal(t, "test-code", got.Code())
-	assert.Equal(t, mrerr.ErrorKindSystem, got.Kind())
-	assert.ErrorContains(t, got, "test-message")
-}
-
 func TestProtoAppError_Error(t *testing.T) {
 	t.Parallel()
 

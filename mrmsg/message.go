@@ -1,7 +1,6 @@
 package mrmsg
 
 import (
-	"bytes"
 	"fmt"
 	"html/template"
 	"log"
@@ -29,7 +28,7 @@ func Render(message string, vars map[string]string) (string, error) {
 		return "", fmt.Errorf("parse message error: %w", err)
 	}
 
-	var msg bytes.Buffer
+	var msg strings.Builder
 
 	if err = templ.Execute(&msg, vars); err != nil {
 		return "", fmt.Errorf("execute template error: %w", err)

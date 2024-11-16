@@ -1,6 +1,21 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-11-16
+### Added
+- Добавилась возможность добавления следующих опций в конструкторе `NewProto()`:
+  - `WithProtoCaller()`;
+  - `WithProtoOnCreated()`;
+- Добавлена функция `InitDefaultOptions()` для первичной инициализации всех `Proto` ошибок,
+  которые были созданы в глобальных переменных и установки обработчика `ProtoOptionsHandler`
+  формирования Proto опций по умолчанию.
+
+### Removed
+- Удалены следующие функции:
+  - `mrerr.WithExtra()`;
+  - `mrerrfactory.NewProtoAppErrorByDefault()`;
+  - `mrerrfactory.NewProtoAppError()`;
+
 ## 2024-10-27
 ### Added
 - Добавлены значения по умолчанию для опций `mrcaller.Caller`;
@@ -11,9 +26,9 @@
 
 ### Changed
 - Переименованы:
-  - `mrmsg.Render` -> `mrmsg.RenderWithNamedArgs`;
-  - `mrmsg.MustRender` -> `mrmsg.MustRenderWithNamedArgs`;
-  - `mrmsg.CheckParse` -> `mrmsg.CheckRender`;
+    - `mrmsg.Render` -> `mrmsg.RenderWithNamedArgs`;
+    - `mrmsg.MustRender` -> `mrmsg.MustRenderWithNamedArgs`;
+    - `mrmsg.CheckParse` -> `mrmsg.CheckRender`;
 - Метод `mrmsg.NamedArg.ValueString()` теперь работает на базе `mrmsg.ToString()`;
 
 ## 2024-10-11
@@ -26,8 +41,8 @@
 ## 2024-10-06
 ### Changed
 - Переименованы:
-  - `ErrorCodeUnexpectedInternal` -> `ErrorCodeInternal`;
-  - `ErrorCodeUnexpectedSystem` -> `ErrorCodeSystem`;
+    - `ErrorCodeUnexpectedInternal` -> `ErrorCodeInternal`;
+    - `ErrorCodeUnexpectedSystem` -> `ErrorCodeSystem`;
 - Включена проверка наличия глобальных переменных в тестах; 
 
 ## 2024-09-29
@@ -46,9 +61,9 @@
 ## 2024-09-14
 ### Changed
 - Переименованы CallerOption:
-  - `DepthOption` -> `WithDepth`;
-  - `ShowFuncNameOption` -> `WithShowFuncName`;
-  - `FilterStackTraceOption` -> `WithFilterStackTrace`;
+    - `DepthOption` -> `WithDepth`;
+    - `ShowFuncNameOption` -> `WithShowFuncName`;
+    - `FilterStackTraceOption` -> `WithFilterStackTrace`;
 
 ## 2024-09-08
 ### Changed
@@ -95,9 +110,9 @@
 ## 2024-06-09
 ### Changed
 - Переработан пакет ошибок:
-  - объект `AppErrorFactory` заменён на `ProtoAppError` который теперь сам является ошибкой;
-  - добавление генераторов ID и стека к прототипу ошибок делается через `mrerr.WithExtra`,
-    это позволило отказаться от глобальных переменных;
+    - объект `AppErrorFactory` заменён на `ProtoAppError` который теперь сам является ошибкой;
+    - добавление генераторов ID и стека к прототипу ошибок делается через `mrerr.WithExtra`,
+      это позволило отказаться от глобальных переменных;
 - Написаны тесты для пакета `mrerr`;
 - Изменился интерфейс `CustomError`;
 - Добавлены примеры работы с пакетом `mrerr`;

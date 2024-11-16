@@ -6,15 +6,7 @@ import (
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
-// WithExtra - создаёт новую ProtoAppError на основе указанной с дополнительными параметрами.
-func WithExtra(proto ProtoAppError, extra ProtoExtra) ProtoAppError {
-	proto.caller = extra.Caller
-	proto.onCreated = extra.OnCreated
-
-	return proto
-}
-
-// WithoutStackTrace - возвращает ошибку без стека вызовов.
+// WithoutStackTrace - возвращает ошибку без стека вызовов, если он был сформирован.
 func WithoutStackTrace(err *AppError) *AppError {
 	if err == nil {
 		return ErrErrorIsNilPointer.New()

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrerr"
-	"github.com/mondegor/go-sysmess/mrerr/mrerrfactory"
+	"github.com/mondegor/go-sysmess/mrerr/features"
 )
 
 // main - пример internal ошибки c уникальным ID и со stack trace.
@@ -23,12 +23,12 @@ func main() {
 }
 
 func createErrorProto() *mrerr.ProtoAppError {
-	return mrerrfactory.NewProtoAppError(
+	return mrerr.NewProto(
 		"errMyInternalError",
 		mrerr.ErrorKindInternal,
 		"my internal error",
-		true,
-		true,
+		features.WithProtoCaller(),
+		features.WithProtoOnCreated(),
 	)
 }
 
