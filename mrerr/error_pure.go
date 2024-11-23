@@ -4,6 +4,8 @@ import (
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
+//go:generate mockgen -source=error_pure.go -destination=./mock/error_pure.go
+
 const (
 	ErrorCodeInternal = "errInternal" // ErrorCodeInternal - обобщённый код ошибки: внутренняя ошибка приложения
 	ErrorCodeSystem   = "errSystem"   // ErrorCodeSystem - обобщённый код ошибки: системная ошибка приложения

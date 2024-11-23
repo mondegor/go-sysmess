@@ -1,4 +1,4 @@
-# Описание GoSysMess v0.13.0
+# Описание GoSysMess v0.13.1
 Этот репозиторий содержит описание библиотеки GoSysMess.
 
 ## Статус библиотеки
@@ -11,7 +11,7 @@
   (более подробно см. ниже);
 
 ## Подключение библиотеки
-`go get -u github.com/mondegor/go-sysmess@v0.13.0`
+`go get -u github.com/mondegor/go-sysmess@v0.13.1`
 
 ## Установка библиотеки для её локальной разработки
 - Выбрать рабочую директорию, где должна быть расположена библиотека
@@ -113,25 +113,33 @@
 - [ProtoAppError](https://github.com/mondegor/go-sysmess/blob/master/mrerr/error_proto.go)
 - [AppError](https://github.com/mondegor/go-sysmess/blob/master/mrerr/error.go)
 - [CustomError](https://github.com/mondegor/go-sysmess/blob/master/mrerr/custom_error.go)
-- [IDGenerator](https://github.com/mondegor/go-sysmess/blob/master/mrerr/features/generate_instance_id.go)
-- [StackTraceCaller](https://github.com/mondegor/go-sysmess/blob/master/mrcaller/caller.go)
+- [Базовый IDGenerator](https://github.com/mondegor/go-sysmess/blob/master/mrerr/features/generate_instance_id.go)
+- [Базовый StackTraceCaller](https://github.com/mondegor/go-sysmess/blob/master/mrcaller/caller.go)
+- [Примеры](https://github.com/mondegor/go-sysmess/tree/master/examples)
 
 ![image](docs/resources/packages/c4/sysmess.svg)
 
 ### Подсистема обработки ошибок
-- [ErrorManager](https://github.com/mondegor/go-webcore/blob/master/mrcore/mrinit/error_manager.go)
+- Компоненты InitErrorEngine:
+  - [Инициализация ошибок](https://github.com/mondegor/go-sysmess/blob/master/mrerr/error_proto_init.go) 
+  - [Настройки ошибок](https://github.com/mondegor/go-webcore/blob/master/mrcore/mrinit/error_settings.go)
 - [Базовый ErrorHandler](https://github.com/mondegor/go-webcore/blob/master/mrcore/mrapp/error_handler.go)
 - [Создание системных типов ошибок](https://github.com/mondegor/go-webcore/blob/master/mrcore/usecase_errors.go)
-- [Хелпер обёртки ошибок](https://github.com/mondegor/go-webcore/blob/master/mrcore/mrapp/error_wrapper.go#L16)
-- [Пример первичной обработки ошибки Http сервером](https://github.com/mondegor/go-webcore/blob/master/mrserver/mrresp/sender_error.go#L44)
+- Примеры обработки ошибок:
+  - [Front controller Http сервера]https://github.com/mondegor/go-webcore/blob/master/mrserver/mrresp/sender_error.go#L95)
+  - [Worker в сервисе Consumer](https://github.com/mondegor/go-webcore/blob/master/mrworker/process/consume/message_processor.go#L227)
+  - [Task в сервисе Scheduler]https://github.com/mondegor/go-webcore/blob/master/mrworker/process/schedule/task_scheduler.go#L106
 
 ![image](docs/resources/packages/c4/errcore.svg)
 
 ### Сервис использующий обработку ошибок
-- [Создание и настройка ErrorManager](https://github.com/mondegor/go-sample/blob/master/app/cmd/factory/error_manager.go#L15)
+- [Создание и настройка обработки ошибок в проекте](https://github.com/mondegor/go-sample/blob/master/app/cmd/factory/init_errors.go#L15)
+  - [Добавление ошибкам специфических настроек](https://github.com/mondegor/go-sample/blob/master/app/cmd/factory/init_errors.go#L72)
 - [Создание типов ошибок модуля](https://github.com/mondegor/go-sample/blob/master/app/internal/catalog/product/module/errors.go)
-- [Регистрация типов ошибок модулей](https://github.com/mondegor/go-sample/blob/master/app/cmd/factory/app.go#L184)
-- [Создание ошибок, прямая обёртка ошибок и с использованием хелпера](https://github.com/mondegor/go-sample/blob/master/app/internal/catalog/product/section/adm/usecase/product.go#L114)
+- Примеры использования:
+  - [Создание ошибки](https://github.com/mondegor/go-sample/blob/master/app/internal/catalog/product/section/adm/usecase/product.go#L109)
+  - [Обёртка ошибки](https://github.com/mondegor/go-sample/blob/master/app/internal/catalog/product/section/adm/usecase/product.go#L129)
+  - [С использованием хелпера](https://github.com/mondegor/go-sample/blob/master/app/internal/catalog/product/section/adm/usecase/product.go#L129)
 
 ![image](docs/resources/packages/c4/app.svg)
 

@@ -12,8 +12,6 @@ import (
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
-//go:generate mockgen -source=error_pure.go -destination=./mock/error_pure.go
-
 const (
 	expectedCode    = "test-code"
 	expectedMessage = "test-message"

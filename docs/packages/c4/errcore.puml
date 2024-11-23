@@ -4,7 +4,7 @@
 ' title Подсистема обработки ошибок
 
 Boundary(errcore, "Подсистема ErrCore") {
-  !include components/c4/errcore/error_manager.iuml
+  !include components/c4/errcore/init_error_engine.iuml
   !include components/c4/errcore/error_handler.iuml
   !include components/c4/errcore/sentry_handler.iuml
   !include components/c4/errcore/logger.iuml
