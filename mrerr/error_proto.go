@@ -48,7 +48,7 @@ func NewProto(code string, kind ErrorKind, message string, opts ...ProtoOption) 
 
 				// параметризованные сообщения по умолчанию
 				// используют фиктивные значения параметров
-				args: makeArgs(nil, len(argsNames)),
+				args: makeArgs(nil, argsNames),
 			},
 		},
 	}
@@ -87,7 +87,7 @@ func (e *ProtoAppError) New(args ...any) *AppError {
 	if len(args) > 0 {
 		// если аргументов передано больше c.argsNames,
 		// то при вызове Error() ошибки будет выведено предупреждение
-		c.args = makeArgs(args, len(c.argsNames))
+		c.args = makeArgs(args, c.argsNames)
 	}
 
 	if e.caller != nil {
@@ -119,7 +119,7 @@ func (e *ProtoAppError) Wrap(err error, args ...any) *AppError {
 	if len(args) > 0 {
 		// если аргументов передано больше c.argsNames,
 		// то при вызове Error() ошибки будет выведено предупреждение
-		c.args = makeArgs(args, len(c.argsNames))
+		c.args = makeArgs(args, c.argsNames)
 	}
 
 	if wrappedErr, ok := c.err.(*AppError); ok { //nolint:errorlint

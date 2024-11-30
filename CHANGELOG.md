@@ -1,6 +1,11 @@
 # GoSysMess Changelog
 Все изменения библиотеки GoSysMess будут документироваться на этой странице.
 
+## 2024-11-30
+### Changed
+- В `mrcaller` изменилось определение нижней границы стека вызова;
+- Более понятно подчёркиваются случайно пропущенные параметры в сообщениях об ошибках (`missed-error-arg`);
+
 ## 2024-11-23
 ### Changed
 - Доработана документация по использованию библиотеки.
@@ -8,17 +13,17 @@
 ## 2024-11-16
 ### Added
 - Добавилась возможность добавления следующих опций в конструкторе `NewProto()`:
-  - `WithProtoCaller()`;
-  - `WithProtoOnCreated()`;
+    - `WithProtoCaller()`;
+    - `WithProtoOnCreated()`;
 - Добавлена функция `InitDefaultOptions()` для первичной инициализации всех `Proto` ошибок,
   которые были созданы в глобальных переменных и установки обработчика `ProtoOptionsHandler`
   формирования Proto опций по умолчанию.
 
 ### Removed
 - Удалены следующие функции:
-  - `mrerr.WithExtra()`;
-  - `mrerrfactory.NewProtoAppErrorByDefault()`;
-  - `mrerrfactory.NewProtoAppError()`;
+     - `mrerr.WithExtra()`;
+    - `mrerrfactory.NewProtoAppErrorByDefault()`;
+    - `mrerrfactory.NewProtoAppError()`;
 
 ## 2024-10-27
 ### Added

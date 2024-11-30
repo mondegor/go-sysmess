@@ -1,8 +1,6 @@
 package mrerr
 
 import (
-	"strconv"
-
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -33,13 +31,13 @@ func Cast(proto *ProtoAppError) *AppError {
 	}
 }
 
-func makeArgs(args []any, minLength int) []any {
-	if len(args) >= minLength {
+func makeArgs(args []any, argsNames []string) []any {
+	if len(args) >= len(argsNames) {
 		return args
 	}
 
 	l := len(args)
-	newArgs := make([]any, minLength)
+	newArgs := make([]any, len(argsNames))
 
 	// копируются все переданные параметры в новый массив
 	for i := 0; i < l; i++ {
@@ -47,8 +45,8 @@ func makeArgs(args []any, minLength int) []any {
 	}
 
 	// копируются недостающие параметры
-	for i := l; i < minLength; i++ {
-		newArgs[i] = "missed-arg" + strconv.Itoa(i+1)
+	for i := l; i < len(argsNames); i++ {
+		newArgs[i] = "missed-error-arg={{ ." + argsNames[i] + " }}"
 	}
 
 	return newArgs

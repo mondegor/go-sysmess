@@ -35,12 +35,12 @@ func TestProtoAppError_Error(t *testing.T) {
 		{
 			name:    "test2",
 			message: "my-message {{ .key1 }} - {{ .key2 }}",
-			want:    "my-message missed-arg1 - missed-arg2",
+			want:    "my-message missed-error-arg={{ .key1 }} - missed-error-arg={{ .key2 }}",
 		},
 		{
 			name:    "test3",
 			message: "my-message {{ .key1 }} - {{ .key3 }} - {{ .key2 }}",
-			want:    "my-message missed-arg1 - missed-arg2 - missed-arg3",
+			want:    "my-message missed-error-arg={{ .key1 }} - missed-error-arg={{ .key3 }} - missed-error-arg={{ .key2 }}",
 		},
 	}
 	for _, tt := range tests {

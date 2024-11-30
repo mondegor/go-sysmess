@@ -1,7 +1,9 @@
 package mrcaller
 
+import "strings"
+
 const (
-	lowerBound = "runtime.main"
+	lowerBoundPrefix = "runtime." // runtime.main, runtime.goexit
 )
 
 // FilterStackTraceTrimUpper - функция срезает верхнюю часть стека вызовов,
@@ -19,7 +21,7 @@ func FilterStackTraceTrimUpper(bounds []string) func(frames []uintptr) []uintptr
 		for i := length - 1; i >= 0; i-- {
 			item := runtimeFrame(frames[i]).Name()
 
-			if length == len(frames) && lowerBound == item {
+			if length == len(frames) && strings.HasPrefix(item, lowerBoundPrefix) {
 				length = i // исключая нижнюю границу
 
 				continue
