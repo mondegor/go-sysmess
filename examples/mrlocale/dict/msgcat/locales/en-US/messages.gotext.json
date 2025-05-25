@@ -1,0 +1,87 @@
+{
+    "language": "en-US",
+    "messages": [
+        {
+            "id": "Message example",
+            "message": "Message example",
+            "translation": "Message example",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Message example with param {Param1}",
+            "message": "Message example with param {Param1}",
+            "translation": "Message example with param {Param1}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Param1",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "\"param1\""
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "Message example with two params {Param1} and {Param2}",
+            "message": "Message example with two params {Param1} and {Param2}",
+            "translation": "Message example with two params {Param1} and {Param2}",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Param1",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "\"param1\""
+                },
+                {
+                    "id": "Param2",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "\"param2\""
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "Total {TotalMessageCount} message(s)",
+            "message": "Total {TotalMessageCount} message(s)",
+            "translation": {
+                "select": {
+                    "feature": "plural",
+                    "arg": "TotalMessageCount",
+                    "cases": {
+                        "=0": {
+                            "msg": "There are no messages"
+                        },
+                        "=1": {
+                            "msg": "One message"
+                        },
+                        "other": {
+                            "msg": "Total {TotalMessageCount} messages"
+                        }
+                    }
+                }
+            },
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "TotalMessageCount",
+                    "string": "%[1]d",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "\"totalMessageCount\""
+                }
+            ],
+            "fuzzy": true
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "language": "en-US",
+    "messages": [
+        {
+            "id": "id7391",
+            "message": "id7391",
+            "translation": "7391|Pineapple|A perennial herbaceous plant",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "id97104",
+            "message": "id97104",
+            "translation": "97104|Plum|A deciduous tree that includes many varieties of fruit trees",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        }
+    ]
+}

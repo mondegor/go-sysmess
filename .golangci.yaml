@@ -633,9 +633,6 @@ issues:
         - noctx
         - revive
         - unparam
-    - path: mrlang/locale\.go # TODO: требует рефакторинга
-      linters:
-        - gochecknoglobals
 
   # Which dirs to exclude: issues from them won't be reported.
   # Can use regexp here: `generated.*`, regexp is applied on full path,

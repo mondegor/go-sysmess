@@ -12,16 +12,16 @@ LAYOUT_WITH_LEGEND()
 
 Container_Boundary(project, "Конкретный проект") {
   !include components/c4/app.iuml
-  !include components/c4/sysmess.iuml
+  !include components/c4/mrerr.iuml
   !include components/c4/err_core.iuml
 }
 
-Rel(app, sysmess, "Создаёт типы ошибок используемые системой на основе ProtoAppError")
-Rel(app, err_core, "Инициализирует типы ошибок при помощи InitErrorEngine, привязывает необходимые для них обработчики: IDGenerator, StackTraceCaller, SentryHandler")
+Rel(app, mrerr, "Создаёт типы ошибок используемые системой на основе ProtoError")
+Rel(app, err_core, "Инициализирует типы ошибок при помощи InitErrorEngine, привязывает необходимые для них обработчики, такие как: IDGenerator, StackTraceCaller, SentryHandler")
 Rel(app, err_core, "Настраивает персональный для системы ErrorHandler")
 
-Rel(app, sysmess, "Создаёт новые AppError, оборачивает переданные из других слоёв системы")
-Rel(sysmess, err_core, "Формирует события о возникновении ошибок, устанавливает ошибкам их персональный ID, прикрепляет стек вызовов")
+Rel(app, mrerr, "Создаёт новые InstantError, оборачивает переданные из других слоёв системы")
+Rel(mrerr, err_core, "Формирует события о возникновении ошибок, генерирует ошибкам их ID и формирует для них стек вызовов")
 Rel(err_core, sentry, "Отправляет информацию об ошибках в момент их возникновений")
 
 Rel(app, err_core, "Передаёт ошибки с их персональным ID в ErrorHandler")

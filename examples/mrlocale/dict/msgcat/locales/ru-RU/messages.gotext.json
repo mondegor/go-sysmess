@@ -1,0 +1,85 @@
+{
+    "language": "ru-RU",
+    "messages": [
+        {
+            "id": "Message example",
+            "message": "Message example",
+            "translation": "Пример сообщения"
+        },
+        {
+            "id": "Message example with param {Param1}",
+            "message": "Message example with param {Param1}",
+            "translation": "Пример сообщения с параметром {Param1}",
+            "placeholders": [
+                {
+                    "id": "Param1",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "\"param1\""
+                }
+            ]
+        },
+        {
+            "id": "Message example with two params {Param1} and {Param2}",
+            "message": "Message example with two params {Param1} and {Param2}",
+            "translation": "Пример сообщения с двумя параметрами поменянными местами {Param2} и {Param1}",
+            "placeholders": [
+                {
+                    "id": "Param1",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "\"param1\""
+                },
+                {
+                    "id": "Param2",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "\"param2\""
+                }
+            ]
+        },
+        {
+            "id": "Total {TotalMessageCount} message(s)",
+            "message": "Total {TotalMessageCount} message(s)",
+            "translation": {
+                "select": {
+                    "feature": "plural",
+                    "arg": "TotalMessageCount",
+                    "cases": {
+                        "=0": {
+                            "msg": "Сообщения отсутствуют"
+                        },
+                        "=1": {
+                            "msg": "Всего одно сообщение"
+                        },
+                        "few": {
+                            "msg": "Всего {TotalMessageCount} сообщения"
+                        },
+                        "one": {
+                            "msg": "Всего {TotalMessageCount} сообщение"
+                        },
+                        "other": {
+                            "msg": "Всего {TotalMessageCount} сообщений"
+                        }
+                    }
+                }
+            },
+            "placeholders": [
+                {
+                    "id": "TotalMessageCount",
+                    "string": "%[1]d",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "\"totalMessageCount\""
+                }
+            ]
+        }
+    ]
+}

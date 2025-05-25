@@ -1,125 +1,119 @@
 package mrerr
 
 import (
-	"strconv"
-	"strings"
+	"sync"
 
-	"github.com/mondegor/go-sysmess/mrmsg"
-)
-
-const (
-	attrNameByDefault       = "unnamed"
-	messageTooManyArguments = "[WARNING!!! too many arguments in error message] "
+	"github.com/mondegor/go-sysmess/mrerrors"
 )
 
 type (
-	// AppError - ошибка с поддержкой параметров, ID экземпляра ошибки и стека вызовов.
-	AppError struct {
-		pureError
-		instanceID    string // собственный ID (устанавливается только если не установлено во вложенной ошибке)
-		attrs         []mrmsg.NamedArg
-		err           error
-		errInstanceID *string // ID вложенной ошибки
-		stackTrace    stackTrace
-	}
-
-	stackTrace struct {
-		val StackTracer
-		has bool // признак, что стек есть у текущего объекта или у одного из вложенных
+	// options - объект используемый только в момент создания mrerrors.ProtoError ошибки
+	// для того чтобы явно заданные опции не сбрасывались в значения по умолчанию.
+	options struct {
+		proto               *mrerrors.ProtoError
+		changedArgsReplacer bool
+		changedCaller       bool
+		changedOnCreated    bool
 	}
 )
 
-// WithAttr - возвращает новую ошибку с прикреплённым к нему именованным атрибутом.
-func (e *AppError) WithAttr(name string, value any) *AppError {
-	c := *e
-	c.attrs = appendAttr(c.attrs, name, value)
+var defopts = struct { //nolint:gochecknoglobals
+	mu sync.Mutex
 
-	return &c
+	// delayed - массив собирает все ошибки созданные через New(), до момента вызова InitDefaultOptions().
+	// Это позволяет, в момент запуска приложения, отследить создание всех таких ошибок в переменных
+	// вида 'var Err* = mrerr.New(...)' для того чтобы проинициализировать их опциями по умолчанию
+	// при запуске приложения с помощью метода InitDefaultOptions(). Далее все таки ошибки инициализируются
+	// опциями по умолчанию сразу же при их создании, а этот массив более не используется.
+	delayed []options
+
+	// defaultProtoOptions - глобальный обработчик формирования списка опций по умолчанию
+	// для создаваемых прототипов ошибок (при вызове New()).
+	handler OptionsHandler
+}{}
+
+// NewKindInternal - создаёт фабрику ProtoError для создания ошибок типа Internal с указанными опциями.
+func NewKindInternal(message string, opts ...Option) *mrerrors.ProtoError {
+	return New(ErrorKindInternal, message, opts...)
 }
 
-// InstanceID - возвращает уникальный идентификатор случившейся ошибки.
-// Но только если в фабрике, породившей эту ошибку, был установлен генератор ID ошибок,
-// В противном случае вернётся пустая строка.
-func (e *AppError) InstanceID() string {
-	if e.errInstanceID != nil {
-		return *e.errInstanceID
-	}
-
-	return e.instanceID
+// NewKindSystem - создаёт фабрику ProtoError для создания ошибок типа System с указанными опциями.
+func NewKindSystem(message string, opts ...Option) *mrerrors.ProtoError {
+	return New(ErrorKindSystem, message, opts...)
 }
 
-// Error - возвращает ошибку в виде строки.
-func (e *AppError) Error() string {
-	var buf strings.Builder
-
-	if e.instanceID != "" {
-		buf.WriteByte('[')
-		buf.WriteString(e.instanceID)
-		buf.WriteString("] ")
-	}
-
-	// buf.WriteString(e.code)
-	// buf.WriteString(": ")
-
-	if len(e.argsNames) == 0 {
-		buf.WriteString(e.message)
-	} else {
-		if len(e.args) > len(e.argsNames) {
-			buf.WriteString(messageTooManyArguments)
-		}
-
-		buf.WriteString(mrmsg.MustRenderWithNamedArgs(e.message, e.getNamedArgs()))
-	}
-
-	if len(e.attrs) > 0 {
-		buf.WriteString(" (")
-
-		for i, attr := range e.attrs {
-			if i > 0 {
-				buf.WriteString(", ")
-			}
-
-			buf.WriteString(attr.Name)
-			buf.WriteByte('=')
-			buf.WriteString(attr.ValueString())
-		}
-
-		buf.WriteByte(')')
-	}
-
-	if e.stackTrace.val != nil {
-		cnt := e.stackTrace.val.Count()
-
-		for i := 0; i < cnt; i++ {
-			name, file, line := e.stackTrace.val.Item(i)
-
-			if i == 0 {
-				buf.WriteString(" in ")
-			} else {
-				buf.WriteString(" , ")
-			}
-
-			if name != "" {
-				buf.WriteByte('[')
-				buf.WriteString(name)
-				buf.WriteString("] ")
-			}
-
-			buf.WriteString(file)
-			buf.WriteByte(':')
-			buf.WriteString(strconv.Itoa(line))
-		}
-	}
-
-	if e.err != nil {
-		buf.WriteString(": ")
-		buf.WriteString(e.err.Error())
-	}
-
-	return buf.String()
+// NewKindUser - создаёт фабрику ProtoError для создания ошибок типа User с указанными опциями.
+func NewKindUser(code, message string, opts ...Option) *mrerrors.ProtoError {
+	return New(ErrorKindUser, message, append(opts, WithCode(code))...)
 }
 
-// Unwrap - возвращает вложенную ошибку (errors.Is использует этот интерфейс).
-func (e *AppError) Unwrap() error {
-	return e.err
+// New - создаёт фабрику ProtoError для создания ошибок указанного типа с указанными опциями.
+func New(kind ErrorKind, message string, opts ...Option) *mrerrors.ProtoError {
+	wp := options{
+		proto: mrerrors.NewProto(message, mrerrors.WithProtoKind(kind)),
+	}
+
+	for _, opt := range opts {
+		opt(&wp)
+	}
+
+	defopts.mu.Lock()
+	defer defopts.mu.Unlock()
+
+	// сначала происходит сбор создаваемых глобальных Proto ошибок в момент запуска приложения
+	// чтобы их инициализировать нужными опциями, которые определяются приложением позже
+	// это будет происходить до тех пор, пока не будет вызвана функция InitDefaultOptions()
+	// далее опции по умолчанию применяются сразу
+	if defopts.handler == nil {
+		defopts.delayed = append(defopts.delayed, wp)
+
+		return wp.proto
+	}
+
+	// устанавливаются опции по умолчанию,
+	// но только если они не были явно переданы в данный метод
+	for _, opt := range defopts.handler.Options(kind, wp.proto.Code(), wp.proto.Message()) {
+		opt(&wp)
+	}
+
+	return wp.proto
+}
+
+// InitDefaultOptions - с помощью указанного обработчика одноразово присваивает опции
+// по умолчанию всем созданным через New() ошибкам в момент инициализации приложения,
+// при этом, не изменяет опции, которые были явно переданы в конструктор такой ошибки.
+// После этого, этот обработчик сохраняется и начинает вызываться каждый раз в момент
+// создания очередной такой ошибки.
+func InitDefaultOptions(handler OptionsHandler) {
+	defopts.mu.Lock()
+	defer defopts.mu.Unlock()
+
+	if defopts.handler != nil {
+		return
+	}
+
+	// если обработчик не указан, то устанавливается заглушка,
+	// которая блокирует повторный вызов функции InitDefaultOptions()
+	if handler == nil {
+		defopts.handler = OptionsHandlerFunc(
+			func(_ ErrorKind, _, _ string) []Option {
+				return nil
+			},
+		)
+
+		defopts.delayed = nil
+
+		return
+	}
+
+	// устанавливаются опции по умолчанию для каждой созданной ошибки, в момент инициализации приложения,
+	// но только если эти опции уже не были установлены в момент создания этих ошибок
+	for _, wp := range defopts.delayed {
+		for _, opt := range handler.Options(wp.proto.Kind(), wp.proto.Code(), wp.proto.Message()) {
+			opt(&wp)
+		}
+	}
+
+	defopts.handler = handler
+	defopts.delayed = nil
 }

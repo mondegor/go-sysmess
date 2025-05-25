@@ -9,16 +9,16 @@ type (
 	CustomErrors []*CustomError
 )
 
-// Error - возвращает список ошибок в виде строки.
-func (l CustomErrors) Error() string {
+// Error - возвращает список пользовательских ошибок в виде строки.
+func (es CustomErrors) Error() string {
 	var buf strings.Builder
 
-	for i := 0; i < len(l); i++ {
+	for i := 0; i < len(es); i++ {
 		if i > 0 {
 			buf.WriteByte('\n')
 		}
 
-		buf.WriteString(l[i].Error())
+		buf.WriteString((es)[i].Error())
 	}
 
 	return buf.String()

@@ -1,0 +1,20 @@
+{
+    "language": "ru-RU",
+    "messages": [
+        {
+            "id": "InternalError",
+            "message": "InternalError",
+            "translation": "Внутренняя ошибка сервера\n\nОбратитесь за поддержкой в Telegram"
+        },
+        {
+            "id": "SystemError",
+            "message": "SystemError",
+            "translation": "Системная ошибка сервера\n\nСистема временно недоступна, пожалуйста, повторите попытку позже"
+        },
+        {
+            "id": "entity not found",
+            "message": "entity not found",
+            "translation": "Ресурс не найден"
+        }
+    ]
+}

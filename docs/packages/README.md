@@ -6,4 +6,4 @@
 
 ![image](../resources/packages/c4/errcore.svg)
 
-![image](../resources/packages/c4/sysmess.svg)
+![image](../resources/packages/c4/mrerr.svg)

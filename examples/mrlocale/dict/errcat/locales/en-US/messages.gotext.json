@@ -1,0 +1,26 @@
+{
+    "language": "en-US",
+    "messages": [
+        {
+            "id": "InternalError",
+            "message": "InternalError",
+            "translation": "Internal server error\n\nContact support in telegram",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "SystemError",
+            "message": "SystemError",
+            "translation": "System server error\n\nThe system is temporarily unavailable, please try again later",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "entity not found",
+            "message": "entity not found",
+            "translation": "Resource not found",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        }
+    ]
+}

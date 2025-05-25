@@ -1,0 +1,1 @@
+Component(instant_error, "InstantError", "mrerr", "Содержит информацию об ошибке с выданным ID и сформированным StackTrace")

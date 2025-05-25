@@ -2,56 +2,64 @@ package mrerr
 
 import (
 	"fmt"
+
+	"github.com/mondegor/go-sysmess/mrerrors"
 )
 
 type (
-	// CustomError - пользовательская ошибка с персональным кодом.
+	// CustomError - пользовательская ошибка с уточнённым кодом ошибки.
+	// Например, код может выглядеть следующим образом: EmailAlreadyExists/userEmail
+	// Где EmailAlreadyExists - пользовательская ошибка, userEmail - поле, в которой произошла ошибка.
 	CustomError struct {
 		customCode string
-		err        *AppError
+		err        *mrerrors.InstantError
 	}
 )
 
 var (
-	// ErrCustomErrorHasInternalError - пользовательская ошибка содержит внутреннюю или системную ошибку.
-	ErrCustomErrorHasInternalError = NewProto(
-		"errCustomErrorHasInternalError", ErrorKindInternal, "custom error has an internal error")
+	// ErrCustomErrorHasNilError - пользовательская ошибка содержит nil.
+	ErrCustomErrorHasNilError = NewKindInternal("custom error has an nil error")
+
+	// ErrCustomErrorHasInternalError - пользовательская ошибка содержит внутреннюю ошибку.
+	ErrCustomErrorHasInternalError = NewKindInternal("custom error has an internal error")
+
+	// ErrCustomErrorHasSystemError - пользовательская ошибка содержит системную ошибку.
+	ErrCustomErrorHasSystemError = NewKindSystem("custom error has an system error")
 
 	// ErrCustomErrorHasNoWrappedError - пользовательская ошибка содержит необработанную ошибку.
-	ErrCustomErrorHasNoWrappedError = NewProto(
-		"errCustomErrorHasNoWrappedError", ErrorKindInternal, "custom error has no wrapped error")
+	ErrCustomErrorHasNoWrappedError = NewKindInternal("custom error has no wrapped error")
 )
 
-// NewCustomError - создаёт объект CustomError, аргумент err должен содержать ошибку.
+// NewCustomError - создаёт объект CustomError.
+// Если аргумент err содержит любую ошибку, которая не соответствует типу ErrorKindUser
+// то вся эта ошибка будет считаться невалидной.
 func NewCustomError(customCode string, err error) *CustomError {
-	newError := func(customCode string, err *AppError) *CustomError {
-		return &CustomError{
-			customCode: customCode,
-			err:        err,
-		}
-	}
-
 	if err == nil {
-		return newError(customCode, ErrErrorIsNilPointer.New())
+		return newCustomError(customCode, ErrCustomErrorHasNilError.New())
 	}
 
-	if e, ok := err.(*AppError); ok { //nolint:errorlint
-		if e.Kind() == ErrorKindUser {
-			return newError(customCode, e)
-		}
+	var appErr *mrerrors.InstantError
 
-		return newError(customCode, ErrCustomErrorHasInternalError.Wrap(err))
+	switch e := err.(type) { //nolint:errorlint
+	case *mrerrors.InstantError:
+		appErr = e
+	case *mrerrors.ProtoError:
+		appErr = mrerrors.CastProto(e)
 	}
 
-	if e, ok := err.(*ProtoAppError); ok { //nolint:errorlint
-		if e.Kind() == ErrorKindUser {
-			return newError(customCode, e.New())
-		}
-
-		return newError(customCode, ErrCustomErrorHasInternalError.Wrap(err))
+	if appErr == nil {
+		return newCustomError(customCode, ErrCustomErrorHasNoWrappedError.Wrap(err))
 	}
 
-	return newError(customCode, ErrCustomErrorHasNoWrappedError.Wrap(err))
+	if appErr.Kind() == ErrorKindUser {
+		return newCustomError(customCode, appErr)
+	}
+
+	if appErr.Kind() == ErrorKindSystem {
+		return newCustomError(customCode, ErrCustomErrorHasSystemError.Wrap(appErr))
+	}
+
+	return newCustomError(customCode, ErrCustomErrorHasInternalError.Wrap(appErr))
 }
 
 // CustomCode - возвращает персональный код ошибки.
@@ -66,12 +74,19 @@ func (e *CustomError) IsValid() bool {
 	return e.err.Kind() == ErrorKindUser
 }
 
-// Err - возвращает вложенную ошибку, привязанную к текущей ошибке.
-func (e *CustomError) Err() *AppError {
+// Err - возвращает вложенную ошибку.
+func (e *CustomError) Err() *mrerrors.InstantError {
 	return e.err
 }
 
 // Error - возвращает ошибку в виде строки.
 func (e *CustomError) Error() string {
-	return fmt.Sprintf("error customCode=%s: {%s}", e.customCode, e.err.Error())
+	return fmt.Sprintf("customCode=%s: {%s}", e.customCode, e.err.Error())
+}
+
+func newCustomError(customCode string, err *mrerrors.InstantError) *CustomError {
+	return &CustomError{
+		customCode: customCode,
+		err:        err,
+	}
 }

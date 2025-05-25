@@ -1,1 +1,1 @@
-Component(error_handler, "ErrorHandler", "errcore", "Обрабатывает и распределяет ошибки по разным хранилищам")
+Component(error_handler, "ErrorHandler", "errcore", "Обрабатывает и анализирует ошибки для распределения их по различным системам мониторинга")

@@ -1,0 +1,14 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+' title Подсистема формирования ошибок
+
+Boundary(mrerr, "Подсистема MrErr Package") {
+  !include components/c4/mrerr/proto_error.iuml
+  !include components/c4/mrerr/instant_error.iuml
+  !include components/c4/mrerr/custom_error.iuml
+  !include components/c4/mrerr/id_generator.iuml
+  !include components/c4/mrerr/stack_caller.iuml
+}
+
+@enduml
