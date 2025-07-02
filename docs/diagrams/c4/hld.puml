@@ -17,7 +17,7 @@ Container_Boundary(project, "Конкретный проект") {
 }
 
 Rel(app, mrerr, "Создаёт типы ошибок используемые системой на основе ProtoError")
-Rel(app, err_core, "Инициализирует типы ошибок при помощи InitErrorEngine, привязывает необходимые для них обработчики, такие как: IDGenerator, StackTraceCaller, SentryHandler")
+Rel(app, err_core, "Инициализирует типы ошибок, привязывает необходимые для них обработчики, такие как: IDGenerator, StackTraceCaller, SentryHandler")
 Rel(app, err_core, "Настраивает персональный для системы ErrorHandler")
 
 Rel(app, mrerr, "Создаёт новые InstantError, оборачивает переданные из других слоёв системы")
