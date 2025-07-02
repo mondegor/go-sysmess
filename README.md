@@ -124,14 +124,14 @@
 ### Подсистема обработки ошибок
 - [Создание и инициализация ошибок опциями по умолчанию](https://github.com/mondegor/go-sysmess/blob/master/mrerr/error.go); 
 - [ErrorHandler](https://github.com/mondegor/go-sysmess/blob/master/mrerr/error_handler.go);
-- Библиотека ошибок:
-  - [Внутренние ошибки](https://github.com/mondegor/go-webcore/blob/master/mrerr/mr/errors_internal.go);
-  - [Инфраструктурные ошибки](https://github.com/mondegor/go-webcore/blob/master/mrerr/mr/errors_storage.go);
-  - [Ошибки бизнес логики](https://github.com/mondegor/go-webcore/blob/master/mrerr/mr/errors_usecase.go);
-  - [Http ошибки](https://github.com/mondegor/go-webcore/blob/master/mrerr/mr/errors_http.go);
+- Библиотека готовых ошибок:
+  - [Внутренние ошибки](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_internal.go);
+  - [Инфраструктурные ошибки](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_storage.go);
+  - [Ошибки бизнес логики](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_usecase.go);
+  - [Http ошибки](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_http.go);
 - Врапперы ошибок:
-  - [Для инфраструктурного слоя](https://github.com/mondegor/go-webcore/blob/master/mrerr/mr/wrapper_storage.go);
-  - [Для слоя бизнес логики](https://github.com/mondegor/go-webcore/blob/master/mrerr/mr/wrapper_usecase.go);
+  - [Для инфраструктурного слоя](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/wrapper_storage.go);
+  - [Для слоя бизнес логики](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/wrapper_usecase.go);
 
 ![image](docs/resources/packages/c4/errcore.svg)
 
