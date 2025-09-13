@@ -10,6 +10,8 @@ import (
 	"path"
 )
 
+// go install ./cmd/gotext-catalog-fix
+
 type config struct {
 	sourceFile string
 	outputFile string

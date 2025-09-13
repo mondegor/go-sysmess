@@ -2,12 +2,13 @@ package mrerr
 
 import "github.com/mondegor/go-sysmess/mrerrors"
 
+// Виды ошибок.
 const (
-	ErrorKindUnknown              = ErrorKind(0)               // ErrorKindUnknown - специальный тип ошибки сигнализирующий о её нераспознаности.
-	ErrorKindInternal             = mrerrors.ErrorKindInternal // ErrorKindInternal - алиас mrerrors.ErrorKindInternal.
-	ErrorKindSystem               = mrerrors.ErrorKindSystem   // ErrorKindSystem - алиас mrerrors.ErrorKindSystem.
-	ErrorKindUser                 = mrerrors.ErrorKindUser     // ErrorKindUser - алиас mrerrors.ErrorKindUser.
-	ErrorKindUserWithWrappedError = mrerrors.ErrorKindUser + 1 // ErrorKindUserWithWrappedError - пользовательская ошибка в которой находится вложенная ошибка.
+	ErrorKindUnknown              = ErrorKind(0)
+	ErrorKindInternal             = mrerrors.ErrorKindInternal
+	ErrorKindSystem               = mrerrors.ErrorKindSystem
+	ErrorKindUser                 = mrerrors.ErrorKindUser
+	ErrorKindUserWithWrappedError = mrerrors.ErrorKindUser + 1 // пользовательская ошибка в которой находится вложенная ошибка
 )
 
 type (

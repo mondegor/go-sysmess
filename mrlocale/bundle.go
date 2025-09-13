@@ -7,9 +7,10 @@ import (
 	"golang.org/x/text/language"
 )
 
+// Предопределённые названия доменов по умолчанию.
 const (
-	DefaultMessagesDomain = "messages" // DefaultMessagesDomain - название домена сообщений по умолчанию.
-	DefaultErrorsDomain   = "errors"   // DefaultErrorsDomain - название домена ошибок по умолчанию.
+	DefaultMessagesDomain = "messages"
+	DefaultErrorsDomain   = "errors"
 )
 
 type (

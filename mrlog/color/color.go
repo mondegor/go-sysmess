@@ -1,22 +1,23 @@
 package color
 
+// Коды цветов используемых в консоли.
 const (
-	Blue        = "\033[94m" // Blue - синий.
-	Cyan        = "\033[36m" // Cyan - бирюзовый.
-	LightCyan   = "\033[96m" // LightCyan - светло бирюзовый.
-	Green       = "\033[32m" // Green - зелёный.
-	LightGreen  = "\033[92m" // LightGreen - светло зелёный.
-	Magenta     = "\033[95m" // Magenta - сиреневый.
-	Red         = "\033[91m" // Red - красный.
-	Yellow      = "\033[33m" // Yellow - желтый.
-	LightYellow = "\033[93m" // LightYellow - светло желтый.
-	Gray        = "\033[90m" // Gray - серый.
-	LightGray   = "\033[37m" // LightGray - светло серый.
-	White       = "\033[97m" // White - белый.
-	End         = "\033[0m"  // End - завершающий символ цвета.
+	Blue        = "\033[94m" // синий
+	Cyan        = "\033[36m" // бирюзовый
+	LightCyan   = "\033[96m" // светло бирюзовый
+	Green       = "\033[32m" // зелёный
+	LightGreen  = "\033[92m" // светло зелёный
+	Magenta     = "\033[95m" // сиреневый
+	Red         = "\033[91m" // красный
+	Yellow      = "\033[33m" // желтый
+	LightYellow = "\033[93m" // светло желтый
+	Gray        = "\033[90m" // серый
+	LightGray   = "\033[37m" // светло серый
+	White       = "\033[97m" // белый
+	End         = "\033[0m"  // завершающий символ цвета
 )
 
-// ColorizeText - возвращает указанный текст с в указанном цвете для отображения в консоле.
+// ColorizeText - возвращает указанный текст в указанном цвете для отображения в консоли.
 func ColorizeText(colorCode, value string) string {
 	return colorCode + value + End
 }

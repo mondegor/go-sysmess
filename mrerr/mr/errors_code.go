@@ -1,8 +1,11 @@
 package mr
 
 const (
-	DefaultErrorCodeInternal = "Internal" // DefaultErrorCodeInternal - обобщённый код ошибки: внутренняя ошибка приложения.
-	DefaultErrorCodeSystem   = "System"   // DefaultErrorCodeSystem - обобщённый код ошибки: системная ошибка приложения.
+	// DefaultErrorCodeInternal - обобщённый код ошибки: внутренняя ошибка приложения.
+	DefaultErrorCodeInternal = "Internal"
+
+	// DefaultErrorCodeSystem - обобщённый код ошибки: системная ошибка приложения.
+	DefaultErrorCodeSystem = "System"
 
 	// ErrorCodeUnexpectedInternal - внутренняя ошибка, содержащая ошибку, которую следовало обернуть ранее.
 	ErrorCodeUnexpectedInternal = "UnexpectedInternal"

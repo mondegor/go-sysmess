@@ -6,16 +6,17 @@ import (
 
 type (
 	// Level - уровень логирования.
-	Level int8
+	Level int
 )
 
+// Перечисление уровней логирования.
 const (
-	LevelDebug = Level(slog.LevelDebug)     // LevelDebug - LevelWarn + LevelWarn + LevelInfo - отладочные сообщения.
-	LevelInfo  = Level(slog.LevelInfo)      // LevelInfo - LevelError + LevelWarn + информационные сообщения.
-	LevelWarn  = Level(slog.LevelWarn)      // LevelWarn - LevelError + предупреждения.
-	LevelError = Level(slog.LevelError)     // LevelError - ошибки (максимальный уровень, который можно назначить в конфиге).
-	LevelFatal = Level(slog.LevelError + 4) // LevelFatal - дополнительный уровень для фатальных ошибок (служебный).
-	LevelTrace = Level(slog.LevelError + 8) // LevelTrace - режим трассировки (служебный, управляется отдельно).
+	LevelDebug = Level(slog.LevelDebug)     // LevelWarn + LevelWarn + LevelInfo - отладочные сообщения
+	LevelInfo  = Level(slog.LevelInfo)      // LevelError + LevelWarn + информационные сообщения
+	LevelWarn  = Level(slog.LevelWarn)      // LevelError + предупреждения
+	LevelError = Level(slog.LevelError)     // ошибки (максимальный уровень, который можно назначить в конфиге)
+	LevelFatal = Level(slog.LevelError + 4) // дополнительный уровень для фатальных ошибок (служебный)
+	LevelTrace = Level(slog.LevelError + 8) // режим трассировки (служебный, управляется отдельно)
 )
 
 // String - возвращает значение уровня в виде строки.
