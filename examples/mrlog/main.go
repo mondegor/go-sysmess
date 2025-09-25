@@ -22,7 +22,6 @@ func main() {
 		slog.WithLevel(mrlog.LevelInfo.String()),
 		slog.WithJsonFormat(true),
 		slog.WithTimeFormat("RFC3339Nano"),
-		slog.WithReplaceArgs(slog.ReplaceArg),
 	)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -37,7 +36,6 @@ func main() {
 		slog.WithLevel(mrlog.LevelDebug.String()),
 		slog.WithJsonFormat(false),
 		slog.WithTimeFormat("Kitchen"),
-		slog.WithReplaceArgs(slog.ReplaceArg),
 		slog.WithMiddlewareHandler(
 			middleware.BeforeHandle(
 				func(ctx context.Context, rec sdkslog.Record) sdkslog.Record {
@@ -93,8 +91,8 @@ func main() {
 func printMsg(ctx context.Context, logger mrlog.Logger) {
 	logger.Info(ctx, "Logger info message - OK!")
 	logger.Debug(ctx, "Logger DEBUG message", "version", "v1.0.0")
-	logger.Error(ctx, "Error with error message", mrlog.Err(errors.New("my error")))
-	logger.Warn(ctx, "Warning with error message", mrlog.Err(errors.New("my warning")))
+	logger.Error(ctx, "Error with error message", slog.Err(errors.New("my error")))
+	logger.Warn(ctx, "Warning with error message", slog.Err(errors.New("my warning")))
 	logger.Info(ctx, "Exec query", "sql", "SELECT COUNT(*) FROM table_name")
 
 	err := error(&baseError{
@@ -102,7 +100,7 @@ func printMsg(ctx context.Context, logger mrlog.Logger) {
 		message: "my error with attr-1",
 		args:    []any{"err-attr-1", "err-value-1"},
 	})
-	logger.Error(ctx, "Error with error message and args", mrlog.Err(err))
+	logger.Error(ctx, "Error with error message and args", slog.Err(err))
 
 	logger = logger.WithAttrs("processId", "D8OR0E27-7WMZ-SC1A")
 	logger.Info(ctx, "Start process", "service", "MainService")

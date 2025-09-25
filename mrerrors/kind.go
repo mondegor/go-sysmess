@@ -9,7 +9,7 @@ const (
 
 type (
 	// ErrorKind - вид ошибки.
-	ErrorKind int8
+	ErrorKind uint8
 )
 
 // String - возвращает тип ошибки в виде строки.

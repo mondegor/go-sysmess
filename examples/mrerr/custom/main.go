@@ -17,7 +17,7 @@ func main() {
 
 	kindUserProto := mrerr.NewKindUser(
 		"MyErrorWithParams",
-		"my error with '{{param1}}' and '{{param2}}'",
+		"my error with '{Param1}' and '{Param2}'",
 		mrerr.WithDefaultArgsReplacer(),
 	)
 
@@ -35,8 +35,8 @@ func main() {
 }
 
 func addSomeItems(list mrerr.CustomErrors) mrerr.CustomErrors {
-	kindSystemProto := mrerr.NewKindSystem("my system error with '{{param1}}'")
-	kindInternalProto := mrerr.NewKindInternal("my internal error with '{{param1}}'")
+	kindSystemProto := mrerr.NewKindSystem("my system error with '{Param1}'")
+	kindInternalProto := mrerr.NewKindInternal("my internal error with '{Param1}'")
 
 	list = append(list, mrerr.NewCustomError("formField2", kindSystemProto.New("p1-222")))
 	list = append(list, mrerr.NewCustomError("formField3", kindInternalProto.New("p1-333")))

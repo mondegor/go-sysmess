@@ -34,7 +34,7 @@ func createErrorProto() *mrerrors.ProtoError {
 	)
 
 	return mrerrors.NewProto(
-		"my internal error with param '{param1}'",
+		"my internal error with param '{Param1}'",
 		mrerrors.WithProtoKind(mrerrors.ErrorKindInternal),
 		mrerrors.WithProtoCode("int-code-001"),
 		mrerrors.WithProtoArgsReplacer(func(message string) mrerrors.MessageReplacer {

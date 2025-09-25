@@ -50,13 +50,6 @@ func WithTimeFormat(value string) Option {
 	}
 }
 
-// WithReplaceArgs - устанавливает функцию замены аргумента сообщения для LoggerAdapter.
-func WithReplaceArgs(value func(arg any) (newArg any)) Option {
-	return func(o *options) {
-		o.replaceArg = value
-	}
-}
-
 // WithMiddlewareHandler - устанавливает middleware для LoggerAdapter.
 func WithMiddlewareHandler(value ...func(next slog.Handler) slog.Handler) Option {
 	return func(o *options) {

@@ -1,4 +1,4 @@
-# Описание GoSysMess v0.14.1
+# Описание GoSysMess v0.14.2
 Этот репозиторий содержит описание библиотеки GoSysMess.
 
 ## Статус библиотеки
@@ -12,7 +12,7 @@
 - предоставляет систему логирования сообщений и ошибок на основе `slog`;
 
 ## Подключение библиотеки
-`go get -u github.com/mondegor/go-sysmess@v0.14.1`
+`go get -u github.com/mondegor/go-sysmess@v0.14.2`
 
 ## Установка библиотеки для её локальной разработки
 - Выбрать рабочую директорию, где должна быть расположена библиотека
@@ -40,8 +40,6 @@
 #### Короткий вариант выше приведённых команд (Makefile)
 - `make deps` // аналог `mrcmd go-dev deps`
 - `make generate` // аналог `mrcmd go-dev generate`
-- `make fmt` // аналог `mrcmd go-dev gofumpt-fix`
-- `make fmti` // аналог `mrcmd go-dev goimports-fix`
 - `make lint` // аналог `mrcmd golangci-lint check`
 - `make test` // аналог `mrcmd go-dev test`
 - `make test-report` // аналог `mrcmd go-dev test-report`

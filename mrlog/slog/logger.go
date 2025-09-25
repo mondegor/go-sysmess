@@ -16,8 +16,7 @@ type (
 	// LoggerAdapter - логгер на крайний случай, например,
 	// когда не был установлен логгер в контексте.
 	LoggerAdapter struct {
-		sl         *slog.Logger
-		replaceArg func(arg any) (newArg any)
+		sl *slog.Logger
 	}
 
 	options struct {
@@ -26,7 +25,6 @@ type (
 		level              mrlog.Level
 		jsonFormat         bool
 		timeFormat         string
-		replaceArg         func(arg any) (newArg any)
 		middlewareHandlers []func(next slog.Handler) slog.Handler
 		replaceAttr        func(attr slog.Attr) (newAttr slog.Attr)
 		colorMode          bool
@@ -87,21 +85,13 @@ func NewLoggerAdapter(opts ...Option) (logger *LoggerAdapter, err error) {
 		handler = o.middlewareHandlers[i](handler)
 	}
 
-	return NewWithReplaceArgs(handler, o.replaceArg), nil
+	return New(handler), nil
 }
 
 // New - создаёт объект LoggerAdapter.
 func New(handler slog.Handler) *LoggerAdapter {
 	return &LoggerAdapter{
 		sl: slog.New(handler),
-	}
-}
-
-// NewWithReplaceArgs - создаёт объект LoggerAdapter.
-func NewWithReplaceArgs(handler slog.Handler, replaceArg func(arg any) (newArg any)) *LoggerAdapter {
-	return &LoggerAdapter{
-		sl:         slog.New(handler),
-		replaceArg: replaceArg,
 	}
 }
 
@@ -113,7 +103,7 @@ func (l *LoggerAdapter) WithAttrs(args ...any) mrlog.Logger {
 	}
 
 	c := *l
-	c.sl = l.sl.With(l.replaceArgs(args)...)
+	c.sl = l.sl.With(args...)
 
 	return &c
 }
@@ -125,12 +115,12 @@ func (l *LoggerAdapter) Enabled(level mrlog.Level) bool {
 
 // Log - логирует сообщения на указанном уровне.
 func (l *LoggerAdapter) Log(ctx context.Context, level mrlog.Level, msg string, args ...any) {
-	l.sl.Log(ctx, slog.Level(level), msg, l.replaceArgs(args)...)
+	l.sl.Log(ctx, slog.Level(level), msg, args...)
 }
 
 // Debug - логирует сообщения на уровне mrlog.LevelDebug.
 func (l *LoggerAdapter) Debug(ctx context.Context, msg string, args ...any) {
-	l.sl.DebugContext(ctx, msg, l.replaceArgs(args)...)
+	l.sl.DebugContext(ctx, msg, args...)
 }
 
 // DebugFunc - логирует сообщения на уровне mrlog.LevelDebug с их отложенным созданием.
@@ -141,30 +131,20 @@ func (l *LoggerAdapter) DebugFunc(ctx context.Context, createMsg func() string, 
 		return
 	}
 
-	l.sl.DebugContext(ctx, createMsg(), l.replaceArgs(args)...)
+	l.sl.DebugContext(ctx, createMsg(), args...)
 }
 
 // Info - логирует сообщения на уровне mrlog.LevelInfo.
 func (l *LoggerAdapter) Info(ctx context.Context, msg string, args ...any) {
-	l.sl.InfoContext(ctx, msg, l.replaceArgs(args)...)
+	l.sl.InfoContext(ctx, msg, args...)
 }
 
 // Warn - логирует сообщения на уровне mrlog.LevelWarn.
 func (l *LoggerAdapter) Warn(ctx context.Context, msg string, args ...any) {
-	l.sl.WarnContext(ctx, msg, l.replaceArgs(args)...)
+	l.sl.WarnContext(ctx, msg, args...)
 }
 
 // Error - логирует сообщения на уровне mrlog.LevelError.
 func (l *LoggerAdapter) Error(ctx context.Context, msg string, args ...any) {
-	l.sl.ErrorContext(ctx, msg, l.replaceArgs(args)...)
-}
-
-func (l *LoggerAdapter) replaceArgs(args []any) []any {
-	if l.replaceArg != nil {
-		for i := range args {
-			args[i] = l.replaceArg(args[i])
-		}
-	}
-
-	return args
+	l.sl.ErrorContext(ctx, msg, args...)
 }

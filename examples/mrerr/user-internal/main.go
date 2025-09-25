@@ -43,7 +43,7 @@ func createErrorInternalProto() *mrerrors.ProtoError {
 func createErrorUserProto() *mrerrors.ProtoError {
 	return mrerr.NewKindUser(
 		"MyUserError",
-		"my user error with param '{{param1}}' and param '{{param2}}'",
+		"my user error with param '{Param1}' and param '{Param2}'",
 		mrerr.WithDefaultArgsReplacer(),
 	)
 }
