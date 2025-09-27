@@ -18,7 +18,6 @@ func main() {
 	kindUserProto := mrerr.NewKindUser(
 		"MyErrorWithParams",
 		"my error with '{Param1}' and '{Param2}'",
-		mrerr.WithDefaultArgsReplacer(),
 	)
 
 	list := mrerr.CustomErrors{
@@ -58,12 +57,12 @@ func echo(err error) {
 func translateError(e *mrerrors.InstantError) string {
 	switch {
 	case e.Kind() == mrerrors.ErrorKindUser:
-		return fmt.Sprintf("%s + args: %+v", e.Message(), e.Args())
+		return fmt.Sprintf("translateError()->%s + args: %+v", e.Message(), e.Args())
 
 	case e.Kind() == mrerrors.ErrorKindSystem:
-		return "system error"
+		return "translateError()->system error"
 
 	default:
-		return "internal error"
+		return "translateError()->internal error"
 	}
 }

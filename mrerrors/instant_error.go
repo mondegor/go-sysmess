@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/mondegor/go-sysmess/mrargs"
+	"github.com/mondegor/go-sysmess/mrtype"
 )
 
 type (
@@ -108,7 +109,7 @@ func (e *InstantError) Error() string {
 			buf.WriteString(", ")
 			buf.WriteString(key)
 			buf.WriteByte('=')
-			buf.WriteString(mrargs.ToJSONValue(value))
+			buf.WriteString(mrtype.ToJSONValue(value))
 		}
 	}
 

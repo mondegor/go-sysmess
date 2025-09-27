@@ -2,6 +2,7 @@ package mrlog
 
 import (
 	"context"
+	"os"
 )
 
 type (
@@ -30,3 +31,9 @@ type (
 		ContextLogger() Logger
 	}
 )
+
+// Fatal - логирует ошибку и прекращает выполнение программы.
+func Fatal(logger LiteLogger, msg string, args ...any) {
+	logger.Error(msg, args...)
+	os.Exit(1) // //nolint:revive
+}

@@ -133,17 +133,23 @@ func WithDefaultOnCreated() Option {
 // необходимый для вызова InitDefaultOptions().
 func DefaultOptionsHandler() OptionsHandlerFunc {
 	internalOpts := []Option{
+		WithDefaultArgsReplacer(),
 		WithDefaultCaller(),
 		WithDefaultOnCreated(),
 	}
 
 	systemOpts := []Option{
+		WithDefaultArgsReplacer(),
 		WithDefaultOnCreated(),
+	}
+
+	userOpts := []Option{
+		WithDefaultArgsReplacer(),
 	}
 
 	return func(kind ErrorKind, _, _ string) []Option {
 		if kind == ErrorKindUser {
-			return nil
+			return userOpts
 		}
 
 		if kind == ErrorKindSystem {

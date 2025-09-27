@@ -1,4 +1,4 @@
-package mrargs
+package mrtype
 
 import (
 	"fmt"

@@ -4,6 +4,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/mondegor/go-sysmess/mrtype"
 )
 
 type (
@@ -15,7 +17,7 @@ type (
 // Если ключ не найден, то возвращается пустая строка.
 func (g Group) ValueString(key string) string {
 	if val, ok := g[key]; ok {
-		return ToString(val)
+		return mrtype.ToString(val)
 	}
 
 	return ""
@@ -31,7 +33,7 @@ func (g Group) ToStringMap() map[string]string {
 	data := make(map[string]string, len(g))
 
 	for k := range g {
-		data[k] = ToString(g[k])
+		data[k] = mrtype.ToString(g[k])
 	}
 
 	return data
@@ -78,7 +80,7 @@ func (g Group) String() string {
 
 		buf.WriteString(strconv.Quote(key))
 		buf.WriteString(": ")
-		buf.WriteString(ToJSONValue(g[key]))
+		buf.WriteString(mrtype.ToJSONValue(g[key]))
 	}
 
 	buf.WriteByte('}')
