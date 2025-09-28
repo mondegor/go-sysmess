@@ -6,6 +6,8 @@ import (
 	"github.com/mondegor/go-sysmess/mrerrors"
 )
 
+//go:generate mockgen -source=mrerr.go -destination=./mock/mrerr.go
+
 // Виды ошибок.
 const (
 	ErrorKindUnknown              = ErrorKind(0)
