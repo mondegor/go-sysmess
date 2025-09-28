@@ -16,7 +16,7 @@ type (
 	}
 )
 
-// NewDetailedIP - comment method.
+// NewDetailedIP - создаёт объект DetailedIP.
 func NewDetailedIP(realIP, proxyIP uint32) (ip DetailedIP) {
 	if realIP > 0 {
 		ip.Real = casttype.Uint2ip(realIP)

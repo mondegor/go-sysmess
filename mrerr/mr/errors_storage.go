@@ -29,11 +29,11 @@ var (
 	// Это вспомогательная ошибка, для неё отключено формирование стека вызовов и отправление события о её создании.
 	ErrStorageRowsNotAffected = mrerr.NewKindInternal("rows not affected", mrerr.WithDisabledCaller(), mrerr.WithDisabledOnCreated())
 
-	// ErrStorageLockNotObtained - .
+	// ErrStorageLockKeyNotCaptured - lock key not captured (ключ блокировки не удалось захватить).
 	// Это вспомогательная ошибка, для неё отключено формирование стека вызовов и отправление события о её создании.
-	ErrStorageLockNotObtained = mrerr.NewKindInternal("lock not obtained", mrerr.WithDisabledCaller(), mrerr.WithDisabledOnCreated())
+	ErrStorageLockKeyNotCaptured = mrerr.NewKindInternal("lock key not captured", mrerr.WithDisabledCaller(), mrerr.WithDisabledOnCreated())
 
-	// ErrStorageLockNotHeld - .
+	// ErrStorageLockKeyNotHeld - lock key not held (ключ блокировки был освобождён ранее).
 	// Это вспомогательная ошибка, для неё отключено формирование стека вызовов и отправление события о её создании.
-	ErrStorageLockNotHeld = mrerr.NewKindInternal("lock not held", mrerr.WithDisabledCaller(), mrerr.WithDisabledOnCreated())
+	ErrStorageLockKeyNotHeld = mrerr.NewKindInternal("lock key not held", mrerr.WithDisabledCaller(), mrerr.WithDisabledOnCreated())
 )

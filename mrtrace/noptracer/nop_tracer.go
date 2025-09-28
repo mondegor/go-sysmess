@@ -1,0 +1,23 @@
+package noptracer
+
+import (
+	"context"
+)
+
+type (
+	// Tracer - заглушка реализующая интерфейс трейсера.
+	Tracer struct{}
+)
+
+// NewTracer - создаёт объект Tracer.
+func NewTracer() *Tracer {
+	return &Tracer{}
+}
+
+// Enabled - всегда возвращает false.
+func (e *Tracer) Enabled() bool {
+	return false
+}
+
+// Trace - имитирует запись данных.
+func (e *Tracer) Trace(_ context.Context, _ ...any) {}

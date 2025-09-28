@@ -55,7 +55,7 @@ func (l *Locker) LockWithExpiry(ctx context.Context, key string, expiry time.Dur
 	defer l.mu.Unlock()
 
 	if exp, ok := l.keys[key]; ok && exp > time.Now().UnixNano() {
-		return nil, mr.ErrStorageLockNotObtained.New("source", mutexLockerName, "key", key)
+		return nil, mr.ErrStorageLockKeyNotCaptured.New("source", mutexLockerName, "key", key)
 	}
 
 	l.keys[key] = time.Now().UnixNano() + expiry.Nanoseconds()
@@ -69,7 +69,7 @@ func (l *Locker) LockWithExpiry(ctx context.Context, key string, expiry time.Dur
 		if _, ok := l.keys[key]; ok {
 			delete(l.keys, key)
 		} else {
-			l.logger.Warn(ctx, "unlock", "error", mr.ErrStorageLockNotHeld.New("source", mutexLockerName, "key", key))
+			l.logger.Warn(ctx, "unlock", "error", mr.ErrStorageLockKeyNotHeld.New("source", mutexLockerName, "key", key))
 		}
 	}, nil
 }

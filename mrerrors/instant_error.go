@@ -171,7 +171,6 @@ func (e *InstantError) As(target any) bool {
 		panic("mrerr: target cannot be nil")
 	}
 
-	//nolint:dupl
 	switch x := target.(type) {
 	case **InstantError:
 		if x == nil {

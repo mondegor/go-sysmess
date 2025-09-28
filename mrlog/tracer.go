@@ -5,27 +5,36 @@ import (
 )
 
 type (
-	// Tracer - comment struct.
+	// Tracer - трейсинг на основе логгера.
 	Tracer struct {
-		logger Logger
+		logger  Logger
+		enabled bool
 	}
 )
 
 // NewTracer - создаёт объект Tracer.
-func NewTracer(logger Logger) *Tracer {
+func NewTracer(logger Logger, enabledLevel Level) *Tracer {
 	return &Tracer{
-		logger: logger,
+		logger:  logger,
+		enabled: logger.Enabled(enabledLevel),
 	}
 }
 
-// Enabled - comment method.
+// NewDebugTracer - создаёт объект Tracer работающий в отладочном режиме.
+func NewDebugTracer(logger Logger) *Tracer {
+	return NewTracer(logger, LevelDebug)
+}
+
+// Enabled - сообщает, включен ли трейсер.
 func (e *Tracer) Enabled() bool {
-	return e.logger != nil
+	return e.enabled
 }
 
-// Trace - comment method.
+// Trace - если трейсер включён, то он логирует данные в режиме LevelTrace.
 func (e *Tracer) Trace(ctx context.Context, args ...any) {
-	if e.logger != nil {
-		e.logger.Log(ctx, LevelTrace, "---", args...)
+	if !e.enabled {
+		return
 	}
+
+	e.logger.Log(ctx, LevelTrace, "---", args...)
 }
