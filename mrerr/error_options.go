@@ -3,9 +3,9 @@ package mrerr
 import (
 	"context"
 
-	"github.com/mondegor/go-sysmess/mrerr/generate"
 	"github.com/mondegor/go-sysmess/mrerr/stacktrace"
 	"github.com/mondegor/go-sysmess/mrerrors"
+	"github.com/mondegor/go-sysmess/mrlib/crypt"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -124,7 +124,7 @@ func WithDefaultCaller() Option {
 func WithDefaultOnCreated() Option {
 	return WithOnCreated(
 		func(_ context.Context, _ error) (instanceID string) {
-			return generate.InstanceID()
+			return crypt.GenerateInstanceID()
 		},
 	)
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/mrerr/generate"
 	"github.com/mondegor/go-sysmess/mrerrors"
+	"github.com/mondegor/go-sysmess/mrlib/crypt"
 	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
@@ -33,7 +33,7 @@ func createErrorProto() *mrerrors.ProtoError {
 			return mrmsg.NewMessageReplacer("%", "%", message)
 		}),
 		mrerrors.WithProtoOnCreated(func(ctx context.Context, err error) (instanceID string) {
-			return generate.InstanceID()
+			return crypt.GenerateInstanceID()
 		}),
 	)
 }

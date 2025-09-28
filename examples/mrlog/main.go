@@ -8,7 +8,7 @@ import (
 	sdkslog "log/slog"
 	"os"
 
-	"github.com/mondegor/go-sysmess/mrerr/generate"
+	"github.com/mondegor/go-sysmess/mrlib/crypt"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/color"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
@@ -96,7 +96,7 @@ func printMsg(ctx context.Context, logger mrlog.Logger) {
 	logger.Info(ctx, "Exec query", "sql", "SELECT COUNT(*) FROM table_name")
 
 	err := error(&baseError{
-		id:      generate.InstanceID(),
+		id:      crypt.GenerateInstanceID(),
 		message: "my error with attr-1",
 		args:    []any{"err-attr-1", "err-value-1"},
 	})

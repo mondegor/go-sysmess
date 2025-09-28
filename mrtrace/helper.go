@@ -15,10 +15,6 @@ func NewContextWithIDs(originalCtx context.Context) context.Context {
 		return ctx
 	}
 
-	if value := tracectx.TraceID(originalCtx); value != "" {
-		ctx = tracectx.WithTraceID(ctx, value)
-	}
-
 	if value := tracectx.CorrelationID(originalCtx); value != "" {
 		ctx = tracectx.WithCorrelationID(ctx, value)
 	}
@@ -61,11 +57,7 @@ func ExtractCorrelationID(ctx context.Context) string {
 		return value
 	}
 
-	if value := tracectx.ProcessID(ctx); value != "" {
-		return value
-	}
-
-	return tracectx.TraceID(ctx)
+	return tracectx.ProcessID(ctx)
 }
 
 // ExtractKeysValues - возвращает попарно (key/id-value) все имеющиеся
@@ -75,11 +67,7 @@ func ExtractKeysValues(ctx context.Context) (keyValue []any) {
 		return nil
 	}
 
-	keyValue = make([]any, 0, 6)
-
-	if value := tracectx.TraceID(ctx); value != "" {
-		keyValue = append(keyValue, KeyTraceID, value)
-	}
+	keyValue = make([]any, 0, 5)
 
 	if value := tracectx.CorrelationID(ctx); value != "" {
 		keyValue = append(keyValue, KeyCorrelationID, value)

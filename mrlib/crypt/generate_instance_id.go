@@ -1,4 +1,4 @@
-package generate
+package crypt
 
 import (
 	"bytes"
@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-// InstanceID - возвращает ID в формате DA54BADA-MO43-E7OA используемый
+// GenerateInstanceID - возвращает ID в формате DA54BADA-MO43-E7OA используемый
 // при создании конкретного экземпляра ошибки.
-func InstanceID() string {
+func GenerateInstanceID() string {
 	var (
 		value [26]byte
 		rnd   [8]byte

@@ -20,62 +20,53 @@ func NewContextManager(idGenerator IdentifierGenerator) *ContextManager {
 	}
 }
 
-// WithTraceID - генерирует ID корреляции запроса и возвращает результат вызова функции WithTraceID.
-func (e *ContextManager) WithTraceID(ctx context.Context) context.Context {
-	return tracectx.WithTraceID(ctx, e.idGenerator.GenerateID())
+// WithCorrelationID - возвращает результат вызова функции tracectx.WithCorrelationID.
+// Метод WithGeneratedRequestID не предусмотрен, т.к. Correlation предполагается получать из вне, а не генерировать.
+func (e *ContextManager) WithCorrelationID(ctx context.Context, id string) context.Context {
+	return tracectx.WithCorrelationID(ctx, id)
 }
 
-// TraceID - возвращает результат вызова функции TraceID.
-func (e *ContextManager) TraceID(ctx context.Context) string {
-	return tracectx.TraceID(ctx)
-}
-
-// WithCorrelationID - генерирует ID корреляции запроса и возвращает результат вызова функции WithCorrelationID.
-func (e *ContextManager) WithCorrelationID(ctx context.Context) context.Context {
-	return tracectx.WithCorrelationID(ctx, e.idGenerator.GenerateID())
-}
-
-// CorrelationID - возвращает результат вызова функции CorrelationID.
+// CorrelationID - возвращает результат вызова функции tracectx.CorrelationID.
 func (e *ContextManager) CorrelationID(ctx context.Context) string {
 	return tracectx.CorrelationID(ctx)
 }
 
-// WithRequestID - генерирует ID запроса и возвращает результат вызова функции WithRequestID.
-func (e *ContextManager) WithRequestID(ctx context.Context) context.Context {
+// WithGeneratedRequestID - генерирует ID запроса и возвращает результат вызова функции tracectx.WithRequestID.
+func (e *ContextManager) WithGeneratedRequestID(ctx context.Context) context.Context {
 	return tracectx.WithRequestID(ctx, e.idGenerator.GenerateID())
 }
 
-// RequestID - возвращает результат вызова функции RequestID.
+// RequestID - возвращает результат вызова функции tracectx.RequestID.
 func (e *ContextManager) RequestID(ctx context.Context) string {
 	return tracectx.RequestID(ctx)
 }
 
-// WithProcessID - генерирует ID процесса и возвращает результат вызова функции WithRequestID.
-func (e *ContextManager) WithProcessID(ctx context.Context) context.Context {
+// WithGeneratedProcessID - генерирует ID процесса и возвращает результат вызова функции tracectx.WithRequestID.
+func (e *ContextManager) WithGeneratedProcessID(ctx context.Context) context.Context {
 	return tracectx.WithProcessID(ctx, e.idGenerator.GenerateID())
 }
 
-// ProcessID - возвращает результат вызова функции ProcessID.
+// ProcessID - возвращает результат вызова функции tracectx.ProcessID.
 func (e *ContextManager) ProcessID(ctx context.Context) string {
 	return tracectx.ProcessID(ctx)
 }
 
-// WithWorkerID - генерирует ID воркера и возвращает результат вызова функции WithRequestID.
-func (e *ContextManager) WithWorkerID(ctx context.Context) context.Context {
+// WithGeneratedWorkerID - генерирует ID воркера и возвращает результат вызова функции tracectx.WithRequestID.
+func (e *ContextManager) WithGeneratedWorkerID(ctx context.Context) context.Context {
 	return tracectx.WithWorkerID(ctx, e.idGenerator.GenerateID())
 }
 
-// WorkerID - возвращает результат вызова функции WorkerID.
+// WorkerID - возвращает результат вызова функции tracectx.WorkerID.
 func (e *ContextManager) WorkerID(ctx context.Context) string {
 	return tracectx.WorkerID(ctx)
 }
 
-// WithTaskID - генерирует ID корреляции запроса и возвращает результат вызова функции WithCorrelationID.
-func (e *ContextManager) WithTaskID(ctx context.Context) context.Context {
+// WithGeneratedTaskID - генерирует ID корреляции запроса и возвращает результат вызова функции tracectx.WithCorrelationID.
+func (e *ContextManager) WithGeneratedTaskID(ctx context.Context) context.Context {
 	return tracectx.WithTaskID(ctx, e.idGenerator.GenerateID())
 }
 
-// TaskID - возвращает результат вызова функции TaskID.
+// TaskID - возвращает результат вызова функции tracectx.TaskID.
 func (e *ContextManager) TaskID(ctx context.Context) string {
 	return tracectx.TaskID(ctx)
 }

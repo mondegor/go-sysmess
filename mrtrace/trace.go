@@ -5,9 +5,6 @@ import (
 )
 
 const (
-	// KeyTraceID - название ключа ID трейса.
-	KeyTraceID = "trace_id"
-
 	// KeyCorrelationID - название ключа ID корреляции.
 	KeyCorrelationID = "correlation_id"
 
