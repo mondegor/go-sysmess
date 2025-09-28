@@ -1,15 +1,16 @@
-package mrerr
+package handler
 
 import (
 	"context"
 
+	"github.com/mondegor/go-sysmess/mrerr"
 	"github.com/mondegor/go-sysmess/mrerrors"
 )
 
 type (
 	// ErrorHandler - обработчик ошибок какого либо сервиса или приложения в целом.
 	ErrorHandler struct {
-		handler func(ctx context.Context, analyzedKind ErrorKind, err error)
+		handler func(ctx context.Context, analyzedKind mrerr.ErrorKind, err error)
 		wrapper unknownErrorWrapper
 	}
 
@@ -17,9 +18,9 @@ type (
 )
 
 // NewErrorHandler - создаёт объект ErrorHandler.
-func NewErrorHandler(handler func(ctx context.Context, analyzedKind ErrorKind, err error), wrapper unknownErrorWrapper) *ErrorHandler {
-	if handler == nil {
-		handler = func(_ context.Context, _ ErrorKind, _ error) {}
+func NewErrorHandler(hdr func(ctx context.Context, analyzedKind mrerr.ErrorKind, err error), wrapper unknownErrorWrapper) *ErrorHandler {
+	if hdr == nil {
+		hdr = func(_ context.Context, _ mrerr.ErrorKind, _ error) {}
 	}
 
 	if wrapper == nil {
@@ -29,7 +30,7 @@ func NewErrorHandler(handler func(ctx context.Context, analyzedKind ErrorKind, e
 	}
 
 	return &ErrorHandler{
-		handler: handler,
+		handler: hdr,
 		wrapper: wrapper,
 	}
 }
@@ -44,10 +45,10 @@ func (h *ErrorHandler) Handle(ctx context.Context, err error) {
 // обработчик extraHandler. В результате вызова этих обработчиков ошибка может быть,
 // например, каким-то способом залогирована / отправлена во внешний источник /
 // использована для правильного формирования ответа серверу и т.д.
-func (h *ErrorHandler) HandleWith(ctx context.Context, err error, extraHandler func(analyzedKind ErrorKind, err error)) {
+func (h *ErrorHandler) HandleWith(ctx context.Context, err error, extraHandler func(analyzedKind mrerr.ErrorKind, err error)) {
 	analyzedKind := h.analyzeError(err)
 
-	if analyzedKind == ErrorKindUnknown {
+	if analyzedKind == mrerr.ErrorKindUnknown {
 		err = h.wrapper(err)
 	}
 
@@ -58,14 +59,14 @@ func (h *ErrorHandler) HandleWith(ctx context.Context, err error, extraHandler f
 	}
 }
 
-func (h *ErrorHandler) analyzeError(err error) ErrorKind {
+func (h *ErrorHandler) analyzeError(err error) mrerr.ErrorKind {
 	nestedErr := err
 	foundUserError := false
 
 	// вычисляется общий тип ошибки с учётом её вложенных ошибок
 	for {
 		if e, ok := nestedErr.(*mrerrors.InstantError); ok { //nolint:errorlint
-			if e.Kind() != ErrorKindUser {
+			if e.Kind() != mrerr.ErrorKindUser {
 				return e.Kind()
 			}
 
@@ -77,19 +78,19 @@ func (h *ErrorHandler) analyzeError(err error) ErrorKind {
 			}
 
 			// ошибка не содержит других ошибок, значит она пользовательская
-			return ErrorKindUser
+			return mrerr.ErrorKindUser
 		}
 
 		break
 	}
 
 	if foundUserError {
-		return ErrorKindUserWithWrappedError
+		return mrerr.ErrorKindUserWithWrappedError
 	}
 
 	if e, ok := err.(*mrerrors.ProtoError); ok { //nolint:errorlint
 		return e.Kind()
 	}
 
-	return ErrorKindUnknown
+	return mrerr.ErrorKindUnknown
 }
