@@ -1,4 +1,4 @@
-package mrlog
+package logtracer
 
 import (
 	"context"
