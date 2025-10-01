@@ -2,11 +2,12 @@ package mrwire
 
 import (
 	"context"
-	"github.com/mondegor/go-sysmess/mrapp"
+	"fmt"
 	sdkslog "log/slog"
 	"os"
 	"strings"
 
+	"github.com/mondegor/go-sysmess/mrapp"
 	"github.com/mondegor/go-sysmess/mrerrors"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/color"
@@ -117,5 +118,10 @@ func newLogger(cfg LoggerConfig) (*slog.LoggerAdapter, error) {
 		)
 	}
 
-	return slog.NewLoggerAdapter(opts...)
+	logger, err := slog.NewLoggerAdapter(opts...)
+	if err != nil {
+		return nil, fmt.Errorf("newLogger: %w", err)
+	}
+
+	return logger, nil
 }
