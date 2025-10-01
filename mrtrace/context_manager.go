@@ -9,12 +9,16 @@ import (
 type (
 	// ContextManager - отвечает за установку ID процессов в контекст и за доступ к ним используемых в трейсинге.
 	ContextManager struct {
-		idGenerator IdentifierGenerator
+		idGenerator idGenerator
+	}
+
+	idGenerator interface {
+		GenerateID() string
 	}
 )
 
 // NewContextManager - создаёт объект ContextManager.
-func NewContextManager(idGenerator IdentifierGenerator) *ContextManager {
+func NewContextManager(idGenerator idGenerator) *ContextManager {
 	return &ContextManager{
 		idGenerator: idGenerator,
 	}

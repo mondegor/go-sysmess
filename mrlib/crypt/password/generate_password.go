@@ -1,4 +1,4 @@
-package crypt
+package password
 
 import (
 	"crypto/rand"
@@ -7,65 +7,65 @@ import (
 
 // Символы используемые в пароле.
 const (
-	PassVowels      PassCharsKinds = 1  // гласные буквы
-	PassConsonants  PassCharsKinds = 2  // согласные буквы
-	PassNumerals    PassCharsKinds = 4  // цифры
-	PassSigns       PassCharsKinds = 8  // знаки
-	PassAbc         PassCharsKinds = 3  // PassVowels + PassConsonants
-	PassAbcNumerals PassCharsKinds = 7  // PassVowels + PassConsonants + PassNumerals
-	PassAll         PassCharsKinds = 15 // PassVowels + PassConsonants + PassNumerals + PassSigns
+	CharVowels      CharKinds = 1  // гласные буквы
+	CharConsonants  CharKinds = 2  // согласные буквы
+	CharNumerals    CharKinds = 4  // цифры
+	CharSigns       CharKinds = 8  // знаки
+	CharAbc         CharKinds = 3  // CharVowels + CharConsonants
+	CharAbcNumerals CharKinds = 7  // CharVowels + CharConsonants + CharNumerals
+	CharAll         CharKinds = 15 // CharVowels + CharConsonants + CharNumerals + CharSigns
 )
 
 const (
-	pwCharSetLen = 4
+	charSetLen = 4
 )
 
 type (
-	// PassCharsKinds - вид символов используемых в пароле.
-	PassCharsKinds uint8
+	// CharKinds - вид символов используемых в пароле.
+	CharKinds uint8
 
 	pwCharSet struct {
-		kind            PassCharsKinds
+		kind            CharKinds
 		successivelyMax int
 		firstOrLast     bool
 		lettersLen      uint8
 		letters         []byte
 	}
 
-	// PasswordGenerator - библиотека для генерации стоковых последовательностей.
-	PasswordGenerator struct {
-		pwCharSets [pwCharSetLen]pwCharSet
+	// Generator - библиотека для генерации стоковых последовательностей.
+	Generator struct {
+		pwCharSets [charSetLen]pwCharSet
 	}
 )
 
-// NewPasswordGenerator - создаёт объект PasswordGenerator.
-func NewPasswordGenerator() *PasswordGenerator {
-	return &PasswordGenerator{
-		pwCharSets: [pwCharSetLen]pwCharSet{
-			{PassVowels, 2, true, 10, []byte("aeiuyAEIUY")}, // oO - символы удалены, чтобы не перепутать с нулём
-			{PassConsonants, 2, true, 40, []byte("bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ")},
-			{PassNumerals, 1, false, 9, []byte("123456789")}, // 0 - символ удалён, чтобы не перепутать с символами oO
-			{PassSigns, 1, false, 12, []byte("!$%&.<=>?@_~")},
+// NewGenerator - создаёт объект Generator.
+func NewGenerator() *Generator {
+	return &Generator{
+		pwCharSets: [charSetLen]pwCharSet{
+			{CharVowels, 2, true, 10, []byte("aeiuyAEIUY")}, // oO - символы удалены, чтобы не перепутать с нулём
+			{CharConsonants, 2, true, 40, []byte("bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ")},
+			{CharNumerals, 1, false, 9, []byte("123456789")}, // 0 - символ удалён, чтобы не перепутать с символами oO
+			{CharSigns, 1, false, 12, []byte("!$%&.<=>?@_~")},
 		},
 	}
 }
 
 // Generate - возвращает сгенерированный пароль с указанной длиной и видами символов.
-func (pg *PasswordGenerator) Generate(length int, charsKinds PassCharsKinds) string {
+func (pg *Generator) Generate(length int, charsKinds CharKinds) string {
 	if length < 1 {
 		length = 1
 	}
 
-	if charsKinds == 0 || charsKinds > PassAll {
-		charsKinds = PassAll
+	if charsKinds == 0 || charsKinds > CharAll {
+		charsKinds = CharAll
 	}
 
 	var (
-		abc    [pwCharSetLen]pwCharSet
+		abc    [charSetLen]pwCharSet
 		abcLen uint8
 	)
 
-	for i := 0; i < pwCharSetLen; i++ {
+	for i := 0; i < charSetLen; i++ {
 		if (pg.pwCharSets[abcLen].kind & charsKinds) > 0 {
 			abc[abcLen] = pg.pwCharSets[i]
 			abcLen++
@@ -118,7 +118,7 @@ func (pg *PasswordGenerator) Generate(length int, charsKinds PassCharsKinds) str
 	return string(result)
 }
 
-func (pg *PasswordGenerator) getRandValue(maxValue uint8) uint8 {
+func (pg *Generator) getRandValue(maxValue uint8) uint8 {
 	var tmp [1]byte
 
 	bits100 := uint64(math.Log2(float64(maxValue)) * 100)

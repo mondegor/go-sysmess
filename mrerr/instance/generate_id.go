@@ -1,4 +1,4 @@
-package crypt
+package instance
 
 import (
 	"bytes"
@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-// GenerateInstanceID - возвращает ID в формате DA54BADA-MO43-E7OA используемый
+// GenerateID - возвращает ID в формате 4R4K8OE9XZ-MWFN-4L6R используемый
 // при создании конкретного экземпляра ошибки.
-func GenerateInstanceID() string {
+func GenerateID() string {
 	var (
-		value [26]byte
+		value [28]byte // real 24 - 25
 		rnd   [8]byte
 	)
 
@@ -24,8 +24,8 @@ func GenerateInstanceID() string {
 
 	buf = strconv.AppendUint(buf, binary.BigEndian.Uint64(rnd[:]), 36)
 
-	buf[8] = '-'
-	buf[13] = '-'
+	buf[12] = '-'
+	buf[17] = '-'
 
-	return string(bytes.ToUpper(buf[:18]))
+	return string(bytes.ToUpper(buf[2:22]))
 }

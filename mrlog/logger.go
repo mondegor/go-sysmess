@@ -19,21 +19,39 @@ type (
 
 		Log(ctx context.Context, level Level, message string, args ...any)
 	}
-
-	// LiteLogger - упрощённый интерфейс логирования сообщений и ошибок.
-	LiteLogger interface {
-		Debug(msg string, args ...any)
-		DebugFunc(createMsg func() string, args ...any)
-		Info(msg string, args ...any)
-		Warn(msg string, args ...any)
-		Error(msg string, args ...any)
-
-		ContextLogger() Logger
-	}
 )
 
+// Debug - логирует сообщения на уровне LevelDebug.
+func Debug(logger Logger, msg string, args ...any) {
+	logger.Debug(context.Background(), msg, args...)
+}
+
+// DebugFunc - логирует сообщения на уровне LevelDebug с их отложенным созданием.
+func DebugFunc(logger Logger, createMsg func() string, args ...any) {
+	if !logger.Enabled(LevelDebug) {
+		return
+	}
+
+	logger.Debug(context.Background(), createMsg(), args...)
+}
+
+// Info - логирует сообщения на уровне LevelInfo.
+func Info(logger Logger, msg string, args ...any) {
+	logger.Info(context.Background(), msg, args...)
+}
+
+// Warn - логирует сообщения на уровне LevelWarn.
+func Warn(logger Logger, msg string, args ...any) {
+	logger.Warn(context.Background(), msg, args...)
+}
+
+// Error - логирует сообщения на уровне LevelError.
+func Error(logger Logger, msg string, args ...any) {
+	logger.Error(context.Background(), msg, args...)
+}
+
 // Fatal - логирует ошибку и прекращает выполнение программы.
-func Fatal(logger LiteLogger, msg string, args ...any) {
-	logger.Error(msg, args...)
+func Fatal(logger Logger, msg string, args ...any) {
+	logger.Error(context.Background(), msg, args...)
 	os.Exit(1) // //nolint:revive
 }

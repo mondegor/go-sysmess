@@ -3,12 +3,16 @@ package extio
 import (
 	"context"
 	"io"
+)
 
-	"github.com/mondegor/go-sysmess/mrlog"
+type (
+	logger interface {
+		Error(ctx context.Context, msg string, args ...any)
+	}
 )
 
 // Write - адаптер для вызова io.Writer указанного объекта с логированием ошибки.
-func Write(ctx context.Context, logger mrlog.Logger, w io.Writer, bytes []byte) {
+func Write(ctx context.Context, logger logger, w io.Writer, bytes []byte) {
 	if len(bytes) == 0 {
 		return
 	}

@@ -2,18 +2,20 @@ package mrlog
 
 import (
 	"context"
+
+	"github.com/mondegor/go-sysmess/mrlog"
 )
 
 type (
 	// Tracer - трейсинг на основе логгера.
 	Tracer struct {
-		logger  Logger
+		logger  mrlog.Logger
 		enabled bool
 	}
 )
 
 // NewTracer - создаёт объект Tracer.
-func NewTracer(logger Logger, enabledLevel Level) *Tracer {
+func NewTracer(logger mrlog.Logger, enabledLevel mrlog.Level) *Tracer {
 	return &Tracer{
 		logger:  logger,
 		enabled: logger.Enabled(enabledLevel),
@@ -21,8 +23,8 @@ func NewTracer(logger Logger, enabledLevel Level) *Tracer {
 }
 
 // NewDebugTracer - создаёт объект Tracer работающий в отладочном режиме.
-func NewDebugTracer(logger Logger) *Tracer {
-	return NewTracer(logger, LevelDebug)
+func NewDebugTracer(logger mrlog.Logger) *Tracer {
+	return NewTracer(logger, mrlog.LevelDebug)
 }
 
 // Enabled - сообщает, включен ли трейсер.
@@ -36,5 +38,5 @@ func (e *Tracer) Trace(ctx context.Context, args ...any) {
 		return
 	}
 
-	e.logger.Log(ctx, LevelTrace, "---", args...)
+	e.logger.Log(ctx, mrlog.LevelTrace, "---", args...)
 }

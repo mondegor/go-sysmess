@@ -1,4 +1,4 @@
-package crypt
+package password
 
 import (
 	"math"
@@ -41,8 +41,8 @@ var passStrengthName = map[PassStrength]string{ //nolint:gochecknoglobals
 	PassStrengthBest:     "THE_BEST",
 }
 
-// PasswordStrength - возвращает вычисленную сложность пароля.
-func PasswordStrength(value string) PassStrength {
+// CalcStrength - возвращает вычисленную сложность пароля.
+func CalcStrength(value string) PassStrength {
 	length := len(value)
 
 	if length == 0 {

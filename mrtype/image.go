@@ -3,26 +3,24 @@ package mrtype
 import (
 	"io"
 	"mime/multipart"
-
-	"github.com/mondegor/go-sysmess/mrdto"
 )
 
 type (
 	// Image - мета-информация изображения вместе с источником изображения.
 	Image struct {
-		mrdto.ImageInfo
+		ImageInfo
 		Body io.ReadCloser
 	}
 
 	// ImageContent - изображение с мета-информацией.
 	ImageContent struct {
-		mrdto.ImageInfo
+		ImageInfo
 		Body []byte
 	}
 
 	// ImageHeader - мета-информация изображения вместе с источником изображения (multipart/form-data).
 	ImageHeader struct {
-		mrdto.ImageInfo
+		ImageInfo
 		Header *multipart.FileHeader
 	}
 )

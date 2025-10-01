@@ -25,7 +25,7 @@ type (
 
 	// ListSorter - интерфейс для проверки полей, которые могут участвовать в сортировке.
 	ListSorter interface {
-		CheckField(name string) bool
+		HasField(name string) bool
 		DefaultSort() SortParams
 	}
 )

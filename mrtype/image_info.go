@@ -1,4 +1,4 @@
-package mrdto
+package mrtype
 
 import (
 	"path"
