@@ -4,6 +4,8 @@ import (
 	"context"
 )
 
+//go:generate mockgen -source=error_handler.go -destination=./mock/error_handler.go
+
 type (
 	// ErrorHandler - обработчик ошибок.
 	ErrorHandler interface {

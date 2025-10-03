@@ -52,6 +52,6 @@ func Error(logger Logger, msg string, args ...any) {
 
 // Fatal - логирует ошибку и прекращает выполнение программы.
 func Fatal(logger Logger, msg string, args ...any) {
-	logger.Error(context.Background(), msg, args...)
+	logger.Log(context.Background(), LevelFatal, msg, args...)
 	os.Exit(1) // //nolint:revive
 }

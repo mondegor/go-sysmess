@@ -14,6 +14,7 @@ import (
 	"github.com/mondegor/go-sysmess/mrlog/slog"
 	"github.com/mondegor/go-sysmess/mrlog/slog/middleware"
 	"github.com/mondegor/go-sysmess/mrtrace"
+	"github.com/mondegor/go-sysmess/mrtrace/process"
 )
 
 type (
@@ -33,7 +34,7 @@ type (
 	}
 )
 
-// InitLogger - создаёт и инициализирует логгер.
+// InitLogger - создаёт и инициализирует mrlog.Logger.
 func InitLogger(cfg LoggerConfig) (logger mrlog.Logger, err error) {
 	logger, err = newLogger(cfg)
 	if err != nil {
@@ -60,6 +61,8 @@ func newLogger(cfg LoggerConfig) (*slog.LoggerAdapter, error) {
 		cfg.TimeFormat = "RFC3339"
 	}
 
+	contextProcessIDs := process.ToKeyGetID(traceProcessIDs())
+
 	opts := []slog.Option{
 		slog.WithWriter(os.Stdout),
 		slog.WithLevel(strings.ToUpper(cfg.Level)),
@@ -82,7 +85,7 @@ func newLogger(cfg LoggerConfig) (*slog.LoggerAdapter, error) {
 						return true
 					})
 
-					rec.Add(mrtrace.ExtractKeysValues(ctx)...)
+					rec.Add(process.ExtractKeysValues(ctx, contextProcessIDs)...)
 
 					return rec
 				},
@@ -120,7 +123,7 @@ func newLogger(cfg LoggerConfig) (*slog.LoggerAdapter, error) {
 
 	logger, err := slog.NewLoggerAdapter(opts...)
 	if err != nil {
-		return nil, fmt.Errorf("newLogger: %w", err)
+		return nil, fmt.Errorf("InitLogger: %w", err)
 	}
 
 	return logger, nil

@@ -13,7 +13,7 @@ func WithTaskID(ctx context.Context, taskID string) context.Context {
 	return context.WithValue(ctx, ctxTaskKey{}, taskID)
 }
 
-// TaskID - возвращает из контекста указанные идентификатор текущей задачи.
+// TaskID - возвращает из контекста указанный идентификатор текущей задачи.
 func TaskID(ctx context.Context) string {
 	if value, ok := ctx.Value(ctxTaskKey{}).(string); ok {
 		return value

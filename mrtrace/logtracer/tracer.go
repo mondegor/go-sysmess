@@ -15,16 +15,11 @@ type (
 )
 
 // NewTracer - создаёт объект Tracer.
-func NewTracer(logger mrlog.Logger, enabledLevel mrlog.Level) *Tracer {
+func NewTracer(logger mrlog.Logger) *Tracer {
 	return &Tracer{
 		logger:  logger,
-		enabled: logger.Enabled(enabledLevel),
+		enabled: logger.Enabled(mrlog.LevelError),
 	}
-}
-
-// NewDebugTracer - создаёт объект Tracer работающий в отладочном режиме.
-func NewDebugTracer(logger mrlog.Logger) *Tracer {
-	return NewTracer(logger, mrlog.LevelDebug)
 }
 
 // Enabled - сообщает, включен ли трейсер.
