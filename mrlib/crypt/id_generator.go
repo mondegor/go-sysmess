@@ -6,11 +6,11 @@ type (
 		GenerateID() string
 	}
 
-	// IDGeneratorFunc - реализация интерфейса IDGenerator.
+	// IDGeneratorFunc - генератор уникальных идентификаторов в виде функции.
 	IDGeneratorFunc func() string
 )
 
-// GenerateID - реализация интерфейса IDGenerator.
+// GenerateID - реализация интерфейса IDGenerator в виде функции.
 func (f IDGeneratorFunc) GenerateID() string {
 	return f()
 }
