@@ -1,4 +1,4 @@
-package nop
+package nopslog
 
 import (
 	"context"

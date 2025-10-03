@@ -14,8 +14,8 @@ type (
 	}
 )
 
-// NewTracer - создаёт объект Tracer.
-func NewTracer(logger mrlog.Logger) *Tracer {
+// New - создаёт объект Tracer.
+func New(logger mrlog.Logger) *Tracer {
 	return &Tracer{
 		logger:  logger,
 		enabled: logger.Enabled(mrlog.LevelError),

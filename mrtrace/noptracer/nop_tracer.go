@@ -9,8 +9,8 @@ type (
 	Tracer struct{}
 )
 
-// NewTracer - создаёт объект Tracer.
-func NewTracer() *Tracer {
+// New - создаёт объект Tracer.
+func New() *Tracer {
 	return &Tracer{}
 }
 

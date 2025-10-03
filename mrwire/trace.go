@@ -25,11 +25,11 @@ type (
 func InitTracer(cfg TracerConfig, logger mrlog.Logger) mrtrace.Tracer {
 	if cfg.Enabled {
 		if logger != nil && logger.Enabled(mrlog.LevelDebug) {
-			return logtracer.NewTracer(logger)
+			return logtracer.New(logger)
 		}
 	}
 
-	return noptracer.NewTracer()
+	return noptracer.New()
 }
 
 // InitTraceContextManager - создаёт и инициализирует process.ContextManager.
