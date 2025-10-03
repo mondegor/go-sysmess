@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+
 	mrerr "github.com/mondegor/go-sysmess/mrerr"
 )
 

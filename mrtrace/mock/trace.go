@@ -116,20 +116,6 @@ func (mr *MockContextManagerMockRecorder) ExtractKeysValues(ctx interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExtractKeysValues", reflect.TypeOf((*MockContextManager)(nil).ExtractKeysValues), ctx)
 }
 
-// ID mocks base method.
-func (m *MockContextManager) ID(ctx context.Context) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ID", ctx)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// ID indicates an expected call of ID.
-func (mr *MockContextManagerMockRecorder) ID(ctx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ID", reflect.TypeOf((*MockContextManager)(nil).ID), ctx)
-}
-
 // NewContextWithIDs mocks base method.
 func (m *MockContextManager) NewContextWithIDs(originalCtx context.Context) context.Context {
 	m.ctrl.T.Helper()
@@ -144,30 +130,44 @@ func (mr *MockContextManagerMockRecorder) NewContextWithIDs(originalCtx interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewContextWithIDs", reflect.TypeOf((*MockContextManager)(nil).NewContextWithIDs), originalCtx)
 }
 
-// WithGeneratedID mocks base method.
-func (m *MockContextManager) WithGeneratedID(ctx context.Context) context.Context {
+// ProcessID mocks base method.
+func (m *MockContextManager) ProcessID(ctx context.Context, key string) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WithGeneratedID", ctx)
+	ret := m.ctrl.Call(m, "ProcessID", ctx, key)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// ProcessID indicates an expected call of ProcessID.
+func (mr *MockContextManagerMockRecorder) ProcessID(ctx, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessID", reflect.TypeOf((*MockContextManager)(nil).ProcessID), ctx, key)
+}
+
+// WithGeneratedProcessID mocks base method.
+func (m *MockContextManager) WithGeneratedProcessID(ctx context.Context, key string) context.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithGeneratedProcessID", ctx, key)
 	ret0, _ := ret[0].(context.Context)
 	return ret0
 }
 
-// WithGeneratedID indicates an expected call of WithGeneratedID.
-func (mr *MockContextManagerMockRecorder) WithGeneratedID(ctx interface{}) *gomock.Call {
+// WithGeneratedProcessID indicates an expected call of WithGeneratedProcessID.
+func (mr *MockContextManagerMockRecorder) WithGeneratedProcessID(ctx, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithGeneratedID", reflect.TypeOf((*MockContextManager)(nil).WithGeneratedID), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithGeneratedProcessID", reflect.TypeOf((*MockContextManager)(nil).WithGeneratedProcessID), ctx, key)
 }
 
-// WithID mocks base method.
-func (m *MockContextManager) WithID(ctx context.Context, id string) context.Context {
+// WithProcessID mocks base method.
+func (m *MockContextManager) WithProcessID(ctx context.Context, key, value string) context.Context {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WithID", ctx, id)
+	ret := m.ctrl.Call(m, "WithProcessID", ctx, key, value)
 	ret0, _ := ret[0].(context.Context)
 	return ret0
 }
 
-// WithID indicates an expected call of WithID.
-func (mr *MockContextManagerMockRecorder) WithID(ctx, id interface{}) *gomock.Call {
+// WithProcessID indicates an expected call of WithProcessID.
+func (mr *MockContextManagerMockRecorder) WithProcessID(ctx, key, value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithID", reflect.TypeOf((*MockContextManager)(nil).WithID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithProcessID", reflect.TypeOf((*MockContextManager)(nil).WithProcessID), ctx, key, value)
 }

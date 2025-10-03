@@ -9,23 +9,35 @@ type (
 	// ContextManager - отвечает за установку ID процессов
 	// в контекст и за доступ к ним используемых в трейсинге.
 	ContextManager struct {
-		idGenerator idGenerator
-		keyGetID    map[string]func(ctx context.Context) string
-		keyWithID   map[string]func(ctx context.Context, id string) context.Context
+		keyGetID  map[string]func(ctx context.Context) string
+		keyWithID map[string]func(ctx context.Context, id string) context.Context
 
 		newContextWithIDs    []GetIDWithID
 		extractKeysValues    []KeyGetID
 		extractCorrelationID []KeyGetID
+
+		idGenerator idGenerator
+		logger      logger
 	}
 
 	idGenerator interface {
 		GenerateID() string
 	}
+
+	logger interface {
+		Warn(ctx context.Context, msg string, args ...any)
+	}
 )
 
 // NewContextManager - создаёт объект ContextManager.
-func NewContextManager(idGenerator idGenerator, keyGetIDWithID []KeyGetIDWithID, correlationKeys []string) (*ContextManager, error) {
+func NewContextManager(
+	keyGetIDWithID []KeyGetIDWithID,
+	correlationKeys []string,
+	idGenerator idGenerator,
+	logger logger,
+) (*ContextManager, error) {
 	cm := ContextManager{
+		logger:      logger,
 		idGenerator: idGenerator,
 
 		keyGetID:  make(map[string]func(ctx context.Context) string, len(keyGetIDWithID)),
@@ -79,29 +91,36 @@ func NewContextManager(idGenerator idGenerator, keyGetIDWithID []KeyGetIDWithID,
 	return &cm, nil
 }
 
-// ID - возвращает из контекста ID процесса по его имени key.
-func (e *ContextManager) ID(ctx context.Context, key string) string {
+// ProcessID - возвращает из контекста ID процесса по его имени key.
+func (e *ContextManager) ProcessID(ctx context.Context, key string) string {
 	if fn, ok := e.keyGetID[key]; ok {
 		return fn(ctx)
 	}
 
+	e.logger.Warn(ctx, "process key not found", "key", key)
+
 	return ""
 }
 
-// WithID - устанавливает ID процесса в контекст по его имени key и возвращает получившийся контекст.
-func (e *ContextManager) WithID(ctx context.Context, key, id string) context.Context {
+// WithProcessID - устанавливает ID процесса в контекст по его имени key и возвращает получившийся контекст.
+func (e *ContextManager) WithProcessID(ctx context.Context, key, value string) context.Context {
 	if fn, ok := e.keyWithID[key]; ok {
-		return fn(ctx, id)
+		return fn(ctx, value)
 	}
+
+	e.logger.Warn(ctx, "process key not found", "key", key)
 
 	return ctx
 }
 
-// WithGeneratedID - генерирует ID процесса, устанавливает его в контекст по его имени key и возвращает получившийся контекст.
-func (e *ContextManager) WithGeneratedID(ctx context.Context, key string) context.Context {
+// WithGeneratedProcessID - генерирует ID процесса,
+// устанавливает его в контекст по его имени key и возвращает получившийся контекст.
+func (e *ContextManager) WithGeneratedProcessID(ctx context.Context, key string) context.Context {
 	if fn, ok := e.keyWithID[key]; ok {
 		return fn(ctx, e.idGenerator.GenerateID())
 	}
+
+	e.logger.Warn(ctx, "process key not found", "key", key)
 
 	return ctx
 }

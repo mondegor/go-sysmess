@@ -18,15 +18,14 @@ type (
 		Environment string
 		Version     string
 		Enabled     bool
-		Logger      mrlog.Logger
 	}
 )
 
 // InitTracer - создаёт и инициализирует mrtrace.Tracer.
-func InitTracer(cfg TracerConfig) mrtrace.Tracer {
+func InitTracer(cfg TracerConfig, logger mrlog.Logger) mrtrace.Tracer {
 	if cfg.Enabled {
-		if cfg.Logger != nil && cfg.Logger.Enabled(mrlog.LevelDebug) {
-			return logtracer.NewTracer(cfg.Logger)
+		if logger != nil && logger.Enabled(mrlog.LevelDebug) {
+			return logtracer.NewTracer(logger)
 		}
 	}
 
@@ -34,9 +33,8 @@ func InitTracer(cfg TracerConfig) mrtrace.Tracer {
 }
 
 // InitTraceContextManager - создаёт и инициализирует process.ContextManager.
-func InitTraceContextManager() (*process.ContextManager, error) {
+func InitTraceContextManager(logger mrlog.Logger) (*process.ContextManager, error) {
 	cm, err := process.NewContextManager(
-		crypt.IDGeneratorFunc(process.GenerateID),
 		traceProcessIDs(),
 		[]string{
 			mrtrace.KeyCorrelationID,
@@ -45,6 +43,8 @@ func InitTraceContextManager() (*process.ContextManager, error) {
 			mrtrace.KeyWorkerID,
 			mrtrace.KeyProcessID,
 		},
+		crypt.IDGeneratorFunc(process.GenerateID),
+		logger,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("InitTraceContextManager: %w", err)

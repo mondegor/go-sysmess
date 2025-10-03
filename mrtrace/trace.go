@@ -32,9 +32,9 @@ type (
 
 	// ContextManager - отвечает за установку ID процессов в контекст и за доступ к ним используемых в трейсинге.
 	ContextManager interface {
-		ID(ctx context.Context) string
-		WithID(ctx context.Context, id string) context.Context
-		WithGeneratedID(ctx context.Context) context.Context
+		ProcessID(ctx context.Context, key string) string
+		WithProcessID(ctx context.Context, key, value string) context.Context
+		WithGeneratedProcessID(ctx context.Context, key string) context.Context
 
 		NewContextWithIDs(originalCtx context.Context) context.Context
 		ExtractCorrelationID(ctx context.Context) string
