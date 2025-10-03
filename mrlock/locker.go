@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+//go:generate mockgen -source=locker.go -destination=./mock/locker.go
+
 const (
 	// DefaultExpiry - истечение срока блокировки по умолчанию.
 	DefaultExpiry = time.Second
