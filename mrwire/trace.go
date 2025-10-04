@@ -17,13 +17,13 @@ type (
 	TracerConfig struct {
 		Environment string
 		Version     string
-		Enabled     bool
+		IsEnabled   bool
 	}
 )
 
 // InitTracer - создаёт и инициализирует mrtrace.Tracer.
 func InitTracer(cfg TracerConfig, logger mrlog.Logger) mrtrace.Tracer {
-	if cfg.Enabled {
+	if cfg.IsEnabled {
 		if logger != nil && logger.Enabled(mrlog.LevelDebug) {
 			return logtracer.New(logger)
 		}

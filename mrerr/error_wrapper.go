@@ -25,6 +25,11 @@ type (
 		WrapErrorFailed(err error, attrs ...any) error
 		WrapErrorNotFoundOrFailed(err error, attrs ...any) error
 	}
+
+	// UserErrorWrapper - помощник для оборачивания пользовательских ошибок.
+	UserErrorWrapper interface {
+		WrapError(err error, name string) error
+	}
 )
 
 type (
