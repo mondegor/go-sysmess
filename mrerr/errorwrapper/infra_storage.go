@@ -8,24 +8,12 @@ import (
 type (
 	// InfraStorage - помощник для оборачивания перехваченных ошибок
 	// в часто используемые ошибки инфраструктурного слоя приложения при работе с БД.
-	InfraStorage struct {
-		attrs []any // атрибуты должны быть указаны попарно: название/значение
-	}
+	InfraStorage struct{}
 )
 
 // NewInfraStorage - создаёт объект InfraStorage.
-func NewInfraStorage(source string) *InfraStorage {
-	return &InfraStorage{
-		attrs: []any{mrerr.ErrorSourceKey, source},
-	}
-}
-
-// WithAttrs - возвращает новый InfraStorage с прикреплёнными атрибутами.
-func (w *InfraStorage) WithAttrs(attrs ...any) *InfraStorage {
-	c := *w
-	c.attrs = append(c.attrs, attrs...)
-
-	return &c
+func NewInfraStorage() *InfraStorage {
+	return &InfraStorage{}
 }
 
 // WrapError - возвращает ошибку с указанием источника.
@@ -40,5 +28,5 @@ func (w *InfraStorage) WrapError(err error, attrs ...any) error {
 		return err
 	}
 
-	return mr.ErrStorageQueryFailed.Wrap(err, w.attrs...).WithAttrs(attrs...)
+	return mr.ErrStorageQueryFailed.Wrap(err, attrs...)
 }

@@ -10,24 +10,12 @@ import (
 type (
 	// UseCase - помощник оборачивания перехваченных ошибок
 	// в часто используемые ошибки бизнес-логики приложения.
-	UseCase struct {
-		attrs []any // атрибуты должны быть указаны попарно: название/значение
-	}
+	UseCase struct{}
 )
 
 // NewUseCase - создаёт объект UseCase.
-func NewUseCase(source string) *UseCase {
-	return &UseCase{
-		attrs: []any{mrerr.ErrorSourceKey, source},
-	}
-}
-
-// WithAttrs - возвращает новый UseCase с прикреплёнными атрибутами.
-func (w *UseCase) WithAttrs(attrs ...any) *UseCase {
-	c := *w
-	c.attrs = append(c.attrs, attrs...)
-
-	return &c
+func NewUseCase() *UseCase {
+	return &UseCase{}
 }
 
 // IsNotFoundOrNotAffectedError - сообщает, связанна ли ошибка с отсутствием запрошенной записи,
@@ -66,7 +54,7 @@ func (w *UseCase) wrapErrorFailed(err error, attrs []any) error {
 				return err
 			}
 
-			return mr.ErrUseCaseTemporarilyUnavailable.Wrap(err, w.attrs...).WithAttrs(attrs...)
+			return mr.ErrUseCaseTemporarilyUnavailable.Wrap(err, attrs...)
 		}
 
 		if e.Kind() == mrerr.ErrorKindUser {
@@ -74,5 +62,5 @@ func (w *UseCase) wrapErrorFailed(err error, attrs []any) error {
 		}
 	}
 
-	return mr.ErrUseCaseOperationFailed.Wrap(err, w.attrs...).WithAttrs(attrs...)
+	return mr.ErrUseCaseOperationFailed.Wrap(err, attrs...)
 }
