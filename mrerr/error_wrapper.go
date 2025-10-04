@@ -53,8 +53,8 @@ func NewErrorWrapper(base ErrorWrapper, source string) ErrorWrapper {
 }
 
 // WrapError - возвращает ошибку с указанием источника.
-func (u *errorWrapper) WrapError(err error, attrs ...any) error {
-	return u.base.WrapError(err, addSourceToAttrs(u.sourceValue, attrs)...) //nolint:wrapcheck
+func (w *errorWrapper) WrapError(err error, attrs ...any) error {
+	return w.base.WrapError(err, addSourceToAttrs(w.sourceValue, attrs)...) //nolint:wrapcheck
 }
 
 type (
@@ -79,18 +79,18 @@ func NewUseCaseErrorWrapper(base UseCaseErrorWrapper, source string) UseCaseErro
 
 // IsNotFoundOrNotAffectedError - сообщает, связанна ли ошибка с отсутствием запрошенной записи,
 // или она была найдена, но её изменение не потребовалось.
-func (u *useCaseErrorWrapper) IsNotFoundOrNotAffectedError(err error) bool {
-	return u.base.IsNotFoundOrNotAffectedError(err)
+func (w *useCaseErrorWrapper) IsNotFoundOrNotAffectedError(err error) bool {
+	return w.base.IsNotFoundOrNotAffectedError(err)
 }
 
 // WrapErrorFailed - возвращает обёрнутую ошибку с указанием источника.
-func (u *useCaseErrorWrapper) WrapErrorFailed(err error, attrs ...any) error {
-	return u.base.WrapErrorFailed(err, addSourceToAttrs(u.sourceValue, attrs)...) //nolint:wrapcheck
+func (w *useCaseErrorWrapper) WrapErrorFailed(err error, attrs ...any) error {
+	return w.base.WrapErrorFailed(err, addSourceToAttrs(w.sourceValue, attrs)...) //nolint:wrapcheck
 }
 
 // WrapErrorNotFoundOrFailed - возвращает обёрнутую ошибку с указанием источника.
-func (u *useCaseErrorWrapper) WrapErrorNotFoundOrFailed(err error, attrs ...any) error {
-	return u.base.WrapErrorNotFoundOrFailed(err, addSourceToAttrs(u.sourceValue, attrs)...) //nolint:wrapcheck
+func (w *useCaseErrorWrapper) WrapErrorNotFoundOrFailed(err error, attrs ...any) error {
+	return w.base.WrapErrorNotFoundOrFailed(err, addSourceToAttrs(w.sourceValue, attrs)...) //nolint:wrapcheck
 }
 
 func addSourceToAttrs(value string, attrs ...any) []any {

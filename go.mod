@@ -1,13 +1,13 @@
 module github.com/mondegor/go-sysmess
 
-go 1.22.0
+go 1.24.0
 
 require (
 	github.com/golang/mock v1.6.0
-	github.com/lmittmann/tint v1.0.7
-	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
-	golang.org/x/text v0.3.3
+	github.com/lmittmann/tint v1.1.2
+	github.com/stretchr/testify v1.11.1
+	golang.org/x/exp v0.0.0-20251002181428-27f1f14c8bb9
+	golang.org/x/text v0.29.0
 )
 
 require (
