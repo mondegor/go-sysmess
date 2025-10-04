@@ -25,6 +25,34 @@ func PopKeyValue(args []any) (key string, value any, rest []any) {
 	}
 }
 
+// AddKeyValue - возвращает массив со вставленным в него парой ключ/значение.
+// В случае, если ключ уже имеется в массиве, то его значение будет заменено
+// на значение, которое будет возвращено в функции valueFunc, при этом в index
+// будет указан индекс текущего элемента массива расположенного за ключом,
+// а в item само значение. Если ключ не найден, то в index будет равен -1.
+func AddKeyValue(key string, valueFunc func(index int, item any) (newitem any), args ...any) []any {
+	for i := 0; i < len(args); i += 2 {
+		k, ok := args[i].(string)
+		if !ok || k != key {
+			continue
+		}
+
+		// если сразу же после последнего ключа нет значения
+		if i+1 >= len(args) {
+			args = append(args, missingValue)
+
+			break
+		}
+
+		args[i+1] = valueFunc(i+1, args[i+1])
+
+		return args
+	}
+
+	// если искомый ключ не найден, то он добавляется вместе со значением
+	return append(args, key, valueFunc(-1, nil))
+}
+
 // // KeyValueToString - возвращает преобразованный массив any в массив string.
 // // В указанном массиве последовательно должны располагаться ключ и значение,
 // // причём ключи должны быть строкового типа. А все значения будут преобразованы в строковый тип.

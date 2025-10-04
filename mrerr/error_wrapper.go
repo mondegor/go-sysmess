@@ -1,5 +1,19 @@
 package mrerr
 
+import (
+	"github.com/mondegor/go-sysmess/mrargs"
+)
+
+const (
+	// ErrorSourceKey - ключ источника ошибки.
+	ErrorSourceKey = "errorsource"
+
+	// ErrorSourceSeparator - разделитель между источниками ошибок.
+	ErrorSourceSeparator = "/"
+
+	defaultSource = "general.errors"
+)
+
 type (
 	// ErrorWrapper - помощник для оборачивания ошибок.
 	ErrorWrapper interface {
@@ -14,3 +28,85 @@ type (
 		WrapErrorNotFoundOrFailed(err error, attrs ...any) error
 	}
 )
+
+type (
+	// errorWrapper - расширяет возможности ErrorWrapper добавляя к нему источник данных.
+	errorWrapper struct {
+		base   ErrorWrapper
+		source string
+	}
+)
+
+// NewErrorWrapper - создаёт объект errorWrapper.
+func NewErrorWrapper(base ErrorWrapper, source string) ErrorWrapper {
+	if source == "" {
+		source = defaultSource
+	}
+
+	return &errorWrapper{
+		base:   base,
+		source: source,
+	}
+}
+
+// WrapError - возвращает ошибку с указанием источника.
+func (u *errorWrapper) WrapError(err error, attrs ...any) error {
+	return u.base.WrapError(err, addSourceToAttrs(u.source, attrs)...) //nolint:wrapcheck
+}
+
+type (
+	// useCaseErrorWrapper - расширяет возможности UseCaseErrorWrapper добавляя к нему источник данных.
+	useCaseErrorWrapper struct {
+		base   UseCaseErrorWrapper
+		source string
+	}
+)
+
+// NewUseCaseErrorWrapper - создаёт объект useCaseErrorWrapper.
+func NewUseCaseErrorWrapper(base UseCaseErrorWrapper, source string) UseCaseErrorWrapper {
+	if source == "" {
+		source = defaultSource
+	}
+
+	return &useCaseErrorWrapper{
+		base:   base,
+		source: source,
+	}
+}
+
+// IsNotFoundOrNotAffectedError - сообщает, связанна ли ошибка с отсутствием запрошенной записи,
+// или она была найдена, но её изменение не потребовалось.
+func (u *useCaseErrorWrapper) IsNotFoundOrNotAffectedError(err error) bool {
+	return u.base.IsNotFoundOrNotAffectedError(err)
+}
+
+// WrapErrorFailed - возвращает обёрнутую ошибку с указанием источника.
+func (u *useCaseErrorWrapper) WrapErrorFailed(err error, attrs ...any) error {
+	return u.base.WrapErrorFailed(err, addSourceToAttrs(u.source, attrs)...) //nolint:wrapcheck
+}
+
+// WrapErrorNotFoundOrFailed - возвращает обёрнутую ошибку с указанием источника.
+func (u *useCaseErrorWrapper) WrapErrorNotFoundOrFailed(err error, attrs ...any) error {
+	return u.base.WrapErrorNotFoundOrFailed(err, addSourceToAttrs(u.source, attrs)...) //nolint:wrapcheck
+}
+
+func addSourceToAttrs(value string, attrs ...any) []any {
+	return mrargs.AddKeyValue(
+		ErrorSourceKey,
+		func(index int, item any) (newitem any) {
+			if index < 0 {
+				return value
+			}
+
+			// если значение в виде строки, то оно дополняется,
+			// иначе заменяется на новое
+			v, ok := item.(string)
+			if ok && v != "" {
+				value += ErrorSourceSeparator + v
+			}
+
+			return value
+		},
+		attrs...,
+	)
+}

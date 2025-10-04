@@ -1,28 +1,29 @@
-package mr
+package errorwrapper
 
 import (
 	"errors"
 
 	"github.com/mondegor/go-sysmess/mrerr"
+	"github.com/mondegor/go-sysmess/mrerr/mr"
 )
 
 type (
-	// UseCaseErrorWrapper - помощник оборачивания перехваченных ошибок
+	// UseCase - помощник оборачивания перехваченных ошибок
 	// в часто используемые ошибки бизнес-логики приложения.
-	UseCaseErrorWrapper struct {
+	UseCase struct {
 		attrs []any // атрибуты должны быть указаны попарно: название/значение
 	}
 )
 
-// NewUseCaseErrorWrapper - создаёт объект UseCaseErrorWrapper.
-func NewUseCaseErrorWrapper(source string) *UseCaseErrorWrapper {
-	return &UseCaseErrorWrapper{
-		attrs: []any{"usecase-source", source},
+// NewUseCase - создаёт объект UseCase.
+func NewUseCase(source string) *UseCase {
+	return &UseCase{
+		attrs: []any{mrerr.ErrorSourceKey, source},
 	}
 }
 
-// WithAttrs - возвращает новый UseCaseErrorWrapper с прикреплёнными атрибутами.
-func (w *UseCaseErrorWrapper) WithAttrs(attrs ...any) *UseCaseErrorWrapper {
+// WithAttrs - возвращает новый UseCase с прикреплёнными атрибутами.
+func (w *UseCase) WithAttrs(attrs ...any) *UseCase {
 	c := *w
 	c.attrs = append(c.attrs, attrs...)
 
@@ -30,42 +31,42 @@ func (w *UseCaseErrorWrapper) WithAttrs(attrs ...any) *UseCaseErrorWrapper {
 }
 
 // IsNotFoundOrNotAffectedError - сообщает, связанна ли ошибка с отсутствием запрошенной записи,
-// или её изменение не потребовалось.
-func (w *UseCaseErrorWrapper) IsNotFoundOrNotAffectedError(err error) bool {
-	return errors.Is(err, ErrStorageNoRowFound) ||
-		errors.Is(err, ErrStorageRowsNotAffected)
+// или она была найдена, но её изменение не потребовалось.
+func (w *UseCase) IsNotFoundOrNotAffectedError(err error) bool {
+	return errors.Is(err, mr.ErrStorageNoRowFound) ||
+		errors.Is(err, mr.ErrStorageRowsNotAffected)
 }
 
 // WrapErrorFailed - возвращает ошибку с указанием источника, обёрнутую в
 // ErrUseCaseTemporarilyUnavailable или ErrUseCaseOperationFailed.
 // Ошибки ErrUseCaseOperationFailed, ErrUseCaseTemporarilyUnavailable и пользовательские ошибки не оборачиваются!
-func (w *UseCaseErrorWrapper) WrapErrorFailed(err error, attrs ...any) error {
+func (w *UseCase) WrapErrorFailed(err error, attrs ...any) error {
 	return w.wrapErrorFailed(err, attrs)
 }
 
 // WrapErrorNotFoundOrFailed - возвращает ошибку с указанием источника, обёрнутую в
 // ErrUseCaseEntityNotFound, ErrUseCaseTemporarilyUnavailable или ErrUseCaseOperationFailed.
 // Ошибки ErrUseCaseOperationFailed, ErrUseCaseTemporarilyUnavailable и пользовательские ошибки не оборачиваются!
-func (w *UseCaseErrorWrapper) WrapErrorNotFoundOrFailed(err error, attrs ...any) error {
+func (w *UseCase) WrapErrorNotFoundOrFailed(err error, attrs ...any) error {
 	if w.IsNotFoundOrNotAffectedError(err) {
-		return ErrUseCaseEntityNotFound.New()
+		return mr.ErrUseCaseEntityNotFound.New()
 	}
 
 	return w.wrapErrorFailed(err, attrs)
 }
 
-func (w *UseCaseErrorWrapper) wrapErrorFailed(err error, attrs []any) error {
-	if ErrUseCaseOperationFailed.Is(err) {
+func (w *UseCase) wrapErrorFailed(err error, attrs []any) error {
+	if mr.ErrUseCaseOperationFailed.Is(err) {
 		return err
 	}
 
 	if e, ok := err.(interface{ Kind() mrerr.ErrorKind }); ok {
 		if e.Kind() == mrerr.ErrorKindSystem {
-			if ErrUseCaseTemporarilyUnavailable.Is(err) {
+			if mr.ErrUseCaseTemporarilyUnavailable.Is(err) {
 				return err
 			}
 
-			return ErrUseCaseTemporarilyUnavailable.Wrap(err, w.attrs...).WithAttrs(attrs...)
+			return mr.ErrUseCaseTemporarilyUnavailable.Wrap(err, w.attrs...).WithAttrs(attrs...)
 		}
 
 		if e.Kind() == mrerr.ErrorKindUser {
@@ -73,5 +74,5 @@ func (w *UseCaseErrorWrapper) wrapErrorFailed(err error, attrs []any) error {
 		}
 	}
 
-	return ErrUseCaseOperationFailed.Wrap(err, w.attrs...).WithAttrs(attrs...)
+	return mr.ErrUseCaseOperationFailed.Wrap(err, w.attrs...).WithAttrs(attrs...)
 }

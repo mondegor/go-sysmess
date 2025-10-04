@@ -11,8 +11,10 @@ const (
 	// SourceEventSeparator - разделитель между источником и названием события.
 	SourceEventSeparator = ":"
 
-	// DefaultSource - название источника по умолчанию.
-	DefaultSource = "general"
+	// SourceSeparator - разделитель между источниками.
+	SourceSeparator = "/"
+
+	defaultSource = "general.events"
 )
 
 type (
@@ -57,45 +59,44 @@ func NewEmitter(receivers ...Receiver) Emitter {
 	}
 }
 
-// Emit - отправляет указанное событие (не гарантирует их успешное получение).
+// Emit - отправляет указанное событие всем зарегистрированным получателям.
+// Гарантия успешного получение событий возлагается на Receiver.
 func (e *emitter) Emit(ctx context.Context, eventName string, args ...any) {
 	for _, r := range e.receivers {
-		go func() {
-			r.Receive(ctx, eventName, args...)
-		}()
+		r.Receive(ctx, eventName, args...)
 	}
 }
 
 type (
-	// emitterWrapper - расширяет возможности Emitter добавляя к нему источник данных.
-	emitterWrapper struct {
-		eventEmitter Emitter
-		source       string
+	// sourceEmitter - расширяет возможности Emitter добавляя к нему источник данных.
+	sourceEmitter struct {
+		base   Emitter
+		source string
 	}
 )
 
-// NewEmitterWrapper - создаёт объект emitterWrapper.
-func NewEmitterWrapper(eventEmitter Emitter, source string) Emitter {
+// NewSourceEmitter - создаёт объект sourceEmitter.
+func NewSourceEmitter(base Emitter, source string) Emitter {
 	if source == "" {
-		source = DefaultSource
+		source = defaultSource
 	}
 
-	return &emitterWrapper{
-		eventEmitter: eventEmitter,
-		source:       source,
+	return &sourceEmitter{
+		base:   base,
+		source: source,
 	}
 }
 
 // Emit - отправляет указанное событие добавляя первоисточник.
-func (e *emitterWrapper) Emit(ctx context.Context, eventName string, args ...any) {
+func (e *sourceEmitter) Emit(ctx context.Context, eventName string, args ...any) {
 	separator := SourceEventSeparator
 
 	// в базовом варианте eventName будет заменено на {source}:{eventName},
 	// но если название события уже содержит источник,
-	// то после первоисточника будет стоять слеш: {source}/{eventSource}:{eventName}
+	// то после первоисточника будет стоять "/": {source}/{eventSource}:{eventName}
 	if strings.Contains(eventName, separator) {
-		separator = "/"
+		separator = SourceSeparator
 	}
 
-	e.eventEmitter.Emit(ctx, e.source+separator+eventName, args...)
+	e.base.Emit(ctx, e.source+separator+eventName, args...)
 }
