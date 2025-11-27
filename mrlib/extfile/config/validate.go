@@ -1,0 +1,26 @@
+package config
+
+import (
+	"fmt"
+
+	"github.com/mondegor/go-sysmess/mrlib/extfile"
+)
+
+// ValidateMimeTypes - валидирует указанный список типов файлов.
+func ValidateMimeTypes(mimeTypes []extfile.MimeType) error {
+	uniqExtensions := make(map[string]struct{}, len(mimeTypes))
+
+	for _, mime := range mimeTypes {
+		if mime.Extension == "" {
+			return fmt.Errorf("mimeType extension is required for '%s'", mime.ContentType)
+		}
+
+		if _, ok := uniqExtensions[mime.Extension]; ok {
+			return fmt.Errorf("duplicate mimeType extension '%s' for '%s'", mime.Extension, mime.ContentType)
+		}
+
+		uniqExtensions[mime.Extension] = struct{}{}
+	}
+
+	return nil
+}

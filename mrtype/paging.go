@@ -1,7 +1,7 @@
 package mrtype
 
 import (
-	"github.com/mondegor/go-sysmess/mrtype/enums"
+	"github.com/mondegor/go-sysmess/mrtype/sortdirection"
 )
 
 type (
@@ -19,8 +19,8 @@ type (
 
 	// SortParams - параметры для сортировки списка элементов по указанному полю.
 	SortParams struct {
-		FieldName string              // sortField
-		Direction enums.SortDirection // sortDirection
+		FieldName string             // sortField
+		Direction sortdirection.Enum // sortDirection
 	}
 
 	// ListSorter - интерфейс для проверки полей, которые могут участвовать в сортировке.

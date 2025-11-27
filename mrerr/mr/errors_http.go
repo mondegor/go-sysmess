@@ -21,19 +21,11 @@ var (
 	// ErrHttpResourceNotFound - 404. resource not found.
 	ErrHttpResourceNotFound = mrerr.NewKindUser("ResourceNotFound", "404. resource not found")
 
+	// ErrHttpRequestHeader - header contains incorrect value.
+	// Это вспомогательная ошибка, для неё отключено формирование стека вызовов и отправление события о её создании.
+	ErrHttpRequestHeader = mrerr.NewKindInternal(
+		"header '{Name}' contains incorrect value: '{Value}'", mrerr.WithDisabledCaller(), mrerr.WithDisabledOnCreated())
+
 	// ErrHttpRequestParseData - 422. request body is not valid (ошибка связанная с неправильным форматом отправленных данных).
 	ErrHttpRequestParseData = mrerr.NewKindUser("RequestParseData", "request body is not valid: '{Reason}'")
-
-	// ErrHttpRequestParseParam - request param with key of type contains incorrect value.
-	ErrHttpRequestParseParam = mrerr.NewKindUser("RequestParseParam", "request param with key '{Key}' of type '{Type}' contains incorrect value '{Value}'")
-
-	// ErrHttpRequestParamEmpty - request param with key is empty.
-	ErrHttpRequestParamEmpty = mrerr.NewKindUser("RequestParamEmpty", "request param with key '{Key}' is empty")
-
-	// ErrHttpRequestParamMax - request param with key contains value greater than max.
-	ErrHttpRequestParamMax = mrerr.NewKindUser("RequestParamMax", "request param with key '{Key}' contains value greater then max '{Max}'")
-
-	// ErrHttpRequestParamLenMax - request param with key has value length greater than max characters.
-	ErrHttpRequestParamLenMax = mrerr.NewKindUser(
-		"RequestParamLenMax", "request param with key '{Key}' has value length greater then max '{MaxLength}' characters")
 )
