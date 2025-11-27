@@ -5,7 +5,7 @@ type (
 	FlowMap[Status ~uint8] interface {
 		Registered() []Status
 		Exists(status Status) bool
-		Has(from, to Status) bool
+		IsPossible(from, to Status) bool
 		PossibleToStatuses(from Status) []Status
 		PossibleFromStatuses(to Status) []Status
 	}
@@ -67,8 +67,8 @@ func (f *statusFlow[Status]) Exists(status Status) bool {
 	return ok
 }
 
-// Has - сообщает, возможно ли переключить данный статус в указанный статус.
-func (f *statusFlow[Status]) Has(from, to Status) bool {
+// IsPossible - сообщает, возможно ли переключить данный статус в указанный статус.
+func (f *statusFlow[Status]) IsPossible(from, to Status) bool {
 	toStatuses, ok := f.fromToMap[from]
 	if !ok {
 		return false
