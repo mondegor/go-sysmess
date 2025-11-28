@@ -50,7 +50,7 @@ func NewContextManager(
 
 	for _, v := range keyGetIDWithID {
 		if _, ok := cm.keyGetID[v.Key]; ok {
-			return nil, fmt.Errorf("duplicated key %q", v.Key)
+			return nil, fmt.Errorf("duplicated key '%q'", v.Key)
 		}
 
 		cm.keyGetID[v.Key] = v.GetID
@@ -76,7 +76,7 @@ func NewContextManager(
 	for _, key := range correlationKeys {
 		getID, ok := cm.keyGetID[key]
 		if !ok {
-			return nil, fmt.Errorf("correlation key %s not found", key)
+			return nil, fmt.Errorf("correlation key not found (key='%s')", key)
 		}
 
 		cm.extractCorrelationID = append(

@@ -21,5 +21,5 @@ func ParseDateTimeFormat(value string) (string, error) {
 		return time.Kitchen, nil
 	}
 
-	return time.RFC3339, fmt.Errorf("value '%s' is not found in parser.ParseDateTimeFormat()", value)
+	return time.RFC3339, fmt.Errorf("value is not found in parser.ParseDateTimeFormat() (value='%s')", value)
 }

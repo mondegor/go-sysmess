@@ -42,5 +42,5 @@ func Parse(value string) (Enum, error) {
 		return parsedValue, nil
 	}
 
-	return 0, fmt.Errorf("key is not found in source (source='%s', key='%s')", enumName, value)
+	return 0, fmt.Errorf("key is not found in enum set (enum='%s', key='%s')", enumName, value)
 }

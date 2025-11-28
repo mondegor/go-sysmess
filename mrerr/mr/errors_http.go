@@ -21,11 +21,6 @@ var (
 	// ErrHttpResourceNotFound - 404. resource not found.
 	ErrHttpResourceNotFound = mrerr.NewKindUser("ResourceNotFound", "404. resource not found")
 
-	// ErrHttpRequestHeader - header contains incorrect value.
-	// Это вспомогательная ошибка, для неё отключено формирование стека вызовов и отправление события о её создании.
-	ErrHttpRequestHeader = mrerr.NewKindInternal(
-		"header '{Name}' contains incorrect value: '{Value}'", mrerr.WithDisabledCaller(), mrerr.WithDisabledOnCreated())
-
 	// ErrHttpRequestParseData - 422. request body is not valid (ошибка связанная с неправильным форматом отправленных данных).
 	ErrHttpRequestParseData = mrerr.NewKindUser("RequestParseData", "request body is not valid: '{Reason}'")
 )

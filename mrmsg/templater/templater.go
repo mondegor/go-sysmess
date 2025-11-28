@@ -62,11 +62,11 @@ func (p *Templater) RenderTo(wr io.Writer, message string, data map[string]strin
 
 	t, err := template.New("").Delims(p.leftDelim, p.rightDelim).Parse(message)
 	if err != nil {
-		return fmt.Errorf("parse message '%s' error: %w", message, err)
+		return fmt.Errorf("parse message '%s': %w", message, err)
 	}
 
 	if err = t.Execute(wr, data); err != nil {
-		return fmt.Errorf("render message '%s' error: %w", message, err)
+		return fmt.Errorf("render message '%s': %w", message, err)
 	}
 
 	return nil

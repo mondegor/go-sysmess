@@ -70,7 +70,7 @@ func NewBundle(opts ...BundleOption) (*Bundle, error) {
 
 	if defaultLanguage == language.Und {
 		if o.defaultLanguage != "" {
-			return nil, fmt.Errorf("bundle create: default language '%s' is not supported", o.defaultLanguage)
+			return nil, fmt.Errorf("bundle create: default language is not supported (lang='%s')", o.defaultLanguage)
 		}
 
 		// если в опции явно не указан язык по умолчанию,

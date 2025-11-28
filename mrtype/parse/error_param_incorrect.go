@@ -21,5 +21,5 @@ func NewParamIncorrectError(paramType string, cause error) *ParamIncorrectError 
 }
 
 func (e *ParamIncorrectError) Error() string {
-	return fmt.Sprintf("param contains incorrect value: %s (type='%s')", e.Cause.Error(), e.Type)
+	return fmt.Sprintf("param contains incorrect value '%s' (type='%s')", e.Cause.Error(), e.Type)
 }

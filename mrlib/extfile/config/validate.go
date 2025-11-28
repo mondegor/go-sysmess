@@ -12,11 +12,11 @@ func ValidateMimeTypes(mimeTypes []extfile.MimeType) error {
 
 	for _, mime := range mimeTypes {
 		if mime.Extension == "" {
-			return fmt.Errorf("mimeType extension is required for '%s'", mime.ContentType)
+			return fmt.Errorf("mimeType extension is required for content type '%s'", mime.ContentType)
 		}
 
 		if _, ok := uniqExtensions[mime.Extension]; ok {
-			return fmt.Errorf("duplicate mimeType extension '%s' for '%s'", mime.Extension, mime.ContentType)
+			return fmt.Errorf("duplicate mimeType extension for content type (ext='%s', type='%s')", mime.Extension, mime.ContentType)
 		}
 
 		uniqExtensions[mime.Extension] = struct{}{}

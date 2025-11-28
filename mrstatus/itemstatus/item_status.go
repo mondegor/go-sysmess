@@ -46,7 +46,7 @@ func (e *Enum) Set(value uint8) error {
 		return nil
 	}
 
-	return fmt.Errorf("value '%d' is not found in enum set '%s'", value, enumName)
+	return fmt.Errorf("value is not found in enum set (value='%d', enum='%s')", value, enumName)
 }
 
 // String - возвращает значение в виде строки.
@@ -58,7 +58,7 @@ func (e Enum) String() string {
 func (e Enum) MarshalJSON() ([]byte, error) {
 	bytes, err := json.Marshal(e.String())
 	if err != nil {
-		return nil, fmt.Errorf("marshal error (source='%s'): %w", enumName, err)
+		return nil, fmt.Errorf("marshal error (enum='%s'): %w", enumName, err)
 	}
 
 	return bytes, nil
@@ -69,7 +69,7 @@ func (e *Enum) UnmarshalJSON(data []byte) error {
 	var value string
 
 	if err := json.Unmarshal(data, &value); err != nil {
-		return fmt.Errorf("unmarshal error (source='%s'): %w", enumName, err)
+		return fmt.Errorf("unmarshal error (enum='%s'): %w", enumName, err)
 	}
 
 	val, err := Parse(value)
@@ -102,7 +102,7 @@ func Parse(value string) (Enum, error) {
 		return parsedValue, nil
 	}
 
-	return 0, fmt.Errorf("key is not found in source (source='%s', key='%s')", enumName, value)
+	return 0, fmt.Errorf("key is not found in enum set (enum='%s', key='%s')", enumName, value)
 }
 
 // ParseList - парсит массив строковых значений и

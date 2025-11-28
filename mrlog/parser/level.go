@@ -20,5 +20,5 @@ func ParseLevel(value string) (mrlog.Level, error) {
 		return mrlog.LevelError, nil
 	}
 
-	return mrlog.LevelError, fmt.Errorf("value '%s' is not found in parser.ParseLevel()", value)
+	return mrlog.LevelError, fmt.Errorf("value is not found in parser.ParseLevel() (value='%s')", value)
 }

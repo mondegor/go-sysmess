@@ -31,7 +31,7 @@ func NewPlaceholder(basePath, placeholder string) (Builder, error) {
 		}, nil
 	}
 
-	return nil, fmt.Errorf("placeholder '%s' is not found in path '%s'", placeholder, basePath)
+	return nil, fmt.Errorf("placeholder is not found in path (placeholder='%s', path='%s')", placeholder, basePath)
 }
 
 // BuildPath - возвращает полный путь вставляя в базовый указанный путь.
