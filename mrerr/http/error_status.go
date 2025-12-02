@@ -34,7 +34,7 @@ func (g *ErrorStatusGetter) ErrorStatus(analyzedKind mrerr.ErrorKind, err error)
 
 	// если ошибка явно необработанна разработчиком (не обёрнута в InstantError),
 	// то вместо 500 статуса отображается указанный g.unexpectedStatus
-	if analyzedKind != mrerr.ErrorKindUnknown {
+	if analyzedKind == mrerr.ErrorKindUnknown {
 		return g.unexpectedStatus
 	}
 

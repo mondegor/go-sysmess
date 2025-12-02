@@ -93,7 +93,7 @@ func (w *useCaseErrorWrapper) WrapErrorNotFoundOrFailed(err error, attrs ...any)
 	return w.base.WrapErrorNotFoundOrFailed(err, addSourceToAttrs(w.sourceValue, attrs)...) //nolint:wrapcheck
 }
 
-func addSourceToAttrs(value string, attrs ...any) []any {
+func addSourceToAttrs(value string, attrs []any) []any {
 	return mrargs.AddKeyValue(
 		errorSourceKey,
 		func(index int, item any) (newitem any) {
