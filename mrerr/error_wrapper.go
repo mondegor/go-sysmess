@@ -21,7 +21,7 @@ type (
 	// UseCaseErrorWrapper - помощник для оборачивания ошибок
 	// в зависимости от их вида. Используется в UseCase.
 	UseCaseErrorWrapper interface {
-		IsNotFoundOrNotAffectedError(err error) bool
+		IsNotFoundError(err error) bool
 		WrapErrorFailed(err error, attrs ...any) error
 		WrapErrorNotFoundOrFailed(err error, attrs ...any) error
 	}
@@ -77,10 +77,9 @@ func NewUseCaseErrorWrapper(base UseCaseErrorWrapper, source string) UseCaseErro
 	}
 }
 
-// IsNotFoundOrNotAffectedError - сообщает, связанна ли ошибка с отсутствием запрошенной записи,
-// или она была найдена, но её изменение не потребовалось.
-func (w *useCaseErrorWrapper) IsNotFoundOrNotAffectedError(err error) bool {
-	return w.base.IsNotFoundOrNotAffectedError(err)
+// IsNotFoundError - сообщает, связанна ли ошибка с отсутствием запрошенной записи.
+func (w *useCaseErrorWrapper) IsNotFoundError(err error) bool {
+	return w.base.IsNotFoundError(err)
 }
 
 // WrapErrorFailed - возвращает обёрнутую ошибку с указанием источника.
@@ -118,6 +117,6 @@ func addSourceToAttrs(value string, attrs []any) []any {
 
 			return value
 		},
-		attrs...,
+		attrs,
 	)
 }

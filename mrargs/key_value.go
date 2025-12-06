@@ -30,7 +30,7 @@ func PopKeyValue(args []any) (key string, value any, rest []any) {
 // на значение, которое будет возвращено в функции valueFunc, при этом в index
 // будет указан индекс текущего элемента массива расположенного за ключом,
 // а в item само значение. Если ключ не найден, то в index будет равен -1.
-func AddKeyValue(key string, valueFunc func(index int, item any) (newitem any), args ...any) []any {
+func AddKeyValue(key string, valueFunc func(index int, item any) (newitem any), args []any) []any {
 	for i := 0; i < len(args); i += 2 {
 		k, ok := args[i].(string)
 		if !ok || k != key {
