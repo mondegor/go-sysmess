@@ -10,34 +10,33 @@ type (
 		PossibleFromStatuses(to Status) []Status
 	}
 
-	// FlowItem - comment struct.
-	FlowItem[Status ~uint8] struct {
+	// FlowNode - узел содержащий статус и список статусов, в который этот статус можно переключить.
+	FlowNode[Status ~uint8] struct {
 		From Status
 		To   []Status
 	}
 
-	// statusFlow - comment struct.
 	statusFlow[Status ~uint8] struct {
 		fromToMap     map[Status][]Status
 		toFromMap     map[Status][]Status
-		registeredMap map[Status]struct{}
+		registeredMap map[Status]bool
 		registered    []Status
 	}
 )
 
-// NewFlowMap - создаёт объект statusFlow.
-func NewFlowMap[Status ~uint8](list []FlowItem[Status]) FlowMap[Status] {
+// NewFlowMap - создаёт объект FlowMap[Status].
+func NewFlowMap[Status ~uint8](list []FlowNode[Status]) FlowMap[Status] {
 	fromToMap := make(map[Status][]Status, len(list))
 	toFromMap := make(map[Status][]Status, len(list))
-	registeredMap := make(map[Status]struct{}, len(list))
+	registeredMap := make(map[Status]bool, len(list))
 
 	for _, item := range list {
 		fromToMap[item.From] = item.To
-		registeredMap[item.From] = struct{}{}
+		registeredMap[item.From] = true
 
 		for _, to := range item.To {
 			toFromMap[to] = append(toFromMap[to], item.From)
-			registeredMap[to] = struct{}{}
+			registeredMap[to] = true
 		}
 	}
 
@@ -60,11 +59,9 @@ func (f *statusFlow[Status]) Registered() []Status {
 	return f.registered
 }
 
-// Exists - сообщает, зарегистрирован ли данный статус в карте статусов.
+// Exists - сообщает, имеется ли данный статус в карте статусов.
 func (f *statusFlow[Status]) Exists(status Status) bool {
-	_, ok := f.registeredMap[status]
-
-	return ok
+	return f.registeredMap[status]
 }
 
 // IsPossible - сообщает, возможно ли переключить данный статус в указанный статус.

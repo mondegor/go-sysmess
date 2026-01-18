@@ -25,8 +25,6 @@ func WithCatalog(domain string, cat catalog.Catalog) Option {
 // WithLanguages - добавляет языки для локализации сообщений.
 func WithLanguages(values ...language.Tag) Option {
 	return func(o *options) {
-		if len(values) > 0 {
-			o.languages = append(o.languages, values...)
-		}
+		o.languages = append(o.languages, values...)
 	}
 }

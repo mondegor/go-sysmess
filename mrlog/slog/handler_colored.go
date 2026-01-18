@@ -2,7 +2,7 @@ package slog
 
 import (
 	"io"
-	"log/slog"
+	stdlog "log/slog"
 	"time"
 
 	"github.com/lmittmann/tint"
@@ -10,42 +10,42 @@ import (
 	"github.com/mondegor/go-sysmess/mrlog/color"
 )
 
-func newColoredHandler(w io.Writer, opts options) slog.Handler {
+func newColoredHandler(w io.Writer, opts options) stdlog.Handler {
 	return tint.NewHandler(
 		w,
 		&tint.Options{
-			Level: slog.Level(opts.level),
-			ReplaceAttr: func(_ []string, attr slog.Attr) slog.Attr {
+			Level: stdlog.Level(opts.level),
+			ReplaceAttr: func(_ []string, attr stdlog.Attr) stdlog.Attr {
 				attr = opts.replaceAttr(attr)
 
-				if attr.Key == slog.TimeKey {
+				if attr.Key == stdlog.TimeKey {
 					if tm, ok := attr.Value.Any().(time.Time); ok {
-						attr.Value = slog.StringValue(color.ColorizeText(color.Gray, tm.Format(opts.timeFormat)))
+						attr.Value = stdlog.StringValue(color.ColorizeText(color.Gray, tm.Format(opts.timeFormat)))
 					}
 
 					return attr
 				}
 
-				if attr.Key == slog.LevelKey {
-					if lv, ok := attr.Value.Any().(slog.Level); ok {
+				if attr.Key == stdlog.LevelKey {
+					if lv, ok := attr.Value.Any().(stdlog.Level); ok {
 						switch {
-						case lv > slog.LevelError+4:
-							attr.Value = slog.StringValue(color.ColorizeText(color.Blue, "TRC"))
-						case lv > slog.LevelError:
-							attr.Value = slog.StringValue(color.ColorizeText(color.Red, "FAT"))
-						case lv < slog.LevelInfo:
-							attr.Value = slog.StringValue(color.ColorizeText(color.Yellow, "DBG"))
+						case lv > stdlog.LevelError+4:
+							attr.Value = stdlog.StringValue(color.ColorizeText(color.Blue, "TRC"))
+						case lv > stdlog.LevelError:
+							attr.Value = stdlog.StringValue(color.ColorizeText(color.Red, "FAT"))
+						case lv < stdlog.LevelInfo:
+							attr.Value = stdlog.StringValue(color.ColorizeText(color.Yellow, "DBG"))
 						}
 					}
 
 					return attr
 				}
 
-				if attr.Key == slog.MessageKey {
+				if attr.Key == stdlog.MessageKey {
 					return attr
 				}
 
-				if attr.Value.Kind() == slog.KindAny {
+				if attr.Value.Kind() == stdlog.KindAny {
 					if err, ok := attr.Value.Any().(error); ok {
 						aErr := tint.Err(err)
 						aErr.Key = attr.Key
@@ -64,7 +64,7 @@ func newColoredHandler(w io.Writer, opts options) slog.Handler {
 	)
 }
 
-func colorizeAttr(attr slog.Attr, clr attrColor) slog.Attr {
+func colorizeAttr(attr stdlog.Attr, clr attrColor) stdlog.Attr {
 	if clr.keyColor != "" {
 		attr.Key = color.ColorizeText(clr.keyColor, attr.Key)
 	}
@@ -73,5 +73,5 @@ func colorizeAttr(attr slog.Attr, clr attrColor) slog.Attr {
 		return attr
 	}
 
-	return slog.String(attr.Key, color.ColorizeText(clr.valueColor, attr.Value.String()))
+	return stdlog.String(attr.Key, color.ColorizeText(clr.valueColor, attr.Value.String()))
 }

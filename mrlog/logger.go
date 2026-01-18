@@ -1,57 +1,65 @@
 package mrlog
 
 import (
-	"context"
-	"os"
+	"github.com/mondegor/go-sysmess/mrlog/level"
+	"github.com/mondegor/go-sysmess/mrlog/logger"
 )
+
+//go:generate mockgen -source=logger.go -destination=./mock/logger.go
 
 type (
 	// Logger - интерфейс логирования сообщений и ошибок с использованием контекста.
-	Logger interface {
-		WithAttrs(args ...any) Logger
-		Enabled(level Level) bool
-
-		Debug(ctx context.Context, msg string, args ...any)
-		DebugFunc(ctx context.Context, createMsg func() string, args ...any)
-		Info(ctx context.Context, msg string, args ...any)
-		Warn(ctx context.Context, msg string, args ...any)
-		Error(ctx context.Context, msg string, args ...any)
-
-		Log(ctx context.Context, level Level, message string, args ...any)
-	}
+	Logger = logger.Logger
 )
 
-// Debug - логирует сообщения на уровне LevelDebug.
-func Debug(logger Logger, msg string, args ...any) {
-	logger.Debug(context.Background(), msg, args...)
+// WithAttrs - возвращает логгер с прикреплёнными к нему атрибутами.
+func WithAttrs(l logger.Logger, attrs ...any) logger.Logger {
+	return logger.WithAttrs(l, attrs...)
 }
 
-// DebugFunc - логирует сообщения на уровне LevelDebug с их отложенным созданием.
-func DebugFunc(logger Logger, createMsg func() string, args ...any) {
-	if !logger.Enabled(LevelDebug) {
-		return
-	}
-
-	logger.Debug(context.Background(), createMsg(), args...)
+// DebugEnabled - сообщает логирует ли указанный логгер сообщения уровня level.Debug.
+// Если logger = nil, то будет возвращено false.
+func DebugEnabled(l logger.Logger) bool {
+	return logger.Enabled(l, level.Debug)
 }
 
-// Info - логирует сообщения на уровне LevelInfo.
-func Info(logger Logger, msg string, args ...any) {
-	logger.Info(context.Background(), msg, args...)
+// InfoEnabled - сообщает логирует ли указанный логгер сообщения уровня level.Info.
+// Если logger = nil, то будет возвращено false.
+func InfoEnabled(l logger.Logger) bool {
+	return logger.Enabled(l, level.Info)
 }
 
-// Warn - логирует сообщения на уровне LevelWarn.
-func Warn(logger Logger, msg string, args ...any) {
-	logger.Warn(context.Background(), msg, args...)
+// Debug - логирует сообщения на уровне level.Debug без использования контекста.
+func Debug(l logger.Logger, msg string, args ...any) {
+	logger.Debug(l, msg, args...)
 }
 
-// Error - логирует сообщения на уровне LevelError.
-func Error(logger Logger, msg string, args ...any) {
-	logger.Error(context.Background(), msg, args...)
+// DebugFunc - логирует сообщения на уровне level.Debug без использования контекста с их отложенным созданием сообщения.
+func DebugFunc(l logger.Logger, createMsg func() string, args ...any) {
+	logger.DebugFunc(l, createMsg, args...)
 }
 
-// Fatal - логирует ошибку и прекращает выполнение программы.
-func Fatal(logger Logger, msg string, args ...any) {
-	logger.Log(context.Background(), LevelFatal, msg, args...)
-	os.Exit(1) // //nolint:revive
+// Info - логирует сообщения на уровне level.Info без использования контекста.
+func Info(l logger.Logger, msg string, args ...any) {
+	logger.Info(l, msg, args...)
+}
+
+// Warn - логирует сообщения на уровне level.Warn без использования контекста.
+func Warn(l logger.Logger, msg string, args ...any) {
+	logger.Warn(l, msg, args...)
+}
+
+// Error - логирует сообщения на уровне level.Error без использования контекста.
+func Error(l logger.Logger, msg string, args ...any) {
+	logger.Error(l, msg, args...)
+}
+
+// FatalError - логирует сообщения на уровне level.Fatal без использования контекста и останавливает приложение.
+func FatalError(l logger.Logger, msg string, args ...any) {
+	logger.Fatal(l, msg, args...)
+}
+
+// NopLogger - создаёт объект Logger, который ничего не делает.
+func NopLogger() Logger {
+	return logger.Nop()
 }

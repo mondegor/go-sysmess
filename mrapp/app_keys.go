@@ -7,12 +7,15 @@ const (
 	// KeyAppVersion - название ключа версии приложения (сервиса).
 	KeyAppVersion = "app_ver"
 
-	// KeyUserID - название ключа ID пользователя.
-	// KeyUserID = "user_id".
+	// KeyErrorID - название ключа ID ошибки.
+	KeyErrorID = "error_id"
+
+	// KeyStackTrace - название ключа стека вызовов формируемого при ошибке.
+	KeyStackTrace = "stack_trace"
 
 	// KeyLangCode - название ключа кода языка клиента (пользователя).
 	KeyLangCode = "lang"
 
-	// KeyErrorID - название ключа ID ошибки.
-	KeyErrorID = "error_id"
+	// KeyUserID - название ключа ID пользователя.
+	// KeyUserID = "user_id".
 )

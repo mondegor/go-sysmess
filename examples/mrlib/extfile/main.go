@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/mondegor/go-sysmess/mrlib/extfile"
+	"github.com/mondegor/go-sysmess/lib/extfile"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
 )

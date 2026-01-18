@@ -26,7 +26,6 @@ const (
 type (
 	// Tracer - трейсер для фиксации запросов к сервисам и их ответов.
 	Tracer interface {
-		Enabled() bool
 		Trace(ctx context.Context, args ...any)
 	}
 

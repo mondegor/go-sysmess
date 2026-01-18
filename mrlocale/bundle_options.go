@@ -6,7 +6,7 @@ import (
 
 type (
 	// BundleOption - настройка объекта Bundle.
-	BundleOption func(e *bundleOptions)
+	BundleOption func(o *bundleOptions)
 )
 
 // WithMessageProvider - устанавливает провайдер для локализации сообщений.
@@ -33,18 +33,14 @@ func WithFormatError(fn func(err error) (msg string, args []any)) BundleOption {
 // WithMessagesDomain - устанавливает домен, который будет использоваться при локализации сообщений.
 func WithMessagesDomain(value string) BundleOption {
 	return func(o *bundleOptions) {
-		if value != "" {
-			o.messagesDomain = value
-		}
+		o.messagesDomain = value
 	}
 }
 
 // WithErrorsDomain - устанавливает домен, который будет использоваться при локализации сообщений об ошибках.
 func WithErrorsDomain(value string) BundleOption {
 	return func(o *bundleOptions) {
-		if value != "" {
-			o.errorsDomain = value
-		}
+		o.errorsDomain = value
 	}
 }
 
@@ -58,8 +54,6 @@ func WithLanguages(values ...string) BundleOption {
 // WithDefaultLanguage - устанавливает язык по умолчанию.
 func WithDefaultLanguage(value string) BundleOption {
 	return func(o *bundleOptions) {
-		if value != "" {
-			o.defaultLanguage = value
-		}
+		o.defaultLanguage = value
 	}
 }

@@ -2,7 +2,9 @@ package slog
 
 import (
 	"io"
-	"log/slog"
+	stdlog "log/slog"
+
+	"github.com/mondegor/go-sysmess/mrlog/level"
 )
 
 const (
@@ -14,23 +16,32 @@ const (
 type (
 	// Option - настройка объекта LoggerAdapter.
 	Option func(o *options)
+
+	options struct {
+		stdout             io.Writer
+		levelString        string
+		level              level.Enum
+		jsonFormat         bool
+		timeFormat         string
+		middlewareHandlers []func(next stdlog.Handler) stdlog.Handler
+		replaceAttr        func(attr stdlog.Attr) (newAttr stdlog.Attr)
+		colorMode          bool
+		attrKey2color      map[string]attrColor
+		attrColorByDefault attrColor
+	}
 )
 
 // WithWriter - устанавливает опцию stdout для LoggerAdapter.
 func WithWriter(value io.Writer) Option {
 	return func(o *options) {
-		if o.stdout != nil {
-			o.stdout = value
-		}
+		o.stdout = value
 	}
 }
 
 // WithLevel - устанавливает уровень логирования для LoggerAdapter.
 func WithLevel(value string) Option {
 	return func(o *options) {
-		if value != "" {
-			o.levelString = value
-		}
+		o.levelString = value
 	}
 }
 
@@ -44,25 +55,21 @@ func WithJsonFormat(value bool) Option {
 // WithTimeFormat - устанавливает формат времени при логировании для LoggerAdapter.
 func WithTimeFormat(value string) Option {
 	return func(o *options) {
-		if value != "" {
-			o.timeFormat = value
-		}
+		o.timeFormat = value
 	}
 }
 
 // WithMiddlewareHandler - устанавливает middleware для LoggerAdapter.
-func WithMiddlewareHandler(value ...func(next slog.Handler) slog.Handler) Option {
+func WithMiddlewareHandler(value ...func(next stdlog.Handler) stdlog.Handler) Option {
 	return func(o *options) {
 		o.middlewareHandlers = append(o.middlewareHandlers, value...)
 	}
 }
 
 // WithReplaceAttrs - устанавливает функцию замены атрибутов для LoggerAdapter.
-func WithReplaceAttrs(value func(attr slog.Attr) (newAttr slog.Attr)) Option {
+func WithReplaceAttrs(value func(attr stdlog.Attr) (newAttr stdlog.Attr)) Option {
 	return func(o *options) {
-		if value != nil {
-			o.replaceAttr = value
-		}
+		o.replaceAttr = value
 	}
 }
 

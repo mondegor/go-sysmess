@@ -27,14 +27,14 @@ type (
 
 // NewContextWithIDs - возвращает новый контекст содержащий
 // только все ID процессы, скопированные из указанного контекста.
-func NewContextWithIDs(originalCtx context.Context, list []GetIDWithID) context.Context {
+func NewContextWithIDs(originalCtx context.Context, values []GetIDWithID) context.Context {
 	ctx := context.Background()
 
 	if originalCtx == nil || originalCtx == ctx {
 		return ctx
 	}
 
-	for _, v := range list {
+	for _, v := range values {
 		if value := v.GetID(ctx); value != "" {
 			ctx = v.WithID(ctx, value)
 		}
@@ -45,14 +45,14 @@ func NewContextWithIDs(originalCtx context.Context, list []GetIDWithID) context.
 
 // ExtractKeysValues - возвращает попарно (key/id-value) все имеющиеся
 // ID процессов из указанного контекста.
-func ExtractKeysValues(ctx context.Context, list []KeyGetID) (keyValue []any) {
-	if ctx == nil || ctx == context.Background() {
+func ExtractKeysValues(ctx context.Context, values []KeyGetID) (keyValue []any) {
+	if ctx == nil || ctx == context.Background() || len(values) == 0 {
 		return nil
 	}
 
-	keyValue = make([]any, 0, len(list))
+	keyValue = make([]any, 0, len(values))
 
-	for _, v := range list {
+	for _, v := range values {
 		if value := v.GetID(ctx); value != "" {
 			keyValue = append(keyValue, v.Key, value)
 		}
@@ -63,10 +63,10 @@ func ExtractKeysValues(ctx context.Context, list []KeyGetID) (keyValue []any) {
 
 // ExtractCorrelationID - возвращает первый попавшийся ID из указанного контекста,
 // который можно использовать в качестве CorrelationID.
-func ExtractCorrelationID(ctx context.Context, list []KeyGetID) string {
-	for _, v := range list {
-		if value := v.GetID(ctx); value != "" {
-			return value
+func ExtractCorrelationID(ctx context.Context, values []KeyGetID) string {
+	for _, v := range values {
+		if id := v.GetID(ctx); id != "" {
+			return id
 		}
 	}
 
@@ -74,10 +74,14 @@ func ExtractCorrelationID(ctx context.Context, list []KeyGetID) string {
 }
 
 // ToKeyGetID - возвращает преобразование []KeyGetIDWithID в []KeyGetID.
-func ToKeyGetID(value []KeyGetIDWithID) []KeyGetID {
-	list := make([]KeyGetID, 0, len(value))
+func ToKeyGetID(values []KeyGetIDWithID) []KeyGetID {
+	if len(values) == 0 {
+		return nil
+	}
 
-	for _, v := range value {
+	list := make([]KeyGetID, 0, len(values))
+
+	for _, v := range values {
 		list = append(
 			list,
 			KeyGetID{
@@ -90,19 +94,23 @@ func ToKeyGetID(value []KeyGetIDWithID) []KeyGetID {
 	return list
 }
 
-// ToGetIDWithID - возвращает преобразование []KeyGetIDWithID в []GetIDWithID.
-func ToGetIDWithID(value []KeyGetIDWithID) []GetIDWithID {
-	list := make([]GetIDWithID, 0, len(value))
-
-	for _, v := range value {
-		list = append(
-			list,
-			GetIDWithID{
-				GetID:  v.GetID,
-				WithID: v.WithID,
-			},
-		)
-	}
-
-	return list
-}
+// // ToGetIDWithID - возвращает преобразование []KeyGetIDWithID в []GetIDWithID.
+// func ToGetIDWithID(values []KeyGetIDWithID) []GetIDWithID {
+// 	if len(values) == 0 {
+// 		return nil
+// 	}
+//
+// 	list := make([]GetIDWithID, 0, len(values))
+//
+// 	for _, v := range values {
+// 		list = append(
+// 			list,
+// 			GetIDWithID{
+// 				GetID:  v.GetID,
+// 				WithID: v.WithID,
+// 			},
+// 		)
+// 	}
+//
+// 	return list
+// }

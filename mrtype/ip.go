@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/mondegor/go-sysmess/mrlib/casttype"
+	"github.com/mondegor/go-sysmess/lib/casttype"
 )
 
 type (

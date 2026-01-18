@@ -8,8 +8,8 @@ import (
 //go:generate mockgen -source=event_emitter.go -destination=./mock/event_emitter.go
 
 const (
-	// SourceEventSeparator - разделитель между источником и названием события.
-	SourceEventSeparator = ":"
+	// sourceEventSeparator - разделитель между источником и названием события.
+	sourceEventSeparator = ":"
 
 	// SourceSeparator - разделитель между источниками.
 	SourceSeparator = "/"
@@ -32,18 +32,9 @@ type (
 	ReceiveFunc func(ctx context.Context, eventName string, args ...any)
 )
 
-// Receive - реализация интерфейса Receiver в виде функции для получения события.
+// Receive - реализация интерфейса Receiver в виде функции для получения событий.
 func (f ReceiveFunc) Receive(ctx context.Context, eventName string, args ...any) {
 	f(ctx, eventName, args...)
-}
-
-// ExtractEventName - получение из указанного значение отдельно источник и название события.
-func ExtractEventName(value string) (source, eventName string) {
-	if s, n, ok := strings.Cut(value, SourceEventSeparator); ok {
-		return s, n
-	}
-
-	return "", value
 }
 
 type (
@@ -52,10 +43,42 @@ type (
 	}
 )
 
-// NewEmitter - создаёт объект emitter.
+// NewEmitter - создаёт объект Emitter.
 func NewEmitter(receivers ...Receiver) Emitter {
 	return &emitter{
 		receivers: receivers,
+	}
+}
+
+// NewEmitterWithSource - создаёт объект Emitter для отправки событий через указанных получателей добавляя первоисточник.
+func NewEmitterWithSource(source string, receivers ...Receiver) Emitter {
+	if source == "" {
+		source = defaultSource
+	}
+
+	return &emitter{
+		receivers: []Receiver{
+			ReceiveFunc(
+				func(ctx context.Context, sourceEventName string, args ...any) {
+					// в базовом варианте eventName будет заменено на {source}:{eventName},
+					// но если название события уже содержит источник события,
+					// то новый источник становится после уже имеющегося источника c разделителем "/":
+					// {parentSource}/{source}:{eventName}
+					parentSource, eventName := ExtractEventName(sourceEventName)
+					if parentSource != source {
+						if parentSource != "" {
+							sourceEventName = parentSource + SourceSeparator + source + sourceEventSeparator + eventName
+						} else {
+							sourceEventName = source + sourceEventSeparator + eventName
+						}
+					}
+
+					for _, receive := range receivers {
+						receive.Receive(ctx, sourceEventName, args...)
+					}
+				},
+			),
+		},
 	}
 }
 
@@ -67,36 +90,17 @@ func (e *emitter) Emit(ctx context.Context, eventName string, args ...any) {
 	}
 }
 
-type (
-	// sourceEmitter - расширяет возможности Emitter добавляя к нему источник данных.
-	sourceEmitter struct {
-		base   Emitter
-		source string
-	}
-)
-
-// NewSourceEmitter - создаёт объект sourceEmitter.
-func NewSourceEmitter(base Emitter, source string) Emitter {
-	if source == "" {
-		source = defaultSource
-	}
-
-	return &sourceEmitter{
-		base:   base,
-		source: source,
-	}
+// EmitterWithSource - создаёт объект Emitter
+// для отправки событий через указанный базовый Emitter добавляя первоисточник.
+func EmitterWithSource(base Emitter, source string) Emitter {
+	return NewEmitterWithSource(source, ReceiveFunc(base.Emit))
 }
 
-// Emit - отправляет указанное событие добавляя первоисточник.
-func (e *sourceEmitter) Emit(ctx context.Context, eventName string, args ...any) {
-	separator := SourceEventSeparator
-
-	// в базовом варианте eventName будет заменено на {source}:{eventName},
-	// но если название события уже содержит источник,
-	// то после первоисточника будет стоять "/": {source}/{eventSource}:{eventName}
-	if strings.Contains(eventName, separator) {
-		separator = SourceSeparator
+// ExtractEventName - возвращает отдельно источник и название события из указанной строки.
+func ExtractEventName(value string) (source, eventName string) {
+	if s, n, ok := strings.Cut(value, sourceEventSeparator); ok {
+		return s, n
 	}
 
-	e.base.Emit(ctx, e.source+separator+eventName, args...)
+	return "", value
 }

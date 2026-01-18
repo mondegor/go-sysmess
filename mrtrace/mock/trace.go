@@ -34,20 +34,6 @@ func (m *MockTracer) EXPECT() *MockTracerMockRecorder {
 	return m.recorder
 }
 
-// Enabled mocks base method.
-func (m *MockTracer) Enabled() bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Enabled")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// Enabled indicates an expected call of Enabled.
-func (mr *MockTracerMockRecorder) Enabled() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Enabled", reflect.TypeOf((*MockTracer)(nil).Enabled))
-}
-
 // Trace mocks base method.
 func (m *MockTracer) Trace(ctx context.Context, args ...any) {
 	m.ctrl.T.Helper()

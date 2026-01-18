@@ -1,0 +1,29 @@
+package logger
+
+import (
+	"context"
+)
+
+type (
+	nopLogger struct{}
+)
+
+// Nop - создаёт объект Logger, который ничего не делает.
+func Nop() Logger {
+	return nopLogger{}
+}
+
+// Debug - имитирует логирование.
+func (l nopLogger) Debug(_ context.Context, _ string, _ ...any) {}
+
+// DebugFunc - имитирует логирование.
+func (l nopLogger) DebugFunc(_ context.Context, _ func() string, _ ...any) {}
+
+// Info - имитирует логирование.
+func (l nopLogger) Info(_ context.Context, _ string, _ ...any) {}
+
+// Warn - имитирует логирование.
+func (l nopLogger) Warn(_ context.Context, _ string, _ ...any) {}
+
+// Error - имитирует логирование.
+func (l nopLogger) Error(_ context.Context, _ string, _ ...any) {}
