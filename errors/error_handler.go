@@ -2,6 +2,8 @@ package errors
 
 import "context"
 
+//go:generate mockgen -source=error_handler.go -destination=./mock/error_handler.go
+
 type (
 	// Handler - интерфейс обработчика ошибок.
 	Handler interface {

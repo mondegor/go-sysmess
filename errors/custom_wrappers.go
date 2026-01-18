@@ -5,6 +5,8 @@ import (
 	"github.com/mondegor/go-sysmess/errors/helper"
 )
 
+//go:generate mockgen -source=custom_wrappers.go -destination=./mock/custom_wrappers.go
+
 type (
 	// CustomWrapper - помощник для оборачивания пользовательских ошибок.
 	CustomWrapper interface {

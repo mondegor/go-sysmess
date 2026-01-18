@@ -4,6 +4,8 @@ import (
 	"github.com/mondegor/go-sysmess/errors/helper"
 )
 
+//go:generate mockgen -source=runtime_wrappers.go -destination=./mock/runtime_wrappers.go
+
 type (
 	// Wrapper - помощник для оборачивания ошибок.
 	Wrapper interface {
