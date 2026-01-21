@@ -1,4 +1,4 @@
-package extfile
+package ximage
 
 import (
 	"fmt"

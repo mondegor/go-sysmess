@@ -1,4 +1,4 @@
-package extmath_test
+package xmath_test
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/lib/extmath"
+	"github.com/mondegor/go-sysmess/lib/xmath"
 )
 
 func TestRoundFloat(t *testing.T) {
@@ -61,7 +61,7 @@ func TestRoundFloat(t *testing.T) {
 
 			delta := 1.0 / math.Pow(10, float64(tt.precision)+2)
 
-			got := extmath.RoundFloat(tt.x, tt.precision)
+			got := xmath.RoundFloat(tt.x, tt.precision)
 			assert.InDelta(t, tt.want, got, delta)
 		})
 	}
@@ -70,16 +70,16 @@ func TestRoundFloat(t *testing.T) {
 func TestRoundFloatNaN(t *testing.T) {
 	t.Parallel()
 
-	got := extmath.RoundFloat(math.NaN(), 2)
+	got := xmath.RoundFloat(math.NaN(), 2)
 	assert.True(t, math.IsNaN(got))
 }
 
 func TestRoundFloatInf(t *testing.T) {
 	t.Parallel()
 
-	got := extmath.RoundFloat(math.Inf(1), 2)
+	got := xmath.RoundFloat(math.Inf(1), 2)
 	assert.True(t, math.IsInf(got, 1))
 
-	got = extmath.RoundFloat(math.Inf(-1), 2)
+	got = xmath.RoundFloat(math.Inf(-1), 2)
 	assert.True(t, math.IsInf(got, -1))
 }

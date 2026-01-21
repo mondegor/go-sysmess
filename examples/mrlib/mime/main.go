@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/mondegor/go-sysmess/lib/extfile"
+	"github.com/mondegor/go-sysmess/lib/mime"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
 )
@@ -11,8 +11,8 @@ import (
 func main() {
 	logger, _ := slog.NewLoggerAdapter(slog.WithWriter(os.Stdout))
 
-	mime := extfile.NewMimeTypeList(getMimeTypeListFromConfig())
-	jpegZip, _ := mime.MimeTypesByExts([]string{".jpeg", ".zip"})
+	mt := mime.NewTypeList(getMimeTypeListFromConfig())
+	jpegZip, _ := mt.TypesByExts([]string{".jpeg", ".zip"})
 
 	resultWrapper := func(str string, err error) string {
 		if err != nil {
@@ -22,14 +22,14 @@ func main() {
 		return str
 	}
 
-	mrlog.Info(logger, ".json", "content-type", resultWrapper(mime.ContentTypeByExt("json")))
-	mrlog.Info(logger, ".pdf", "content-type", resultWrapper(mime.ContentTypeByExt(".pdf")))
-	mrlog.Info(logger, "image/jpeg", "extension", resultWrapper(mime.ExtByContentType("image/jpeg")))
+	mrlog.Info(logger, ".json", "content-type", resultWrapper(mt.ContentTypeByExt("json")))
+	mrlog.Info(logger, ".pdf", "content-type", resultWrapper(mt.ContentTypeByExt(".pdf")))
+	mrlog.Info(logger, "image/jpeg", "extension", resultWrapper(mt.ExtByContentType("image/jpeg")))
 	mrlog.Info(logger, "jpeg/zip", "mime-types", jpegZip)
 }
 
-func getMimeTypeListFromConfig() []extfile.MimeType {
-	return []extfile.MimeType{
+func getMimeTypeListFromConfig() []mime.Type {
+	return []mime.Type{
 		{ContentType: "application/excel", Extension: "xl"},
 		{ContentType: "application/mac-binhex40", Extension: "hqx"},
 		{ContentType: "application/mac-compactpro", Extension: "cpt"},

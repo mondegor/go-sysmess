@@ -1,4 +1,4 @@
-package extfile
+package mime
 
 import (
 	"errors"
@@ -7,21 +7,21 @@ import (
 )
 
 type (
-	// MimeTypeList - хранит соответствие расширений их типам файлов (в обе стороны).
-	MimeTypeList struct {
+	// TypeList - хранит соответствие расширений их типам файлов (в обе стороны).
+	TypeList struct {
 		contentTypeMap map[string]string
 		extensionMap   map[string]string
 	}
 
-	// MimeType - хранит расширение и соответствующий ему тип файла.
-	MimeType struct {
+	// Type - хранит расширение и соответствующий ему тип файла.
+	Type struct {
 		ContentType string `yaml:"type"`
 		Extension   string `yaml:"ext"`
 	}
 )
 
-// NewMimeTypeList - создаёт объект MimeTypeList на основе списка соответствий расширений и файлов.
-func NewMimeTypeList(items []MimeType) *MimeTypeList {
+// NewTypeList - создаёт объект TypeList на основе списка соответствий расширений и файлов.
+func NewTypeList(items []Type) *TypeList {
 	mimeMap := make(map[string]string, len(items))
 	extMap := make(map[string]string, len(items))
 
@@ -36,16 +36,16 @@ func NewMimeTypeList(items []MimeType) *MimeTypeList {
 		}
 	}
 
-	return &MimeTypeList{
+	return &TypeList{
 		contentTypeMap: mimeMap,
 		extensionMap:   extMap,
 	}
 }
 
-// MimeTypesByExts - возвращает MimeType массив, в который войдут указанные расширения,
+// TypesByExts - возвращает Type массив, в который войдут указанные расширения,
 // если хотя бы одно расширение не зарегистрировано в списке, то будет выдана ошибка.
-func (mt *MimeTypeList) MimeTypesByExts(values []string) ([]MimeType, error) {
-	mime := make([]MimeType, len(values))
+func (mt *TypeList) TypesByExts(values []string) ([]Type, error) {
+	mime := make([]Type, len(values))
 
 	for i, ext := range values {
 		contentType, err := mt.ContentTypeByExt(ext)
@@ -53,7 +53,7 @@ func (mt *MimeTypeList) MimeTypesByExts(values []string) ([]MimeType, error) {
 			return nil, err
 		}
 
-		mime[i] = MimeType{
+		mime[i] = Type{
 			ContentType: contentType,
 			Extension:   ext,
 		}
@@ -64,7 +64,7 @@ func (mt *MimeTypeList) MimeTypesByExts(values []string) ([]MimeType, error) {
 
 // ContentTypeByExt - возвращает тип файла по указанному расширению,
 // если тип не найден, то возвращается пустая строка.
-func (mt *MimeTypeList) ContentTypeByExt(value string) (string, error) {
+func (mt *TypeList) ContentTypeByExt(value string) (string, error) {
 	if value == "" || len(value) == 1 && value[0] == '.' {
 		return "", errors.New("arg 'value' is empty")
 	}
@@ -82,7 +82,7 @@ func (mt *MimeTypeList) ContentTypeByExt(value string) (string, error) {
 
 // ExtByContentType - возвращает расширение по указанному типу файла,
 // если расширение не найдено, то возвращается пустая строка.
-func (mt *MimeTypeList) ExtByContentType(value string) (string, error) {
+func (mt *TypeList) ExtByContentType(value string) (string, error) {
 	if value == "" {
 		return "", errors.New("arg 'value' is empty")
 	}

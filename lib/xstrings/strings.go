@@ -1,4 +1,4 @@
-package extstrings
+package xstrings
 
 import (
 	"strings"

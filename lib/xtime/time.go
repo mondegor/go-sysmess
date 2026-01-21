@@ -1,4 +1,4 @@
-package exttime
+package xtime
 
 import (
 	"time"
