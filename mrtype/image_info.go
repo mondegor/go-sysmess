@@ -4,7 +4,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/mondegor/go-sysmess/lib/copyptr"
+	"github.com/mondegor/go-sysmess/util/copyptr"
 )
 
 type (

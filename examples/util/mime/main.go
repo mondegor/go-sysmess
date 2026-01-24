@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/mondegor/go-sysmess/lib/mime"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
+	"github.com/mondegor/go-sysmess/util/mime"
 )
 
 func main() {

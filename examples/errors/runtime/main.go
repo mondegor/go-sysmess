@@ -7,7 +7,7 @@ import (
 	"github.com/mondegor/go-sysmess/errors"
 	"github.com/mondegor/go-sysmess/errors/kind"
 	"github.com/mondegor/go-sysmess/errors/runtime/baggage/stacktrace"
-	"github.com/mondegor/go-sysmess/lib/conv"
+	"github.com/mondegor/go-sysmess/util/conv"
 	"github.com/mondegor/go-sysmess/wire"
 )
 

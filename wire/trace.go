@@ -3,10 +3,10 @@ package wire
 import (
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/lib/crypt"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrtrace"
 	"github.com/mondegor/go-sysmess/mrtrace/process"
+	"github.com/mondegor/go-sysmess/util/crypt"
 )
 
 // InitTraceContextManager - создаёт и инициализирует process.ContextManager.

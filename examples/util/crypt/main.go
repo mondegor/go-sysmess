@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mondegor/go-sysmess/lib/crypt"
-	"github.com/mondegor/go-sysmess/lib/crypt/password"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
+	"github.com/mondegor/go-sysmess/util/crypt"
+	"github.com/mondegor/go-sysmess/util/crypt/password"
 )
 
 func main() {

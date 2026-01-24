@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/lib/mime"
+	"github.com/mondegor/go-sysmess/util/mime"
 )
 
 // ValidateMimeTypes - валидирует указанный список типов файлов.
