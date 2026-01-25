@@ -6,8 +6,8 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/lmittmann/tint v1.1.2
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39
-	golang.org/x/text v0.31.0
+	golang.org/x/exp v0.0.0-20260112195511-716be5621a96
+	golang.org/x/text v0.33.0
 )
 
 require (
