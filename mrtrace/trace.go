@@ -35,7 +35,7 @@ type (
 		WithProcessID(ctx context.Context, key, value string) context.Context
 		WithGeneratedProcessID(ctx context.Context, key string) context.Context
 
-		NewContextWithIDs(originalCtx context.Context) context.Context
+		// NewContextWithIDs(originalCtx context.Context) context.Context
 		ExtractCorrelationID(ctx context.Context) string
 		ExtractKeysValues(ctx context.Context) []any
 	}

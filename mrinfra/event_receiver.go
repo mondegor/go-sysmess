@@ -36,10 +36,6 @@ func NewEventReceiver(traceManager mrtrace.ContextManager, receiveTimeout time.D
 
 // Receive - отправляет указанное событие.
 func (er *EventReceiver) Receive(ctx context.Context, eventName string, args ...any) {
-	// WARNING: используется новый контекст со скопированными ID процессами из основного контекста,
-	// чтобы гарантировать завершение работы получателей при отмене основного контекста
-	ctx = er.traceManager.NewContextWithIDs(ctx)
-
 	for _, r := range er.receivers {
 		go func(ctx context.Context) {
 			// устанавливается индивидуальный таймаут, чтобы ограничить работу получателей

@@ -23,16 +23,16 @@ func main() {
 	)
 
 	bundle, err := mrlocale.NewBundle(
-		mrlocale.WithLanguages("ru-RU", "en-US"),
+		[]string{"ru-RU", "en-US"},
 		mrlocale.WithDefaultLanguage("ru-RU"),
 		mrlocale.WithFormatError(helper.ExtractMessageForLocalization),
 		mrlocale.WithMessageProvider(
 			func(languages []language.Tag) (mrlocale.MessageProvider, error) {
 				localeProvider, err = gotext.NewProvider(
-					gotext.WithLanguages(languages...),
-					gotext.WithCatalog(mrlocale.DefaultMessagesDomain, msgcat.NewCatalog()),
-					gotext.WithCatalog(mrlocale.DefaultErrorsDomain, errcat.NewCatalog()),
-					gotext.WithCatalog("fruitcat", fruitcat.NewCatalog()),
+					languages,
+					gotext.WithDomainCatalog(mrlocale.DefaultMessagesDomain, msgcat.NewCatalog()),
+					gotext.WithDomainCatalog(mrlocale.DefaultErrorsDomain, errcat.NewCatalog()),
+					gotext.WithDomainCatalog("fruitcat", fruitcat.NewCatalog()),
 				)
 
 				return localeProvider, err

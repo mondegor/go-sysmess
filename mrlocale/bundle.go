@@ -25,20 +25,10 @@ type (
 		languageMatcher language.Matcher
 		defaultLanguage language.Tag
 	}
-
-	bundleOptions struct {
-		createProvider  func(langs []language.Tag) (MessageProvider, error)
-		formatMessage   func(msg string, args []any) (newMsg string, newArgs []any)
-		formatError     func(err error) (msg string, args []any)
-		messagesDomain  string
-		errorsDomain    string
-		languages       []string
-		defaultLanguage string
-	}
 )
 
 // NewBundle - создаёт объект Bundle.
-func NewBundle(opts ...BundleOption) (*Bundle, error) {
+func NewBundle(languages []string, opts ...BundleOption) (*Bundle, error) {
 	o := bundleOptions{
 		messagesDomain: DefaultMessagesDomain,
 		errorsDomain:   DefaultErrorsDomain,
@@ -48,20 +38,20 @@ func NewBundle(opts ...BundleOption) (*Bundle, error) {
 		opt(&o)
 	}
 
-	if len(o.languages) == 0 {
+	if len(languages) == 0 {
 		return nil, errors.New("bundle create: no matching language found")
 	}
 
-	languages := make([]language.Tag, len(o.languages))
+	languageTags := make([]language.Tag, len(languages))
 	defaultLanguage := language.Und
 
-	for i, lang := range o.languages {
+	for i, lang := range languages {
 		tag, err := language.Parse(lang)
 		if err != nil {
 			return nil, fmt.Errorf("bundle create: parsing language '%s': %w", lang, err)
 		}
 
-		languages[i] = tag
+		languageTags[i] = tag
 
 		if o.defaultLanguage == lang {
 			defaultLanguage = tag
@@ -75,10 +65,10 @@ func NewBundle(opts ...BundleOption) (*Bundle, error) {
 
 		// если в опции явно не указан язык по умолчанию,
 		// то по умолчанию используется первый язык в списке
-		defaultLanguage = languages[0]
+		defaultLanguage = languageTags[0]
 	}
 
-	pr, err := o.createProvider(languages)
+	pr, err := o.createProvider(languageTags)
 	if err != nil {
 		return nil, fmt.Errorf("bundle create: %w", err)
 	}
@@ -109,7 +99,7 @@ func NewBundle(opts ...BundleOption) (*Bundle, error) {
 		errorsDomain:    o.errorsDomain,
 		formatMessage:   o.formatMessage,
 		formatError:     o.formatError,
-		languageMatcher: language.NewMatcher(languages),
+		languageMatcher: language.NewMatcher(languageTags),
 		defaultLanguage: defaultLanguage,
 	}, nil
 }

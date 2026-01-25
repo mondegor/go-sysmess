@@ -7,10 +7,19 @@ import (
 type (
 	// BundleOption - настройка объекта Bundle.
 	BundleOption func(o *bundleOptions)
+
+	bundleOptions struct {
+		createProvider  func(languages []language.Tag) (MessageProvider, error)
+		formatMessage   func(msg string, args []any) (newMsg string, newArgs []any)
+		formatError     func(err error) (msg string, args []any)
+		messagesDomain  string
+		errorsDomain    string
+		defaultLanguage string
+	}
 )
 
 // WithMessageProvider - устанавливает провайдер для локализации сообщений.
-func WithMessageProvider(createFunc func(langs []language.Tag) (MessageProvider, error)) BundleOption {
+func WithMessageProvider(createFunc func(languages []language.Tag) (MessageProvider, error)) BundleOption {
 	return func(o *bundleOptions) {
 		o.createProvider = createFunc
 	}
@@ -41,13 +50,6 @@ func WithMessagesDomain(value string) BundleOption {
 func WithErrorsDomain(value string) BundleOption {
 	return func(o *bundleOptions) {
 		o.errorsDomain = value
-	}
-}
-
-// WithLanguages - добавляет языки для локализации сообщений.
-func WithLanguages(values ...string) BundleOption {
-	return func(o *bundleOptions) {
-		o.languages = append(o.languages, values...)
 	}
 }
 

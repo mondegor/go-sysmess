@@ -125,10 +125,10 @@ func (e *ContextManager) WithGeneratedProcessID(ctx context.Context, key string)
 	return ctx
 }
 
-// NewContextWithIDs - возвращает результат вызова функции NewContextWithIDs.
-func (e *ContextManager) NewContextWithIDs(originalCtx context.Context) context.Context {
-	return NewContextWithIDs(originalCtx, e.newContextWithIDs)
-}
+// // NewContextWithIDs - возвращает результат вызова функции NewContextWithIDs.
+// func (e *ContextManager) NewContextWithIDs(originalCtx context.Context) context.Context {
+// 	return NewContextWithIDs(originalCtx, e.newContextWithIDs)
+// }
 
 // ExtractKeysValues - возвращает результат вызова функции ExtractKeysValues.
 func (e *ContextManager) ExtractKeysValues(ctx context.Context) []any {

@@ -102,20 +102,6 @@ func (mr *MockContextManagerMockRecorder) ExtractKeysValues(ctx interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExtractKeysValues", reflect.TypeOf((*MockContextManager)(nil).ExtractKeysValues), ctx)
 }
 
-// NewContextWithIDs mocks base method.
-func (m *MockContextManager) NewContextWithIDs(originalCtx context.Context) context.Context {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NewContextWithIDs", originalCtx)
-	ret0, _ := ret[0].(context.Context)
-	return ret0
-}
-
-// NewContextWithIDs indicates an expected call of NewContextWithIDs.
-func (mr *MockContextManagerMockRecorder) NewContextWithIDs(originalCtx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewContextWithIDs", reflect.TypeOf((*MockContextManager)(nil).NewContextWithIDs), originalCtx)
-}
-
 // ProcessID mocks base method.
 func (m *MockContextManager) ProcessID(ctx context.Context, key string) string {
 	m.ctrl.T.Helper()

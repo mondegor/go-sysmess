@@ -25,23 +25,23 @@ type (
 	}
 )
 
-// NewContextWithIDs - возвращает новый контекст содержащий
-// только все ID процессы, скопированные из указанного контекста.
-func NewContextWithIDs(originalCtx context.Context, values []GetIDWithID) context.Context {
-	ctx := context.Background()
-
-	if originalCtx == nil || originalCtx == ctx {
-		return ctx
-	}
-
-	for _, v := range values {
-		if value := v.GetID(ctx); value != "" {
-			ctx = v.WithID(ctx, value)
-		}
-	}
-
-	return ctx
-}
+// // NewContextWithIDs - возвращает новый контекст содержащий
+// // только все ID процессы, скопированные из указанного контекста.
+// func NewContextWithIDs(originalCtx context.Context, values []GetIDWithID) context.Context {
+// 	ctx := context.Background()
+//
+// 	if originalCtx == nil || originalCtx == ctx {
+// 		return ctx
+// 	}
+//
+// 	for _, v := range values {
+// 		if value := v.GetID(ctx); value != "" {
+// 			ctx = v.WithID(ctx, value)
+// 		}
+// 	}
+//
+// 	return ctx
+// }
 
 // ExtractKeysValues - возвращает попарно (key/id-value) все имеющиеся
 // ID процессов из указанного контекста.
