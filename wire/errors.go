@@ -3,9 +3,9 @@ package wire
 import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 	"github.com/mondegor/go-sysmess/errors/runtime"
-	"github.com/mondegor/go-sysmess/errors/runtime/baggage"
-	"github.com/mondegor/go-sysmess/errors/runtime/baggage/instance"
-	"github.com/mondegor/go-sysmess/errors/runtime/baggage/stacktrace"
+	"github.com/mondegor/go-sysmess/errors/runtime/hint"
+	"github.com/mondegor/go-sysmess/errors/runtime/hint/instance"
+	"github.com/mondegor/go-sysmess/errors/runtime/hint/stacktrace"
 )
 
 // InitErrors - инициализирует работу с runtime ошибками.
@@ -19,8 +19,8 @@ func InitErrors(opts ErrorConfig) {
 
 	onCreateOption := runtime.WithOnCreate(
 		func(_ kind.Enum, _ error) (bag any) {
-			return baggage.New(
-				baggage.WithErrorID(instance.GenerateID()),
+			return hint.New(
+				hint.WithErrorID(instance.GenerateID()),
 			)
 		},
 	)
@@ -37,9 +37,9 @@ func InitErrors(opts ErrorConfig) {
 
 		onCreateOption = runtime.WithOnCreate(
 			func(_ kind.Enum, _ error) (bag any) {
-				return baggage.New(
-					baggage.WithErrorID(instance.GenerateID()),
-					baggage.WithStackTrace(caller.Call()),
+				return hint.New(
+					hint.WithErrorID(instance.GenerateID()),
+					hint.WithStackTrace(caller.Call()),
 				)
 			},
 		)

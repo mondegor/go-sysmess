@@ -7,7 +7,7 @@ import (
 	stdlog "log/slog"
 	"os"
 
-	"github.com/mondegor/go-sysmess/errors/runtime/baggage/instance"
+	"github.com/mondegor/go-sysmess/errors/runtime/hint/instance"
 	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/color"
 	"github.com/mondegor/go-sysmess/mrlog/slog"

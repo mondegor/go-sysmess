@@ -6,7 +6,7 @@ import (
 
 	"github.com/mondegor/go-sysmess/errors"
 	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime/baggage/stacktrace"
+	"github.com/mondegor/go-sysmess/errors/runtime/hint/stacktrace"
 	"github.com/mondegor/go-sysmess/util/conv"
 	"github.com/mondegor/go-sysmess/wire"
 )
@@ -16,10 +16,10 @@ type (
 		error
 
 		Kind() kind.Enum
-		Baggage() any
+		Hint() any
 	}
 
-	errorBaggage interface {
+	errorHint interface {
 		ErrorID() string
 		StackTraceIterator() func() (index int, name, file string, line int)
 	}
@@ -83,7 +83,7 @@ func echoErrorInfo(err error, number int) {
 		fmt.Println("- Kind = " + e.Kind().String())
 		fmt.Println("- MessageForLog = " + e.Error())
 
-		if bag, ok := e.Baggage().(errorBaggage); ok {
+		if bag, ok := e.Hint().(errorHint); ok {
 			fmt.Println("- ErrorID = " + bag.ErrorID())
 
 			stackList := stacktrace.ToStrings(bag.StackTraceIterator())

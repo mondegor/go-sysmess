@@ -26,7 +26,7 @@ type (
 		text     string
 		onCreate func(kindErr kind.Enum, wrappedErr error) (bag any)
 		attrs    []any
-		baggage  any
+		hint     any
 		err      error
 	}
 )
@@ -99,7 +99,7 @@ func (e *protoError) newError(err error, details string, attrs ...any) error {
 
 	if e.onCreate != nil {
 		c.onCreate = nil
-		c.baggage = e.onCreate(e.kind, err)
+		c.hint = e.onCreate(e.kind, err)
 	}
 
 	return &c
@@ -117,10 +117,10 @@ func (e *protoError) Attrs() []any {
 	return e.attrs
 }
 
-// Baggage - возвращает произвольный объект, который назначается
-// во время создания экземпляра ошибки при вызове обработчика onCreate().
-func (e *protoError) Baggage() any {
-	return e.baggage
+// Hint - возвращает дополнительные данные ассоциированные с ошибкой.
+// Они устанавливаются во время создания экземпляра ошибки при вызове обработчика onCreate().
+func (e *protoError) Hint() any {
+	return e.hint
 }
 
 // Error - возвращает ошибку в виде строки.

@@ -9,7 +9,7 @@ import (
 
 	"github.com/mondegor/go-sysmess/errors/helper"
 	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime/baggage/stacktrace"
+	"github.com/mondegor/go-sysmess/errors/runtime/hint/stacktrace"
 	"github.com/mondegor/go-sysmess/mrapp"
 	"github.com/mondegor/go-sysmess/mrlog/color"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
@@ -24,10 +24,10 @@ type (
 		error
 
 		Kind() kind.Enum
-		Baggage() any
+		Hint() any
 	}
 
-	errorBaggage interface {
+	errorHint interface {
 		ErrorID() string
 		StackTraceIterator() func() (index int, name, file string, line int)
 	}
@@ -98,7 +98,7 @@ func initLoggerOptions(cfg wire.LoggerConfig) []slog.Option {
 								)...,
 							)
 
-							bag, ok := e.Baggage().(errorBaggage)
+							bag, ok := e.Hint().(errorHint)
 							if !ok {
 								return true
 							}
