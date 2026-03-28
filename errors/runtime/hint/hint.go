@@ -4,8 +4,6 @@ import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 )
 
-//go:generate mockgen -source=hint.go -destination=./mock/hint.go
-
 type (
 	// Hint - содержит дополнительные данные, которые ассоциированы с ошибкой.
 	Hint interface {

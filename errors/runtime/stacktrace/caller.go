@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-//go:generate mockgen -source=caller.go -destination=./mock/caller.go
-
 const (
 	defaultDepth       = 1
 	defaultShowFunc    = true

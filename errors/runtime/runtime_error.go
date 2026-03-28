@@ -8,8 +8,6 @@ import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 )
 
-//go:generate mockgen -source=runtime_error.go -destination=./mock/runtime_error.go
-
 type (
 	// ProtoError - внутренняя/системная ошибка.
 	ProtoError interface {

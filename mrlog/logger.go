@@ -5,8 +5,6 @@ import (
 	"github.com/mondegor/go-sysmess/mrlog/logger"
 )
 
-//go:generate mockgen -source=logger.go -destination=./mock/logger.go
-
 type (
 	// Logger - интерфейс логирования сообщений и ошибок с использованием контекста.
 	Logger = logger.Logger

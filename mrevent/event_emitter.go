@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-//go:generate mockgen -source=event_emitter.go -destination=./mock/event_emitter.go
-
 const (
 	// sourceEventSeparator - разделитель между источником и названием события.
 	sourceEventSeparator = ":"

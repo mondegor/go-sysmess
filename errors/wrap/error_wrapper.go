@@ -1,7 +1,5 @@
 package wrap
 
-//go:generate mockgen -source=error_wrapper.go -destination=./mock/error_wrapper.go
-
 type (
 	// ErrorWrapper - помощник для оборачивания ошибок.
 	ErrorWrapper interface {

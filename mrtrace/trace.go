@@ -4,8 +4,6 @@ import (
 	"context"
 )
 
-//go:generate mockgen -source=trace.go -destination=./mock/trace.go
-
 const (
 	// KeyCorrelationID - название ключа ID корреляции.
 	KeyCorrelationID = "correlation_id"
