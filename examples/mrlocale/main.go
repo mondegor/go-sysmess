@@ -79,7 +79,7 @@ func main() {
 		errMess = errcat.ParseErrorMessage(lz.TranslateError(errors.ErrSystemStorageConnectionFailed.New()))
 		fmt.Println("reason: '" + errMess.Reason + "'; details: '" + errMess.Details + "'")
 
-		fmt.Println(lz.TranslateError(errors.ErrUseCaseEntityNotFound))
+		fmt.Println(lz.TranslateError(errors.ErrRecordNotFound))
 
 		fmt.Println("..................................................")
 

@@ -19,7 +19,7 @@ var (
 	// ErrInternalIncorrectInputData - input data is incorrect
 	// (когда нет возможности ответить клиенту, например, данные поступают из очереди,
 	// или когда поступаемые данные не зависят от клиента, например, приходят из конфига,
-	// в остальных случаях лучше использовать ErrUseCaseIncorrectInputData).
+	// в остальных случаях лучше использовать ErrIncorrectInputData).
 	ErrInternalIncorrectInputData = NewInternalProto("input data is incorrect")
 
 	// ErrInternalStorageConnectionIsAlreadyCreated - connection is already created (attr: source).
@@ -35,13 +35,12 @@ var (
 	// ErrInternalStorageFetchDataFailed - fetching data failed (attr: source).
 	ErrInternalStorageFetchDataFailed = NewInternalProto("fetching data failed")
 
-	// ErrInternalServiceOperationFailed - service operation failed.
-	// По умолчанию, следует оборачивать все ошибки Service слоя этой ошибкой.
-	ErrInternalServiceOperationFailed = NewInternalProto("service operation failed")
+	// ErrInternalStorageDuplicateKeyViolation - duplicate key violation (attr: source).
+	ErrInternalStorageDuplicateKeyViolation = NewInternalProto("duplicate key violation")
 
-	// ErrInternalUseCaseOperationFailed - operation failed.
-	// По умолчанию, следует оборачивать все ошибки UseCase слоя этой ошибкой.
-	ErrInternalUseCaseOperationFailed = NewInternalProto("operation failed")
+	// ErrInternalServiceOperationFailed - service operation failed.
+	// По умолчанию, следует оборачивать все ошибки Service/UseCase слоя этой ошибкой.
+	ErrInternalServiceOperationFailed = NewInternalProto("service operation failed")
 
 	// ErrInternalHttpResponseParseData - response data is not valid.
 	ErrInternalHttpResponseParseData = NewInternalProto("response data is not valid")

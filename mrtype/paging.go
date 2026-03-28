@@ -5,27 +5,27 @@ import (
 )
 
 type (
-	// PageParams - параметры для выборки части списка элементов.
-	PageParams struct {
-		Index uint64 // pageIndex
-		Size  uint64 // pageSize
+	// CursorParams - параметры для выборки части списка элементов с помощью курсора.
+	CursorParams struct {
+		Value string // название последовательности и указатель на её элемент, с которого должны быть выбраны данные
+		Limit int    // максимальное количество элементов в выборке
 	}
 
-	// PageCursor - параметры для выборки части списка элементов.
-	PageCursor struct {
-		LastID uint64 // lastItemID
-		Size   uint64 // pageSize
+	// PageParams - параметры для выборки части списка элементов с помощью смещения.
+	PageParams struct {
+		Index int // pageIndex, индекс страницы
+		Size  int // pageSize, количество элементов на страницу
 	}
 
 	// SortParams - параметры для сортировки списка элементов по указанному полю.
 	SortParams struct {
-		FieldName string             // sortField
+		Column    string             // sortColumn
 		Direction sortdirection.Enum // sortDirection
 	}
 
-	// ListSorter - интерфейс для проверки полей, которые могут участвовать в сортировке.
+	// ListSorter - контролирует поля участвующие в сортировке.
 	ListSorter interface {
-		HasField(name string) bool
+		HasColumn(name string) bool
 		DefaultSort() SortParams
 	}
 )

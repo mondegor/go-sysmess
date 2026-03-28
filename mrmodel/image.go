@@ -1,4 +1,4 @@
-package mrtype
+package mrmodel
 
 import (
 	"io"
@@ -27,27 +27,27 @@ type (
 
 // ToFile - возвращает изображение преобразованное в файловую структуру
 // (с потерей дополнительной информации об изображении).
-func (i *Image) ToFile() File {
+func (im Image) ToFile() File {
 	return File{
-		FileInfo: i.ImageInfo.ToFileInfo(),
-		Body:     i.Body,
+		FileInfo: im.ImageInfo.ToFileInfo(),
+		Body:     im.Body,
 	}
 }
 
 // ToFileContent - возвращает изображение преобразованное в файловую структуру
 // (с потерей дополнительной информации об изображении).
-func (i *ImageContent) ToFileContent() FileContent {
+func (im ImageContent) ToFileContent() FileContent {
 	return FileContent{
-		FileInfo: i.ImageInfo.ToFileInfo(),
-		Body:     i.Body,
+		FileInfo: im.ImageInfo.ToFileInfo(),
+		Body:     im.Body,
 	}
 }
 
 // ToFileHeader - возвращает изображение преобразованное в файловую структуру
 // (с потерей дополнительной информации об изображении).
-func (i *ImageHeader) ToFileHeader() FileHeader {
+func (im ImageHeader) ToFileHeader() FileHeader {
 	return FileHeader{
-		FileInfo: i.ImageInfo.ToFileInfo(),
-		Header:   i.Header,
+		FileInfo: im.ImageInfo.ToFileInfo(),
+		Header:   im.Header,
 	}
 }

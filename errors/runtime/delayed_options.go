@@ -6,6 +6,8 @@ import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 )
 
+//go:generate mockgen -source=delayed_options.go -destination=./mock/delayed_options.go
+
 type (
 	// OptionsHandler - обработчик формирования списка опций для указанных кодов ошибок.
 	OptionsHandler interface {

@@ -13,9 +13,9 @@ var (
 	// ErrSystemStorageFailedToClose - failed to close source (attr: source).
 	ErrSystemStorageFailedToClose = NewSystemProto("failed to close source")
 
-	// ErrSystemUseCaseTemporarilyUnavailable - system is temporarily unavailable.
+	// ErrSystemServiceTemporarilyUnavailable - service is temporarily unavailable.
 	// Системная ошибка, которая сообщает о сетевых проблемах, о работоспособности внешних ресурсов (БД, API, FileSystem).
-	ErrSystemUseCaseTemporarilyUnavailable = NewSystemProto("system is temporarily unavailable")
+	ErrSystemServiceTemporarilyUnavailable = NewSystemProto("service is temporarily unavailable")
 
 	// ErrSystemHttpMultipartFormFile - the file with the specified key cannot be processed (attr: key).
 	ErrSystemHttpMultipartFormFile = NewSystemProto("the file with the specified key cannot be processed")

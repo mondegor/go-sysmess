@@ -9,7 +9,7 @@ import (
 
 	"github.com/mondegor/go-sysmess/errors/helper"
 	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime/hint/stacktrace"
+	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
 	"github.com/mondegor/go-sysmess/mrapp"
 	"github.com/mondegor/go-sysmess/mrlog/color"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
@@ -107,7 +107,7 @@ func initLoggerOptions(cfg wire.LoggerConfig) []slog.Option {
 								rec.Add(mrapp.KeyErrorID, id)
 							}
 
-							stack = strings.Join(stacktrace.ToStrings(bag.StackTraceIterator()), " | ") // TODO: disable function name of stack on prod
+							stack = strings.Join(stacktrace.ToStrings(bag.StackTraceIterator()), " | ")
 
 							return true
 						},

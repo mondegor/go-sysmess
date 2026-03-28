@@ -1,4 +1,4 @@
-package mrtype
+package mrmodel
 
 import (
 	"io"

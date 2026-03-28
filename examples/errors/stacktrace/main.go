@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/mondegor/go-sysmess/errors/runtime/hint/stacktrace"
+	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
 )
 
 // main - пример формирования стека вызовов с использованием опций.
@@ -15,8 +15,8 @@ func main() {
 
 	caller := stacktrace.NewCaller(
 		stacktrace.WithDepth(16),
-		stacktrace.WithStackTraceFilter(
-			stacktrace.TrimUpperFilter(
+		stacktrace.WithFindBottomBoundFunc(
+			stacktrace.FindBottomBound(
 				[]string{
 					"main.funcLevel2",
 					// "main.funcLevel1",

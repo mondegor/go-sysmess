@@ -1,11 +1,11 @@
 package errors
 
 var (
-	// ErrEventStorageNoRowFound - no row found.
+	// ErrEventStorageNoRecordFound - no record found.
 	// В хранилище данных нет указанной записи, в зависимости от логики это может быть не ошибкой.
-	ErrEventStorageNoRowFound = New("no row found")
+	ErrEventStorageNoRecordFound = New("no record found")
 
-	// ErrEventStorageRowsNotAffected - rows not affected.
+	// ErrEventStorageRecordsNotAffected - records not affected.
 	// В хранилище данных указанная запись не была обновлена, в зависимости от логики это может быть не ошибкой.
-	ErrEventStorageRowsNotAffected = New("rows not affected")
+	ErrEventStorageRecordsNotAffected = New("records not affected")
 )

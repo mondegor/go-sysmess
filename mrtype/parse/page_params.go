@@ -23,16 +23,16 @@ func PageParams(indexValue, sizeValue string) (mrtype.PageParams, error) {
 		return mrtype.PageParams{}, NewParamIncorrectError(typePageParamsSize, err)
 	}
 
-	if parsedSize > math.MaxUint32 {
-		return mrtype.PageParams{}, NewParamMaxValueError(typePageParamsSize, math.MaxUint32)
+	if parsedSize > math.MaxInt {
+		return mrtype.PageParams{}, NewParamMaxValueError(typePageParamsSize, math.MaxInt)
 	}
 
-	if parsedIndex > parsedSize {
-		return mrtype.PageParams{}, NewParamMaxValueError(typePageParamsIndex, parsedSize)
+	if parsedIndex > math.MaxInt {
+		return mrtype.PageParams{}, NewParamMaxValueError(typePageParamsIndex, math.MaxInt)
 	}
 
 	return mrtype.PageParams{
-		Index: parsedIndex,
-		Size:  parsedSize,
+		Index: int(parsedIndex),
+		Size:  int(parsedSize),
 	}, nil
 }

@@ -12,6 +12,9 @@ const (
 
 	// ErrorMessageKindSystem - сообщение для пользователя: системная ошибка приложения.
 	ErrorMessageKindSystem = "system error"
+
+	// ErrorMessageKindUnexpected - сообщение для пользователя: внутренняя необработанная ошибка приложения.
+	ErrorMessageKindUnexpected = "unexpected internal error"
 )
 
 // ExtractMessageForLocalization - возвращает сообщение об ошибки и переданные ей аргументы
@@ -26,12 +29,16 @@ func ExtractMessageForLocalization(err error) (message string, args []any) {
 		return e.Message(), e.Args()
 	}
 
-	// для ошибок типа System и Internal пользователю формируются фиксированные сообщения
-	if kind.Extract(err) == kind.System {
+	// для ошибок типа System и Internal и для необработанных ошибок
+	// пользователю формируются фиксированные сообщения
+	switch kind.Extract(err) {
+	case kind.System:
 		return ErrorMessageKindSystem, nil
+	case kind.Internal:
+		return ErrorMessageKindInternal, nil
+	default:
+		return ErrorMessageKindUnexpected, nil
 	}
-
-	return ErrorMessageKindInternal, nil
 }
 
 // ExtractAttrs - возвращает попарно все атрибуты (ключ/значение)

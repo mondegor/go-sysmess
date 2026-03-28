@@ -11,6 +11,7 @@ type (
 	ErrorConfig struct {
 		HasCaller         bool
 		CallerDepth       uint8
+		CallerShowFunc    bool
 		CallerUpperBounds []string
 	}
 

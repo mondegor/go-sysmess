@@ -6,7 +6,7 @@ import (
 
 	"github.com/mondegor/go-sysmess/errors"
 	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime/hint/stacktrace"
+	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
 	"github.com/mondegor/go-sysmess/util/conv"
 	"github.com/mondegor/go-sysmess/wire"
 )
@@ -29,8 +29,9 @@ type (
 func main() {
 	wire.InitErrors(
 		wire.ErrorConfig{
-			HasCaller:   true,
-			CallerDepth: 3,
+			HasCaller:      true,
+			CallerDepth:    3,
+			CallerShowFunc: true,
 			CallerUpperBounds: []string{
 				"github.com/mondegor/go-sysmess/errors/runtime.(*proto).New",
 			},

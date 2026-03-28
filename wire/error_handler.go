@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/mondegor/go-sysmess/errors"
+	"github.com/mondegor/go-sysmess/errors/handle"
 	"github.com/mondegor/go-sysmess/errors/kind"
 	"github.com/mondegor/go-sysmess/mrlog"
 )
 
 // InitErrorHandler - создаёт объект errors.Handler.
 func InitErrorHandler(logger mrlog.Logger) errors.Handler {
-	return errors.HandlerFunc(
+	return handle.ErrorHandlerFunc(
 		func(ctx context.Context, err error) {
 			switch kind.Analyze(err) {
 			case kind.User:
@@ -22,7 +23,7 @@ func InitErrorHandler(logger mrlog.Logger) errors.Handler {
 				logger.Error(ctx, "ErrorHandler", "error", err)
 			default:
 				// 4. остальные ошибки у которых нет метода Kind() (требуется найти место их возникновения и правильно обработать);
-				logger.Error(ctx, "ErrorHandler: unexpected internal error", "error", err)
+				logger.Error(ctx, "ErrorHandler: unexpected error", "error", err)
 			}
 		},
 	)

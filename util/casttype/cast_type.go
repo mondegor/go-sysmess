@@ -6,17 +6,6 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// SliceToAnySlice - возвращает элементы преобразованные в слайс пустых интерфейсов.
-func SliceToAnySlice[Type any](values []Type) []any {
-	vs := make([]any, len(values))
-
-	for i, v := range values {
-		vs[i] = v
-	}
-
-	return vs
-}
-
 // BoolToNumber - возвращает преобразованный bool к Number.
 func BoolToNumber[Number constraints.Integer | constraints.Float](value bool) Number {
 	if value {

@@ -1,26 +1,29 @@
 package errors
 
 var (
-	// ErrUseCaseIncorrectInputData - input data is incorrect (желательно настраивать в слое выше валидатор этих данных).
-	ErrUseCaseIncorrectInputData = NewUserProto("IncorrectInputData", "input data is incorrect: '{Reason}'")
+	// ErrIncorrectInputData - input data is incorrect (желательно настраивать в слое выше валидатор этих данных).
+	ErrIncorrectInputData = NewUserProto("IncorrectInputData", "input data is incorrect: '{Reason}'")
 
-	// ErrUseCaseAccessForbidden - access forbidden (код 401 или 403).
-	ErrUseCaseAccessForbidden = NewUserProto("AccessForbidden", "access forbidden")
+	// ErrAccessForbidden - access forbidden (код 403).
+	ErrAccessForbidden = NewUserProto("AccessForbidden", "access forbidden")
 
-	// ErrUseCaseEntityNotFound - entity not found (код 404).
-	ErrUseCaseEntityNotFound = NewUserProto("EntityNotFound", "entity not found")
+	// ErrRecordNotFound - record not found (код 404).
+	ErrRecordNotFound = NewUserProto("RecordNotFound", "record not found")
 
-	// ErrUseCaseEntityAlreadyExists - entity already exists.
-	ErrUseCaseEntityAlreadyExists = NewUserProto("EntityAlreadyExists", "entity already exists")
+	// ErrRecordAlreadyExists - record already exists.
+	ErrRecordAlreadyExists = NewUserProto("RecordAlreadyExists", "record already exists")
 
-	// ErrUseCaseEntityVersionConflict - entity version conflict (код 409).
-	ErrUseCaseEntityVersionConflict = NewUserProto("EntityVersionConflict", "entity version conflict")
+	// ErrRecordVersionConflict - record version conflict (код 409).
+	ErrRecordVersionConflict = NewUserProto("RecordVersionConflict", "record version conflict")
 
-	// ErrUseCaseSwitchStatusRejected - switching from status to status is rejected.
-	ErrUseCaseSwitchStatusRejected = NewUserProto("SwitchStatusRejected", "switching from '{StatusFrom}' to '{StatusTo}' is rejected")
+	// ErrSwitchStatusRejected - switching from status to status is rejected.
+	ErrSwitchStatusRejected = NewUserProto("SwitchStatusRejected", "switching from '{StatusFrom}' to '{StatusTo}' is rejected")
 
-	// ErrUseCaseInvalidFile - file is invalid.
-	ErrUseCaseInvalidFile = NewUserProto("InvalidFile", "file is invalid")
+	// ErrNotImplemented - not Implemented (код 501).
+	ErrNotImplemented = NewUserProto("NotImplemented", "not implemented")
+
+	// ErrValidateInvalidFile - file is invalid.
+	ErrValidateInvalidFile = NewUserProto("ValidateInvalidFile", "file is invalid")
 
 	// ErrValidateFileSize - invalid file size.
 	ErrValidateFileSize = NewUserProto("ValidateFileSize", "invalid file size")
@@ -63,9 +66,6 @@ var (
 
 	// ErrHttpResourceNotFound - 404. resource not found.
 	ErrHttpResourceNotFound = NewUserProto("ResourceNotFound", "404. resource not found")
-
-	// ErrHttpResourceVersionInvalid - resource version is invalid (код 409).
-	ErrHttpResourceVersionInvalid = NewUserProto("ResourceVersionInvalid", "resource version is invalid")
 
 	// ErrHttpRequestParseData - request body is not valid (ошибка связанная с неправильным форматом отправленных данных, код 422).
 	ErrHttpRequestParseData = NewUserProto("RequestParseData", "request body is not valid: '{Reason}'")

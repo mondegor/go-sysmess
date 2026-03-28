@@ -8,6 +8,8 @@ import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 )
 
+//go:generate mockgen -source=user_error.go -destination=./mock/user_error.go
+
 const (
 	missingCode = "!MISSINGCODE"
 )

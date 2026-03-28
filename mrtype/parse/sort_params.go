@@ -33,7 +33,7 @@ func SortParams(fieldValue, directionValue string) (mrtype.SortParams, error) {
 	}
 
 	params := mrtype.SortParams{
-		FieldName: fieldValue,
+		Column:    fieldValue,
 		Direction: sortdirection.ASC,
 	}
 

@@ -2,22 +2,18 @@ package errors
 
 import (
 	"github.com/mondegor/go-sysmess/errors/custom"
-	"github.com/mondegor/go-sysmess/errors/helper"
+	"github.com/mondegor/go-sysmess/errors/wrap"
 )
 
-//go:generate mockgen -source=custom_wrappers.go -destination=./mock/custom_wrappers.go
-
 type (
-	// CustomWrapper - помощник для оборачивания пользовательских ошибок.
-	CustomWrapper interface {
-		Wrap(err error) error
-	}
+	// CustomWrapper - помощник для оборачивания пользовательских ошибок в ошибки типа Custom.
+	CustomWrapper = wrap.CustomErrorWrapper
 )
 
 // NewCustomWrapper - оборачивает ошибки с указанными кодами.
 // Коды передаются попарно: 1 - код пользовательской ошибки, 2 - переопределённый код.
 func NewCustomWrapper(codeCustom ...string) CustomWrapper {
-	return helper.NewCustomErrorWrapper(
+	return wrap.NewCustomErrorWrapper(
 		func(err error, customCode string) error {
 			return custom.New(err, customCode)
 		},

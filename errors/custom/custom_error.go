@@ -7,6 +7,8 @@ import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 )
 
+//go:generate mockgen -source=custom_error.go -destination=./mock/custom_error.go
+
 const (
 	codeSeparator = "/"
 	missingCode   = "!MISSINGCUSTOMCODE"

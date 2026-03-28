@@ -11,8 +11,8 @@ type (
 	// DetailedIP - содержит информацию о настоящем IP и
 	// об IP переданного прокси сервером через заголовки.
 	DetailedIP struct {
-		Real  net.IP
-		Proxy net.IP
+		Real  net.IP `json:"real"`
+		Proxy net.IP `json:"proxy"`
 	}
 )
 

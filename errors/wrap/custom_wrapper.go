@@ -1,13 +1,18 @@
-package helper
+package wrap
 
 import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 )
 
+//go:generate mockgen -source=custom_wrapper.go -destination=./mock/custom_wrapper.go
+
 type (
-	// CustomErrorWrapper - помощник для оборачивания
-	// пользовательских ошибок в ошибки типа Custom.
-	CustomErrorWrapper struct {
+	// CustomErrorWrapper - помощник для оборачивания пользовательских ошибок в ошибки типа Custom.
+	CustomErrorWrapper interface {
+		Wrap(err error) error
+	}
+
+	customErrorWrapper struct {
 		wrapFunc    func(err error, code string) error
 		code2custom map[string]string
 	}
@@ -17,7 +22,7 @@ type (
 func NewCustomErrorWrapper(
 	wrapperCustom func(err error, code string) error,
 	codeCustom ...string,
-) *CustomErrorWrapper {
+) CustomErrorWrapper {
 	code2custom := make(map[string]string, len(codeCustom)/2)
 
 	for i := 0; i < len(codeCustom); i += 2 {
@@ -28,7 +33,7 @@ func NewCustomErrorWrapper(
 		code2custom[codeCustom[len(codeCustom)-1]] = ""
 	}
 
-	return &CustomErrorWrapper{
+	return &customErrorWrapper{
 		wrapFunc:    wrapperCustom,
 		code2custom: code2custom,
 	}
@@ -36,7 +41,7 @@ func NewCustomErrorWrapper(
 
 // Wrap - оборачивает пользовательские ошибки в ошибки типа Custom.
 // Остальные ошибки оставляет без изменения.
-func (w *CustomErrorWrapper) Wrap(err error) error {
+func (w *customErrorWrapper) Wrap(err error) error {
 	if err == nil {
 		return w.wrapFunc(err, "")
 	}
