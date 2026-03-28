@@ -65,3 +65,8 @@ func NewServiceRecordVersionConflictWrapper() Wrapper {
 		),
 	)
 }
+
+// NopWrapper - создаёт объект Wrapper, который возвращает переданную ему ошибку как есть.
+func NopWrapper() Wrapper {
+	return wrap.NopErrorWrapper()
+}

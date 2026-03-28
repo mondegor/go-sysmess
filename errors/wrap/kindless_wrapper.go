@@ -17,7 +17,7 @@ func NewKindlessErrorWrapper(
 	defaultWrapper ErrorWrapper,
 ) ErrorWrapper {
 	if defaultWrapper == nil {
-		defaultWrapper = nopWrapper{}
+		defaultWrapper = nopErrorWrapper{}
 	}
 
 	return &kindlessErrorWrapper{

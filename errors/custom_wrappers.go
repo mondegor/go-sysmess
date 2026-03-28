@@ -44,3 +44,8 @@ func NewDownloadImageWrapper(customCode string) CustomWrapper {
 		ErrValidateImageHeightMax.Code(), customCode,
 	)
 }
+
+// NopCustomWrapper - создаёт объект CustomWrapper, который возвращает переданную ему ошибку как есть.
+func NopCustomWrapper() CustomWrapper {
+	return wrap.NopCustomErrorWrapper()
+}

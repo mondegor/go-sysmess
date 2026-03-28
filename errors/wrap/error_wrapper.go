@@ -24,7 +24,7 @@ func NewShellErrorWrapper(
 	}
 
 	if defaultWrapper == nil {
-		defaultWrapper = nopWrapper{}
+		defaultWrapper = nopErrorWrapper{}
 	}
 
 	return &shellErrorWrapper{
@@ -45,10 +45,13 @@ func (w *shellErrorWrapper) Wrap(err error, attrs ...any) error {
 }
 
 type (
-	nopWrapper struct{}
+	nopErrorWrapper struct{}
 )
 
-// Wrap - возвращает указанную ошибку, реализуя wrapper интерфейс.
-func (e nopWrapper) Wrap(err error, _ ...any) error {
-	return err
+// NopErrorWrapper - создаёт объект ErrorWrapper, который возвращает переданную ему ошибку как есть.
+func NopErrorWrapper() ErrorWrapper {
+	return nopErrorWrapper{}
 }
+
+// Wrap - возвращает указанную ошибку, реализуя ErrorWrapper интерфейс.
+func (t nopErrorWrapper) Wrap(err error, _ ...any) error { return err }

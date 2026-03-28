@@ -4,14 +4,13 @@ import (
 	"context"
 
 	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/errors/handle"
 	"github.com/mondegor/go-sysmess/errors/kind"
 	"github.com/mondegor/go-sysmess/mrlog"
 )
 
 // InitErrorHandler - создаёт объект errors.Handler.
 func InitErrorHandler(logger mrlog.Logger) errors.Handler {
-	return handle.ErrorHandlerFunc(
+	return errors.HandlerFunc(
 		func(ctx context.Context, err error) {
 			switch kind.Analyze(err) {
 			case kind.User:

@@ -55,3 +55,15 @@ func (w *customErrorWrapper) Wrap(err error) error {
 
 	return err
 }
+
+type (
+	nopCustomErrorWrapper struct{}
+)
+
+// NopCustomErrorWrapper - создаёт объект ErrorWrapper, который возвращает переданную ему ошибку как есть.
+func NopCustomErrorWrapper() CustomErrorWrapper {
+	return nopCustomErrorWrapper{}
+}
+
+// Wrap - возвращает указанную ошибку, реализуя CustomErrorWrapper интерфейс.
+func (t nopCustomErrorWrapper) Wrap(err error) error { return err }
