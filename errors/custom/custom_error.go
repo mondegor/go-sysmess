@@ -112,6 +112,7 @@ func (e *customError) CustomCode() string {
 func (e *customError) Error() string {
 	var buf strings.Builder
 
+	buf.Grow(len(e.customCode) + 132)
 	buf.WriteString("#")
 	buf.WriteString(e.customCode)
 	buf.WriteString(" - ")
@@ -132,5 +133,9 @@ func (e *customError) Error() string {
 
 // Unwrap - возвращает вложенную ошибку.
 func (e *customError) Unwrap() error {
-	return e.err
+	if e.err != nil {
+		return e.err
+	}
+
+	return ErrHasNilError
 }

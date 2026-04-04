@@ -79,6 +79,6 @@ func TestNewCustom_NilError(t *testing.T) {
 	got := custom.New(nil, "test-custom-code")
 	require.False(t, got.IsKindUser())
 	require.Equal(t, "test-custom-code", got.CustomCode())
-	require.NoError(t, got.Unwrap())
+	require.ErrorIs(t, got.Unwrap(), custom.ErrHasNilError)
 	assert.Contains(t, got.Error(), custom.ErrHasNilError.Error())
 }
