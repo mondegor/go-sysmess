@@ -19,13 +19,14 @@ type (
 	Enum uint8
 )
 
+//nolint:gochecknoglobals
 var (
-	enumKeys = map[Enum]string{ //nolint:gochecknoglobals
+	enumKeys = map[Enum]string{
 		ASC:  "ASC",
 		DESC: "DESC",
 	}
 
-	enumValues = map[string]Enum{ //nolint:gochecknoglobals
+	enumValues = map[string]Enum{
 		"ASC":  ASC,
 		"DESC": DESC,
 	}

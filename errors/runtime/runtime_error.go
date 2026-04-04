@@ -3,6 +3,7 @@ package runtime
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/mondegor/go-sysmess/errors/kind"
@@ -84,25 +85,29 @@ func (e *protoError) WithError(err error, details string, attrs ...any) error {
 }
 
 func (e *protoError) newError(err error, details string, attrs ...any) error {
-	// оптимизация, чтобы не создавать лишний экземпляр ошибки
+	// оптимизация: чтобы не создавать лишний экземпляр ошибки
 	if err == nil && details == "" && len(attrs) == 0 && e.onCreate == nil {
 		return e
 	}
 
-	c := *e
-	c.err = err
-	c.attrs = attrs
-
+	text := e.text
 	if details != "" {
-		c.text += ": " + details
+		text += ": " + details
 	}
 
+	var hint any
 	if e.onCreate != nil {
-		c.onCreate = nil
-		c.hint = e.onCreate(e.kind, err)
+		hint = e.onCreate(e.kind, err)
 	}
 
-	return &c
+	return &protoError{
+		id:    e.id,
+		kind:  e.kind,
+		text:  text,
+		attrs: attrs,
+		hint:  hint,
+		err:   err,
+	}
 }
 
 // Kind - возвращает тип ошибки.
@@ -111,10 +116,15 @@ func (e *protoError) Kind() kind.Enum {
 }
 
 // Attrs - возвращает попарно атрибуты прикреплённые к ошибке: ключ/значение.
-//
-// Attrs возвращает оригинал слайса, не копию!
 func (e *protoError) Attrs() []any {
-	return e.attrs
+	if len(e.attrs) == 0 {
+		return nil
+	}
+
+	attrs := make([]any, len(e.attrs))
+	copy(attrs, e.attrs)
+
+	return attrs
 }
 
 // Hint - возвращает дополнительные данные ассоциированные с ошибкой.
@@ -129,6 +139,7 @@ func (e *protoError) Error() string {
 
 	attrExists := false
 	attrs := e.attrs
+	estimatedLen := len(e.text)
 
 	// необходимо убедиться, что имеется хотя бы один атрибут для вывода
 	for len(attrs) > 0 {
@@ -137,13 +148,19 @@ func (e *protoError) Error() string {
 		// если найден внутренний атрибут
 		if strings.IndexByte(key, '.') == -1 {
 			attrExists = true
+			estimatedLen += 16 * len(e.attrs) // средний размер атрибутов
 
 			break
 		}
 	}
 
+	if e.err != nil {
+		estimatedLen += 64 // средний размер вложенной ошибки
+	}
+
 	var buf strings.Builder
 
+	buf.Grow(estimatedLen)
 	buf.WriteString(e.text)
 
 	if e.err != nil {
@@ -175,7 +192,7 @@ func (e *protoError) Error() string {
 
 			buf.WriteString(key)
 			buf.WriteByte('=')
-			buf.WriteString(fmt.Sprintf("%v", value))
+			buf.WriteString(formatAttr(value))
 		}
 
 		buf.WriteByte(']')
@@ -201,4 +218,46 @@ func (e *protoError) Is(target error) bool {
 // Unwrap - возвращает вложенную ошибку (errors.Is использует этот интерфейс).
 func (e *protoError) Unwrap() error {
 	return e.err
+}
+
+// formatAttr - функция для небольшой оптимизации.
+func formatAttr(value any) string {
+	switch val := value.(type) {
+	case string:
+		return val
+	case int:
+		return strconv.FormatInt(int64(val), 10)
+	case uint:
+		return strconv.FormatUint(uint64(val), 10)
+	case int64:
+		return strconv.FormatInt(val, 10)
+	case uint64:
+		return strconv.FormatUint(val, 10)
+	case bool:
+		return strconv.FormatBool(val)
+	case int8:
+		return strconv.FormatInt(int64(val), 10)
+	case uint8:
+		return strconv.FormatUint(uint64(val), 10)
+	case int16:
+		return strconv.FormatInt(int64(val), 10)
+	case uint16:
+		return strconv.FormatUint(uint64(val), 10)
+	case int32:
+		return strconv.FormatInt(int64(val), 10)
+	case uint32:
+		return strconv.FormatUint(uint64(val), 10)
+	case float64:
+		return strconv.FormatFloat(val, 'f', -1, 64)
+	case float32:
+		return strconv.FormatFloat(float64(val), 'f', -1, 32)
+	case nil:
+		return "<NIL>"
+	case error:
+		return val.Error()
+	case fmt.Stringer:
+		return val.String()
+	default:
+		return fmt.Sprintf("%+v", val)
+	}
 }

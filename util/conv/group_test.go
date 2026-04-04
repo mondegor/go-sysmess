@@ -42,7 +42,7 @@ func TestData_String(t *testing.T) {
 				key2 string
 				key3 int
 			}{`value and "quotes"`, 1234}},
-			want: `{"key1": "{key2:value and \"quotes\" key3:1234}"}`,
+			want: `{"key1": "{value and \"quotes\" 1234}"}`,
 		},
 		{
 			name:  "data with a few values",

@@ -49,6 +49,6 @@ func toString(value any) (string, bool) {
 	case fmt.Stringer:
 		return val.String(), true
 	default:
-		return fmt.Sprintf("%+v", val), true
+		return fmt.Sprintf("%v", val), true
 	}
 }

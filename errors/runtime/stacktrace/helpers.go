@@ -43,14 +43,20 @@ func ToStrings(stackIterator func() (index int, name, file string, line int)) []
 		return nil
 	}
 
-	var buf strings.Builder
-
-	list := make([]string, 0, stackTraceMaxDepth)
+	var (
+		buf  strings.Builder
+		list []string
+	)
 
 	for {
 		index, name, file, line := stackIterator()
 		if index < 0 {
 			break
+		}
+
+		if list == nil {
+			buf.Grow((len(name) + len(file)) * stackTraceMaxDepth / 8)
+			list = make([]string, 0, stackTraceMaxDepth/8)
 		}
 
 		if name != "" {

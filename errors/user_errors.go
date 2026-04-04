@@ -5,28 +5,28 @@ var (
 	ErrIncorrectInputData = NewUserProto("IncorrectInputData", "input data is incorrect: '{Reason}'")
 
 	// ErrAccessForbidden - access forbidden (код 403).
-	ErrAccessForbidden = NewUserProto("AccessForbidden", "access forbidden")
+	ErrAccessForbidden = NewUserError("AccessForbidden", "access forbidden")
 
 	// ErrRecordNotFound - record not found (код 404).
-	ErrRecordNotFound = NewUserProto("RecordNotFound", "record not found")
+	ErrRecordNotFound = NewUserError("RecordNotFound", "record not found")
 
 	// ErrRecordAlreadyExists - record already exists.
-	ErrRecordAlreadyExists = NewUserProto("RecordAlreadyExists", "record already exists")
+	ErrRecordAlreadyExists = NewUserError("RecordAlreadyExists", "record already exists")
 
 	// ErrRecordVersionConflict - record version conflict (код 409).
-	ErrRecordVersionConflict = NewUserProto("RecordVersionConflict", "record version conflict")
+	ErrRecordVersionConflict = NewUserError("RecordVersionConflict", "record version conflict")
 
 	// ErrSwitchStatusRejected - switching from status to status is rejected.
 	ErrSwitchStatusRejected = NewUserProto("SwitchStatusRejected", "switching from '{StatusFrom}' to '{StatusTo}' is rejected")
 
 	// ErrNotImplemented - not Implemented (код 501).
-	ErrNotImplemented = NewUserProto("NotImplemented", "not implemented")
+	ErrNotImplemented = NewUserError("NotImplemented", "not implemented")
 
 	// ErrValidateInvalidFile - file is invalid.
-	ErrValidateInvalidFile = NewUserProto("ValidateInvalidFile", "file is invalid")
+	ErrValidateInvalidFile = NewUserError("ValidateInvalidFile", "file is invalid")
 
 	// ErrValidateFileSize - invalid file size.
-	ErrValidateFileSize = NewUserProto("ValidateFileSize", "invalid file size")
+	ErrValidateFileSize = NewUserError("ValidateFileSize", "invalid file size")
 
 	// ErrValidateFileSizeMin - invalid file size - min.
 	ErrValidateFileSizeMin = NewUserProto("ValidateFileSizeMin", "invalid file size, min size = {Value}b")
@@ -47,7 +47,7 @@ var (
 	ErrValidateFileUnsupportedType = NewUserProto("ValidateFileUnsupportedType", "unsupported file type '{Value}'")
 
 	// ErrValidateImageSize - invalid image size (width, height).
-	ErrValidateImageSize = NewUserProto("ValidateImageSize", "invalid image size (width, height)")
+	ErrValidateImageSize = NewUserError("ValidateImageSize", "invalid image size (width, height)")
 
 	// ErrValidateImageWidthMax - invalid image width - max.
 	ErrValidateImageWidthMax = NewUserProto("ValidateImageWidthMax", "invalid image width, max size = {Value}px")
@@ -59,17 +59,17 @@ var (
 	ErrHttpFileUpload = NewUserProto("FileUpload", "the file with the specified key '{Key}' was not uploaded")
 
 	// ErrHttpClientUnauthorized - 401. client is unauthorized.
-	ErrHttpClientUnauthorized = NewUserProto("ClientUnauthorized", "401. client is unauthorized")
+	ErrHttpClientUnauthorized = NewUserError("ClientUnauthorized", "401. client is unauthorized")
 
 	// ErrHttpAccessForbidden - 403. access forbidden.
-	ErrHttpAccessForbidden = NewUserProto("AccessForbidden", "403. access forbidden")
+	ErrHttpAccessForbidden = NewUserError("AccessForbidden", "403. access forbidden")
 
 	// ErrHttpResourceNotFound - 404. resource not found.
-	ErrHttpResourceNotFound = NewUserProto("ResourceNotFound", "404. resource not found")
+	ErrHttpResourceNotFound = NewUserError("ResourceNotFound", "404. resource not found")
 
 	// ErrHttpRequestParseData - request body is not valid (ошибка связанная с неправильным форматом отправленных данных, код 422).
 	ErrHttpRequestParseData = NewUserProto("RequestParseData", "request body is not valid: '{Reason}'")
 
 	// ErrHttpTooManyRequests - too many requests (код 429).
-	ErrHttpTooManyRequests = NewUserProto("TooManyRequests", "too many requests")
+	ErrHttpTooManyRequests = NewUserError("TooManyRequests", "too many requests")
 )

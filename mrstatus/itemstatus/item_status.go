@@ -24,14 +24,15 @@ type (
 	Enum uint8
 )
 
+//nolint:gochecknoglobals
 var (
-	enumKeys = map[Enum]string{ //nolint:gochecknoglobals
+	enumKeys = map[Enum]string{
 		Draft:    "DRAFT",
 		Enabled:  "ENABLED",
 		Disabled: "DISABLED",
 	}
 
-	enumValues = map[string]Enum{ //nolint:gochecknoglobals
+	enumValues = map[string]Enum{
 		"DRAFT":    Draft,
 		"ENABLED":  Enabled,
 		"DISABLED": Disabled,

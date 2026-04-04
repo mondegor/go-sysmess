@@ -29,7 +29,7 @@ func (e Enum) String() string {
 }
 
 // Extract - возвращает тип ошибки.
-func Extract(err error) Enum {
+func Extract(err error) (userKind Enum) {
 	if e, ok := err.(interface{ Kind() Enum }); ok {
 		return e.Kind()
 	}
@@ -40,9 +40,7 @@ func Extract(err error) Enum {
 // Analyze - возвращает тип ошибки с учётом её вложенных ошибок.
 // Если пользовательская ошибка содержит вложенную ошибку
 // типа Internal или System, то вернётся этот тип ошибки.
-func Analyze(err error) Enum {
-	var userKind Enum
-
+func Analyze(err error) (userKind Enum) {
 	for {
 		if e, ok := err.(interface{ Kind() Enum }); ok {
 			if e.Kind() != User {

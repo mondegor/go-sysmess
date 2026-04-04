@@ -8,25 +8,29 @@ import (
 )
 
 const (
-	charsetDigit  = "0123456789"
-	charsetHex    = "0123456789abcdef"
-	charsetToken  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	maxCharsetLen = 128
+)
+
+//nolint:gochecknoglobals
+var (
+	charsetDigit = []byte("0123456789")
+	charsetHex   = []byte("0123456789abcdef")
+	charsetToken = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 )
 
 // GenerateDigits - возвращает сгенерированную последовательность из цифр указанной длины.
 func GenerateDigits(length int) (string, error) {
-	return GenerateSequence([]byte(charsetDigit), length)
+	return GenerateSequence(charsetDigit, length)
 }
 
 // GenerateHex - возвращает сгенерированную последовательность из шестнадцатеричных цифр указанной длины.
 func GenerateHex(length int) (string, error) {
-	return GenerateSequence([]byte(charsetHex), length)
+	return GenerateSequence(charsetHex, length)
 }
 
 // GenerateToken - возвращает сгенерированную последовательность указанной длины используемую для уникальных токенов.
 func GenerateToken(length int) (string, error) {
-	return GenerateSequence([]byte(charsetToken), length)
+	return GenerateSequence(charsetToken, length)
 }
 
 // GenerateSequence - возвращает сгенерированную последовательность из указанных символов (ascii) указанной длины.

@@ -16,9 +16,12 @@ const (
 	CharAll         CharKinds = 15 // CharVowels + CharConsonants + CharNumerals + CharSigns
 )
 
-const (
-	charSetLen = 4
-)
+var pwCharSets = [...]pwCharSet{ //nolint:gochecknoglobals
+	{CharVowels, 2, true, 10, []byte("aeiuyAEIUY")}, // oO - символы удалены, чтобы не перепутать с нулём
+	{CharConsonants, 2, true, 40, []byte("bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ")},
+	{CharNumerals, 1, false, 9, []byte("123456789")}, // 0 - символ удалён, чтобы не перепутать с символами oO
+	{CharSigns, 1, false, 12, []byte("!$%&.<=>?@_~")},
+}
 
 type (
 	// CharKinds - вид символов используемых в пароле.
@@ -34,19 +37,14 @@ type (
 
 	// Generator - библиотека для генерации стоковых последовательностей.
 	Generator struct {
-		pwCharSets [charSetLen]pwCharSet
+		pwCharSets []pwCharSet
 	}
 )
 
 // NewGenerator - создаёт объект Generator.
 func NewGenerator() *Generator {
 	return &Generator{
-		pwCharSets: [charSetLen]pwCharSet{
-			{CharVowels, 2, true, 10, []byte("aeiuyAEIUY")}, // oO - символы удалены, чтобы не перепутать с нулём
-			{CharConsonants, 2, true, 40, []byte("bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ")},
-			{CharNumerals, 1, false, 9, []byte("123456789")}, // 0 - символ удалён, чтобы не перепутать с символами oO
-			{CharSigns, 1, false, 12, []byte("!$%&.<=>?@_~")},
-		},
+		pwCharSets: pwCharSets[:],
 	}
 }
 
@@ -60,20 +58,16 @@ func (pg *Generator) Generate(length int, charsKinds CharKinds) string {
 		charsKinds = CharAll
 	}
 
-	var (
-		abc    [charSetLen]pwCharSet
-		abcLen uint8
-	)
+	abc := make([]pwCharSet, 0, len(pg.pwCharSets))
 
-	for i := 0; i < charSetLen; i++ {
-		if (pg.pwCharSets[abcLen].kind & charsKinds) > 0 {
-			abc[abcLen] = pg.pwCharSets[i]
-			abcLen++
+	for i := 0; i < len(pg.pwCharSets); i++ {
+		if (pg.pwCharSets[i].kind & charsKinds) > 0 {
+			abc = append(abc, pg.pwCharSets[i])
 		}
 	}
 
 	// если указан только один набор символов
-	if abcLen == 1 {
+	if len(abc) == 1 {
 		abc[0].successivelyMax = length // максимальная длина совпадает с длиной пароля
 		abc[0].firstOrLast = true       // первый и последний символ не проверяется
 	}
@@ -89,7 +83,7 @@ func (pg *Generator) Generate(length int, charsKinds CharKinds) string {
 		var abcIndex uint8
 
 		for {
-			abcIndex = pg.getRandValue(abcLen)
+			abcIndex = pg.getRandValue(uint8(len(abc))) //nolint:gosec // abc никогда не превзойдёт 255
 
 			// если выбранный тип можно использовать для генерации первого и последнего символа
 			// или если символ не первый и не последний
