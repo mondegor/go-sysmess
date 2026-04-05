@@ -1,47 +1,47 @@
 package errors
 
 var (
-	// ErrInternalNilPointer - unexpected nil pointer.
+	// ErrInternalNilPointer - неожиданный нулевой указатель.
 	ErrInternalNilPointer = NewInternalProto("unexpected nil pointer")
 
-	// ErrInternalCaughtPanic - caught panic (attrs: source, recover, stack_trace).
+	// ErrInternalCaughtPanic - перехвачена паника (attrs: source, recover, stack_trace).
 	ErrInternalCaughtPanic = NewInternalProto("internal panic")
 
-	// ErrInternalTypeAssertion - invalid type assertion (attrs: type, value).
+	// ErrInternalTypeAssertion - некорректное приведение типа (attrs: type, value).
 	ErrInternalTypeAssertion = NewInternalProto("invalid type assertion")
 
-	// ErrInternalInvalidType - invalid type, expected type (attrs: type, expected).
+	// ErrInternalInvalidType - некорректный тип, ожидался другой тип (attrs: type, expected).
 	ErrInternalInvalidType = NewInternalProto("invalid type, expected type")
 
-	// ErrInternalKeyNotFoundInSource - key is not found in source (attrs: key, source).
+	// ErrInternalKeyNotFoundInSource - ключ не найден в источнике (attrs: key, source).
 	ErrInternalKeyNotFoundInSource = NewInternalProto("key is not found in source")
 
-	// ErrInternalIncorrectInputData - input data is incorrect
-	// (когда нет возможности ответить клиенту, например, данные поступают из очереди,
-	// или когда поступаемые данные не зависят от клиента, например, приходят из конфига,
-	// в остальных случаях лучше использовать ErrIncorrectInputData).
+	// ErrInternalIncorrectInputData - входные данные некорректны.
+	// Используется, когда нет возможности ответить клиенту, например, данные поступают из очереди,
+	// или когда поступающие данные не зависят от клиента, например, приходят из конфига.
+	// В остальных случаях лучше использовать ErrIncorrectInputData.
 	ErrInternalIncorrectInputData = NewInternalProto("input data is incorrect")
 
-	// ErrInternalStorageConnectionIsAlreadyCreated - connection is already created (attr: source).
+	// ErrInternalStorageConnectionIsAlreadyCreated - подключение уже создано (attr: source).
 	ErrInternalStorageConnectionIsAlreadyCreated = NewInternalProto("connection is already created")
 
-	// ErrInternalStorageConnectionIsNotOpened - connection is not opened (attr: source).
+	// ErrInternalStorageConnectionIsNotOpened - подключение не открыто (attr: source).
 	ErrInternalStorageConnectionIsNotOpened = NewInternalProto("connection is not opened")
 
-	// ErrInternalStorageQueryFailed - query failed (attr: source).
+	// ErrInternalStorageQueryFailed - запрос не удался (attr: source).
 	// По умолчанию, следует оборачивать все ошибки запросов этой ошибкой.
 	ErrInternalStorageQueryFailed = NewInternalProto("query failed")
 
-	// ErrInternalStorageFetchDataFailed - fetching data failed (attr: source).
+	// ErrInternalStorageFetchDataFailed - получение данных не удалось (attr: source).
 	ErrInternalStorageFetchDataFailed = NewInternalProto("fetching data failed")
 
-	// ErrInternalStorageDuplicateKeyViolation - duplicate key violation (attr: source).
+	// ErrInternalStorageDuplicateKeyViolation - нарушение уникальности ключа (attr: source).
 	ErrInternalStorageDuplicateKeyViolation = NewInternalProto("duplicate key violation")
 
-	// ErrInternalServiceOperationFailed - service operation failed.
+	// ErrInternalServiceOperationFailed - операция сервиса не удалась.
 	// По умолчанию, следует оборачивать все ошибки Service/UseCase слоя этой ошибкой.
 	ErrInternalServiceOperationFailed = NewInternalProto("service operation failed")
 
-	// ErrInternalHttpResponseParseData - response data is not valid.
+	// ErrInternalHttpResponseParseData - ответ некорректен.
 	ErrInternalHttpResponseParseData = NewInternalProto("response data is not valid")
 )

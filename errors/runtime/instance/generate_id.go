@@ -13,9 +13,9 @@ const (
 
 //nolint:gochecknoglobals
 var (
-	baseNChars    = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	baseNCharsLen = uint64(len(baseNChars))
-	rndIfError    = [...]byte{0x0, 0x0, 0xee, 0xee, 0xee, 0xee, 0x0, 0x0}
+	baseNChars    = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")        // символы для кодирования Base-N
+	baseNCharsLen = uint64(len(baseNChars))                               // количество символов для кодирования
+	rndIfError    = [...]byte{0x0, 0x0, 0xee, 0xee, 0xee, 0xee, 0x0, 0x0} // данные по умолчанию при ошибке
 )
 
 // GenerateID - возвращает ID в формате 4R4K8OE9XZ-MWFN-4L6R используемый
