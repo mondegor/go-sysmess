@@ -198,11 +198,11 @@ func TestProto_Wrap_Error(t *testing.T) {
 	wrapped := proto.Wrap(baseErr)
 
 	// Wrap возвращает ошибку, содержащую сообщение прототипа
-	assert.ErrorContains(t, wrapped, "#code - message")
-	assert.ErrorContains(t, wrapped, "base error")
+	require.ErrorContains(t, wrapped, "#code - message")
+	require.ErrorContains(t, wrapped, "base error")
 
 	// errors.Is находит прототип в обёртке
-	assert.True(t, errors.Is(wrapped, proto))
+	require.ErrorIs(t, wrapped, proto)
 
 	// errors.As извлекает ProtoError из обёртки
 	var target userfast.ProtoError

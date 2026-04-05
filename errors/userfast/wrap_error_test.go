@@ -228,6 +228,7 @@ func TestWrapError_ErrorsAs_ProtoError(t *testing.T) {
 	// Поскольку wrapError реализует ProtoError, errors.As
 	// возвращает саму обёртку, а не оригинальный protoError.
 	var target userfast.ProtoError
+
 	require.ErrorAs(t, wrapped, &target)
 	assert.Equal(t, "code", target.Code())
 }
@@ -243,14 +244,14 @@ func TestWrapError_DeepChain_ErrorsIs(t *testing.T) {
 	wrap3 := proto.Wrap(wrap2)
 
 	// Все уровни должны находить прототип
-	assert.True(t, errors.Is(wrap1, proto))
-	assert.True(t, errors.Is(wrap2, proto))
-	assert.True(t, errors.Is(wrap3, proto))
+	require.ErrorIs(t, wrap1, proto)
+	require.ErrorIs(t, wrap2, proto)
+	require.ErrorIs(t, wrap3, proto)
 
 	// И зеркальная проверка
-	assert.True(t, errors.Is(proto, wrap1))
-	assert.True(t, errors.Is(proto, wrap2))
-	assert.True(t, errors.Is(proto, wrap3))
+	require.ErrorIs(t, proto, wrap1)
+	require.ErrorIs(t, proto, wrap2)
+	assert.ErrorIs(t, proto, wrap3)
 }
 
 func TestWrapError_DeepChain_ErrorsAs(t *testing.T) {
@@ -267,14 +268,15 @@ func TestWrapError_DeepChain_ErrorsAs(t *testing.T) {
 	// errors.As находит первый ProtoError в цепочке — это wrap3 (proto2 обёртка).
 	// wrapError теперь реализует ProtoError.
 	var target userfast.ProtoError
+
 	require.ErrorAs(t, wrap3, &target)
 	assert.Equal(t, "code2", target.Code()) // code2, т.к. wrap3 — это обёртка proto2
 
 	// errors.Is(wrap3, proto1) — wrap3 содержит proto1 внутри через цепочку
-	assert.True(t, errors.Is(wrap3, proto1))
+	require.ErrorIs(t, wrap3, proto1)
 
 	// errors.Is(wrap3, proto2) — wrap3 сам является proto2 обёрткой
-	assert.True(t, errors.Is(wrap3, proto2))
+	assert.ErrorIs(t, wrap3, proto2)
 }
 
 func TestWrapError_MixedStdErrors(t *testing.T) {
@@ -288,8 +290,8 @@ func TestWrapError_MixedStdErrors(t *testing.T) {
 	wrap2 := proto.Wrap(wrap1)
 
 	// errors.Is должен найти stdErr1 через цепочку
-	assert.True(t, errors.Is(wrap2, stdErr1))
-	assert.False(t, errors.Is(wrap2, stdErr2))
+	require.ErrorIs(t, wrap2, stdErr1)
+	assert.NotErrorIs(t, wrap2, stdErr2)
 }
 
 func TestWrapError_InterfaceContract(t *testing.T) {
@@ -307,8 +309,9 @@ func TestWrapError_InterfaceContract(t *testing.T) {
 		Args() []any
 	}
 
-	iface, ok := wrapped.(fullError)
-	require.True(t, ok)
+	var iface fullError
+
+	require.ErrorAs(t, wrapped, &iface)
 	assert.Equal(t, kind.User, iface.Kind())
 	assert.Equal(t, "code", iface.Code())
 	assert.Equal(t, "message", iface.Message())

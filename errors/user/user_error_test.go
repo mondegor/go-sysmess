@@ -144,7 +144,7 @@ func TestProto_Wrap_Nil(t *testing.T) {
 
 	// В user.Wrap(nil) оборачивает ErrHasNilError вместо возврата прототипа
 	require.Error(t, wrapped)
-	assert.ErrorIs(t, wrapped, user.ErrHasNilError)
+	require.ErrorIs(t, wrapped, user.ErrHasNilError)
 
 	// Ошибка содержит сообщение прототипа
 	assert.ErrorContains(t, wrapped, "#code - message")
@@ -158,19 +158,21 @@ func TestProto_Wrap_Error(t *testing.T) {
 	wrapped := proto.Wrap(baseErr)
 
 	// Wrap возвращает ошибку, содержащую сообщение прототипа
-	assert.ErrorContains(t, wrapped, "#code - message")
-	assert.ErrorContains(t, wrapped, "base error")
+	require.ErrorContains(t, wrapped, "#code - message")
+	require.ErrorContains(t, wrapped, "base error")
 
 	// errors.Is находит прототип в обёртке
-	assert.True(t, errors.Is(wrapped, proto))
+	require.ErrorIs(t, wrapped, proto)
 
 	// errors.As извлекает ProtoError из обёртки.
 	// Возвращается *protoError с тем же id, но установленным err.
 	var target user.ProtoError
+
 	require.ErrorAs(t, wrapped, &target)
+
 	// Сравнение через proto.Is — совпадает по id
-	assert.True(t, errors.Is(wrapped, target))
-	assert.True(t, errors.Is(target, proto))
+	require.ErrorIs(t, wrapped, target)
+	require.ErrorIs(t, target, proto)
 	assert.Equal(t, "code", target.Code())
 }
 
@@ -181,8 +183,8 @@ func TestProto_New_Args(t *testing.T) {
 	err := proto.New("email")
 
 	// New подставляет аргументы в сообщение
-	assert.ErrorContains(t, err, "#VALIDATION")
-	assert.ErrorContains(t, err, "field")
+	require.ErrorContains(t, err, "#VALIDATION")
+	require.ErrorContains(t, err, "field")
 
 	// Args возвращает аргументы для локализации
 	argsGetter, ok := err.(interface{ Args() []any })
@@ -224,8 +226,8 @@ func TestProto_Unwrap_Chain(t *testing.T) {
 	assert.Equal(t, innerErr, errors.Unwrap(outerErr))
 
 	// errors.Is должен найти base error через цепочку (сравниваем тот же объект)
-	assert.True(t, errors.Is(outerErr, baseErr))
-	assert.True(t, errors.Is(outerErr, innerProto))
+	require.ErrorIs(t, outerErr, baseErr)
+	assert.ErrorIs(t, outerErr, innerProto)
 }
 
 func TestProto_As_FromWrapped(t *testing.T) {
@@ -238,8 +240,10 @@ func TestProto_As_FromWrapped(t *testing.T) {
 	// В user пакете Wrap создаёт новый *protoError,
 	// который имеет тот же id и сравнивается через Is().
 	var target user.ProtoError
+
 	require.ErrorAs(t, wrapped, &target)
-	assert.True(t, errors.Is(target, proto))
+
+	require.ErrorIs(t, target, proto)
 	assert.Equal(t, "code", target.Code())
 }
 
@@ -250,8 +254,10 @@ func TestProto_As_FromWrappedWithArgs(t *testing.T) {
 	wrapped := proto.Wrap(errors.New("db error"), "email")
 
 	var target user.ProtoError
+
 	require.ErrorAs(t, wrapped, &target)
-	assert.True(t, errors.Is(target, proto))
+
+	require.ErrorIs(t, target, proto)
 	assert.Equal(t, "VALIDATION", target.Code())
 
 	argsGetter, ok := wrapped.(interface{ Args() []any })
@@ -282,10 +288,10 @@ func TestProto_ErrorsIs_DeepChain(t *testing.T) {
 	wrap1 := proto.Wrap(err1)
 	wrap2 := proto.Wrap(wrap1)
 
-	assert.True(t, errors.Is(wrap1, proto))
-	assert.True(t, errors.Is(wrap2, proto))
-	assert.True(t, errors.Is(wrap1, err1))
-	assert.True(t, errors.Is(wrap2, err1))
+	require.ErrorIs(t, wrap1, proto)
+	require.ErrorIs(t, wrap2, proto)
+	require.ErrorIs(t, wrap1, err1)
+	assert.ErrorIs(t, wrap2, err1)
 }
 
 func TestProto_ErrorsIs_CrossProto(t *testing.T) {
@@ -296,15 +302,15 @@ func TestProto_ErrorsIs_CrossProto(t *testing.T) {
 	wrapped := proto2.Wrap(proto1)
 
 	// wrapped (proto2) содержит proto1 внутри через Unwrap
-	assert.True(t, errors.Is(wrapped, proto1))
-	assert.True(t, errors.Is(wrapped, proto2))
+	require.ErrorIs(t, wrapped, proto1)
+	require.ErrorIs(t, wrapped, proto2)
 
 	// proto1 не содержит wrapped (разные id: proto1 != proto2)
-	assert.False(t, errors.Is(proto1, wrapped))
+	require.NotErrorIs(t, proto1, wrapped)
 
 	// proto2 содержит wrapped, т.к. wrapped имеет тот же id, что и proto2
 	// (protoError.Is сравнивает по id, а не по указателю)
-	assert.True(t, errors.Is(proto2, wrapped))
+	assert.ErrorIs(t, proto2, wrapped)
 }
 
 var errTestProtoInstanceAs = user.New("test-code1", "test-message1")
