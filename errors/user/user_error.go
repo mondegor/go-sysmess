@@ -20,9 +20,9 @@ type (
 	ProtoError interface {
 		error
 
+		Code() string
 		New(args ...any) error
 		Wrap(err error, args ...any) error
-		Code() string
 	}
 
 	protoError struct {

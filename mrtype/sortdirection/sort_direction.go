@@ -34,7 +34,11 @@ var (
 
 // String - возвращает значение в виде строки.
 func (e Enum) String() string {
-	return enumKeys[e]
+	if v, ok := enumKeys[e]; ok {
+		return v
+	}
+
+	return "UNKNOWN"
 }
 
 // Parse - парсит указанное значение и если оно валидно, то устанавливает его числовое значение.

@@ -89,34 +89,141 @@ func TestProto_Is(t *testing.T) {
 	errUserTest2 := userfast.New("test-code2", "test-message2")
 
 	tests := []struct {
-		name   string
-		target error
-		want   bool
+		name       string
+		err        error
+		want       bool
+		mirrorWant bool
 	}{
 		{
-			name:   "test1",
-			target: errors.New("my-message"),
-			want:   false,
+			name:       "test1",
+			err:        errors.New("my-message"),
+			want:       false,
+			mirrorWant: false,
 		},
 		{
-			name:   "test2",
-			target: errUserTest1,
-			want:   true,
+			name:       "test2",
+			err:        errUserTest1,
+			want:       true,
+			mirrorWant: true,
 		},
 		{
-			name:   "test3",
-			target: errUserTest2,
-			want:   false,
+			name:       "test3",
+			err:        errUserTest2,
+			want:       false,
+			mirrorWant: false,
+		},
+		{
+			name:       "test4",
+			err:        errUserTest1.Wrap(errors.New("test-error3")),
+			want:       true,
+			mirrorWant: true,
+		},
+		{
+			name:       "test5",
+			err:        errUserTest1.Wrap(errUserTest1),
+			want:       true,
+			mirrorWant: true,
+		},
+		{
+			name:       "test6",
+			err:        errUserTest1.Wrap(errUserTest2),
+			want:       true,
+			mirrorWant: true,
+		},
+		{
+			name:       "test7",
+			err:        errUserTest2.Wrap(errors.New("test-error3")),
+			want:       false,
+			mirrorWant: false,
+		},
+		{
+			name:       "test8",
+			err:        errUserTest2.Wrap(errUserTest1),
+			want:       true,
+			mirrorWant: false,
+		},
+		{
+			name:       "test9",
+			err:        errUserTest2.Wrap(errUserTest2),
+			want:       false,
+			mirrorWant: false,
+		},
+		{
+			name:       "test10",
+			err:        errUserTest2.Wrap(errUserTest1.Wrap(errUserTest1)),
+			want:       true,
+			mirrorWant: false,
+		},
+		{
+			name:       "test11",
+			err:        errUserTest2.Wrap(errUserTest2.Wrap(errUserTest1)),
+			want:       true,
+			mirrorWant: false,
+		},
+		{
+			name:       "test12",
+			err:        errUserTest2.Wrap(errUserTest2.Wrap(errUserTest2)),
+			want:       false,
+			mirrorWant: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := errors.Is(tt.target, errUserTest1)
+			got := errors.Is(tt.err, errUserTest1)
 			assert.Equal(t, tt.want, got)
+
+			got = errors.Is(errUserTest1, tt.err)
+			assert.Equal(t, tt.mirrorWant, got)
 		})
 	}
+}
+
+func TestProto_Wrap_Nil(t *testing.T) {
+	t.Parallel()
+
+	proto := userfast.New("code", "message")
+	err := proto.Wrap(nil)
+
+	// При передаче nil Wrap возвращает сам прототип, а не обёртку
+	assert.Same(t, proto, err)
+}
+
+func TestProto_Wrap_Error(t *testing.T) {
+	t.Parallel()
+
+	proto := userfast.New("code", "message")
+	baseErr := errors.New("base error")
+	wrapped := proto.Wrap(baseErr)
+
+	// Wrap возвращает ошибку, содержащую сообщение прототипа
+	assert.ErrorContains(t, wrapped, "#code - message")
+	assert.ErrorContains(t, wrapped, "base error")
+
+	// errors.Is находит прототип в обёртке
+	assert.True(t, errors.Is(wrapped, proto))
+
+	// errors.As извлекает ProtoError из обёртки
+	var target userfast.ProtoError
+
+	require.ErrorAs(t, wrapped, &target)
+	assert.Equal(t, "code", target.Code())
+}
+
+func TestProto_As_FromWrapped(t *testing.T) {
+	t.Parallel()
+
+	proto := userfast.New("code", "message")
+	wrapped := proto.Wrap(errors.New("inner error"))
+
+	// errors.As извлекает ProtoError из обёртки.
+	// Поскольку wrapError тоже реализует ProtoError,
+	// errors.As возвращает саму обёртку, а не оригинальный protoError.
+	var target userfast.ProtoError
+
+	require.ErrorAs(t, wrapped, &target)
+	assert.Equal(t, "code", target.Code())
 }
 
 var errTestProtoInstanceAs = userfast.New("test-code1", "test-message1")

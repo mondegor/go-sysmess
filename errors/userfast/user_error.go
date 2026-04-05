@@ -16,6 +16,7 @@ type (
 		error
 
 		Code() string
+		Wrap(err error) error
 	}
 
 	protoError struct {
@@ -36,14 +37,22 @@ func New(code, message string) ProtoError {
 	}
 }
 
+// Wrap - оборачивает указанную ошибку в прототип пользовательской ошибки.
+// Если err == nil, возвращает сам прототип.
+func (e *protoError) Wrap(err error) error {
+	if err == nil {
+		return e
+	}
+
+	return &wrapError{
+		proto: e,
+		err:   err,
+	}
+}
+
 // Kind - всегда возвращает kind.User.
 func (e *protoError) Kind() kind.Enum {
 	return kind.User
-}
-
-// Code - возвращает код ошибки.
-func (e *protoError) Code() string {
-	return e.message[1:e.pos]
 }
 
 // Message - возвращает сообщение об ошибке (для поддержки локализации).
@@ -56,7 +65,26 @@ func (e *protoError) Args() []any {
 	return nil
 }
 
+// Code - возвращает код ошибки.
+func (e *protoError) Code() string {
+	return e.message[1:e.pos]
+}
+
 // Error - возвращает ошибку в виде строки.
 func (e *protoError) Error() string {
 	return e.message
+}
+
+// Is - сообщает, имеет ли указанная ошибка тот же
+// прототип ошибки (errors.Is использует этот интерфейс).
+func (e *protoError) Is(target error) bool {
+	if e == target {
+		return true
+	}
+
+	if t, ok := target.(*wrapError); ok {
+		return e == t.proto
+	}
+
+	return false
 }
