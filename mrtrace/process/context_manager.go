@@ -29,7 +29,14 @@ type (
 	}
 )
 
-// NewContextManager - создаёт объект ContextManager.
+// NewContextManager - создаёт менеджер контекста для управления ID процессов.
+// Параметры:
+//   - keyGetIDWithID - список триад (ключ, функция получения ID, функция установки ID);
+//   - correlationKeys - список ключей, которые могут использоваться как ID корреляции;
+//   - idGenerator - генератор уникальных ID;
+//   - logger - логгер для предупреждений при отсутствии ключей;
+//
+// Возвращает ошибку при дублировании ключей или отсутствии correlationKeys в keyGetIDWithID.
 func NewContextManager(
 	keyGetIDWithID []KeyGetIDWithID,
 	correlationKeys []string,
@@ -91,7 +98,8 @@ func NewContextManager(
 	return &cm, nil
 }
 
-// ProcessID - возвращает из контекста ID процесса по его имени key.
+// ProcessID - извлекает ID процесса из контекста по указанному ключу.
+// Если ключ не зарегистрирован, логирует предупреждение и возвращает пустую строку.
 func (e *ContextManager) ProcessID(ctx context.Context, key string) string {
 	if fn, ok := e.keyGetID[key]; ok {
 		return fn(ctx)
@@ -102,7 +110,8 @@ func (e *ContextManager) ProcessID(ctx context.Context, key string) string {
 	return ""
 }
 
-// WithProcessID - устанавливает ID процесса в контекст по его имени key и возвращает получившийся контекст.
+// WithProcessID - устанавливает указанный ID процесса в контекст по ключу.
+// Если ключ не зарегистрирован, логирует предупреждение и возвращает исходный контекст без изменений.
 func (e *ContextManager) WithProcessID(ctx context.Context, key, value string) context.Context {
 	if fn, ok := e.keyWithID[key]; ok {
 		return fn(ctx, value)
@@ -113,8 +122,8 @@ func (e *ContextManager) WithProcessID(ctx context.Context, key, value string) c
 	return ctx
 }
 
-// WithGeneratedProcessID - генерирует ID процесса,
-// устанавливает его в контекст по его имени key и возвращает получившийся контекст.
+// WithGeneratedProcessID - генерирует новый уникальный ID процесса и устанавливает его в контекст.
+// Если ключ не зарегистрирован, логирует предупреждение и возвращает исходный контекст без изменений.
 func (e *ContextManager) WithGeneratedProcessID(ctx context.Context, key string) context.Context {
 	if fn, ok := e.keyWithID[key]; ok {
 		return fn(ctx, e.idGenerator.GenerateID())
@@ -125,17 +134,20 @@ func (e *ContextManager) WithGeneratedProcessID(ctx context.Context, key string)
 	return ctx
 }
 
-// // NewContextWithIDs - возвращает результат вызова функции NewContextWithIDs.
+// // NewContextWithIDs - возвращает новый контекст содержащий
+// // только все ID процессы, скопированные из указанного контекста.
 // func (e *ContextManager) NewContextWithIDs(originalCtx context.Context) context.Context {
 // 	return NewContextWithIDs(originalCtx, e.newContextWithIDs)
 // }
 
-// ExtractKeysValues - возвращает результат вызова функции ExtractKeysValues.
+// ExtractKeysValues - извлекает все зарегистрированные ID процессов из контекста.
+// Возвращает плоский слайс пар ключ/значение: ["key1", "value1", "key2", "value2", ...].
 func (e *ContextManager) ExtractKeysValues(ctx context.Context) []any {
 	return ExtractKeysValues(ctx, e.extractKeysValues)
 }
 
-// ExtractCorrelationID - возвращает результат вызова функции ExtractCorrelationID.
+// ExtractCorrelationID - извлекает первый найденный ID корреляции из контекста.
+// Проверяет ключи в порядке, указанном при создании ContextManager.
 func (e *ContextManager) ExtractCorrelationID(ctx context.Context) string {
 	return ExtractCorrelationID(ctx, e.extractCorrelationID)
 }

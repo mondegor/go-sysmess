@@ -1,7 +1,8 @@
 package wrap
 
 type (
-	// ErrorWrapper - помощник для оборачивания ошибок.
+	// ErrorWrapper - помощник для обёртывания ошибок.
+	// Позволяет настраивать стратегию обёртывания через композицию функций.
 	ErrorWrapper interface {
 		Wrap(err error, attrs ...any) error
 	}
@@ -12,7 +13,9 @@ type (
 	}
 )
 
-// NewShellErrorWrapper - создаёт объект ErrorWrapper.
+// NewShellErrorWrapper - создаёт обёртку с двумя уровнями обработки.
+// Параметр wrapFunc - основная функция обёртывания; если она возвращает ok=true,
+// результат сразу возвращается. Если ok=false, используется defaultWrapper.
 func NewShellErrorWrapper(
 	wrapFunc func(err error, attrs []any) (wrappedErr error, ok bool),
 	defaultWrapper ErrorWrapper,
@@ -33,9 +36,8 @@ func NewShellErrorWrapper(
 	}
 }
 
-// Wrap - анализирует указанную ошибку, при необходимости её преобразует/оборачивает и возвращает результат.
-// Сначала преобразование происходит с помощью wrapFunc, если попытка не удалась,
-// то ошибка оборачивается в defaultWrapper.
+// Wrap - анализирует ошибку и пытается обернуть её через wrapFunc.
+// Если wrapFunc вернула ok=false, ошибка оборачивается через defaultWrapper.
 func (w *shellErrorWrapper) Wrap(err error, attrs ...any) error {
 	if wrappedErr, ok := w.wrapFunc(err, attrs); ok {
 		return wrappedErr
@@ -45,10 +47,12 @@ func (w *shellErrorWrapper) Wrap(err error, attrs ...any) error {
 }
 
 type (
+	// nopErrorWrapper - заглушка, реализующая интерфейс ErrorWrapper.
+	// Возвращает переданную ошибку без изменений.
 	nopErrorWrapper struct{}
 )
 
-// NopErrorWrapper - создаёт объект ErrorWrapper, который возвращает переданную ему ошибку как есть.
+// NopErrorWrapper - создаёт ErrorWrapper-заглушку.
 func NopErrorWrapper() ErrorWrapper {
 	return nopErrorWrapper{}
 }

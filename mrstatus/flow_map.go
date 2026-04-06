@@ -1,7 +1,8 @@
 package mrstatus
 
 type (
-	// FlowMap - интерфейс для управления статусами их переключениями.
+	// FlowMap - интерфейс управления переходами между статусами.
+	// Определяет, какие статусы зарегистрированы и какие переходы между ними допустимы.
 	FlowMap[Status ~uint8] interface {
 		Registered() []Status
 		Exists(status Status) bool
@@ -10,7 +11,9 @@ type (
 		PossibleFromStatuses(to Status) []Status
 	}
 
-	// FlowNode - узел содержащий статус и список статусов, в который этот статус можно переключить.
+	// FlowNode - описывает допустимые переходы из одного статуса в другие.
+	// From - исходный статус.
+	// To - список статусов, в которые разрешён переход из From.
 	FlowNode[Status ~uint8] struct {
 		From Status
 		To   []Status
@@ -24,7 +27,9 @@ type (
 	}
 )
 
-// NewFlowMap - создаёт объект FlowMap[Status].
+// NewFlowMap - создаёт карту допустимых переходов между статусами.
+// Параметр list - список узлов переходов (FlowNode), определяющих граф состояний.
+// Автоматически строит двунаправленную карту: from→to и to→from.
 func NewFlowMap[Status ~uint8](list []FlowNode[Status]) FlowMap[Status] {
 	fromToMap := make(map[Status][]Status, len(list))
 	toFromMap := make(map[Status][]Status, len(list))

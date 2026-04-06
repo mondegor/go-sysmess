@@ -6,19 +6,22 @@ import (
 )
 
 type (
-	// Image - мета-информация изображения вместе с источником изображения.
+	// Image - изображение с мета-информацией и потоком данных для чтения.
+	// Body представляет io.ReadCloser для чтения содержимого изображения.
 	Image struct {
 		ImageInfo
 		Body io.ReadCloser
 	}
 
-	// ImageContent - изображение с мета-информацией.
+	// ImageContent - изображение с мета-информацией и содержимым в памяти.
+	// Body содержит все данные изображения в виде байтового слайса.
 	ImageContent struct {
 		ImageInfo
 		Body []byte
 	}
 
-	// ImageHeader - мета-информация изображения вместе с источником изображения (multipart/form-data).
+	// ImageHeader - изображение с мета-информацией из multipart/form-data запроса.
+	// Header содержит заголовок multipart-файла для доступа к оригинальным метаданным.
 	ImageHeader struct {
 		ImageInfo
 		Header *multipart.FileHeader

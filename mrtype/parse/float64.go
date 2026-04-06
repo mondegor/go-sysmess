@@ -14,8 +14,9 @@ const (
 	maxLenFloat64       = 64
 )
 
-// Float64 - возвращает Float64 значение из указанной строки.
-// Если параметр пустой, то в зависимости от required возвращается 0 или ошибка.
+// Float64 - парсит строку в значение float64.
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает 0.
 func Float64(value string, required bool) (float64, error) {
 	value = strings.TrimSpace(value)
 
@@ -39,7 +40,8 @@ func Float64(value string, required bool) (float64, error) {
 	return item, nil
 }
 
-// RangeFloat64 - возвращает RangeFloat64 из строковых параметров.
+// RangeFloat64 - парсит два строковых значения в RangeFloat64.
+// Если maxValue меньше minValue и maxValue > 0, автоматически меняет их местами.
 func RangeFloat64(minValue, maxValue string) (mrtype.RangeFloat64, error) {
 	parsedMinValue, err := Float64(minValue, false)
 	if err != nil {

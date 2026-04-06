@@ -6,7 +6,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// BoolToNumber - возвращает преобразованный bool к Number.
+// BoolToNumber - преобразует bool в числовой тип: true → 1, false → 0.
 func BoolToNumber[Number constraints.Integer | constraints.Float](value bool) Number {
 	if value {
 		return 1
@@ -15,8 +15,8 @@ func BoolToNumber[Number constraints.Integer | constraints.Float](value bool) Nu
 	return 0
 }
 
-// BoolToPointer - возвращает преобразованный bool к его указателю.
-// Если свойство required не указано или равно false, то вместо значения false будет возвращено nil.
+// BoolToPointer - возвращает указатель на bool.
+// Если required не указан или false, для значения false возвращается nil.
 func BoolToPointer(value bool, required ...bool) *bool {
 	if isNullable(required) && !value {
 		return nil
@@ -25,8 +25,8 @@ func BoolToPointer(value bool, required ...bool) *bool {
 	return &value
 }
 
-// NumberToPointer - возвращает преобразованный number к его указателю.
-// Если свойство required не указано или равно false, то вместо нулевого значения будет возвращено nil.
+// NumberToPointer - возвращает указатель на числовое значение.
+// Если required не указан или false, для нулевого значения возвращается nil.
 func NumberToPointer[Number constraints.Integer | constraints.Float](value Number, required ...bool) *Number {
 	if isNullable(required) && value == 0 {
 		return nil
@@ -35,8 +35,8 @@ func NumberToPointer[Number constraints.Integer | constraints.Float](value Numbe
 	return &value
 }
 
-// StringToPointer - возвращает преобразованную строку к его указателю.
-// Если свойство required не указано или равно false, то вместо пустого значения будет возвращено nil.
+// StringToPointer - возвращает указатель на строку.
+// Если required не указан или false, для пустой строки возвращается nil.
 func StringToPointer(value string, required ...bool) *string {
 	if isNullable(required) && value == "" {
 		return nil
@@ -45,8 +45,8 @@ func StringToPointer(value string, required ...bool) *string {
 	return &value
 }
 
-// TimeToPointer - возвращает преобразованное время к его указателю.
-// Если свойство required не указано или равно false, то вместо нулевого значения будет возвращено nil.
+// TimeToPointer - возвращает указатель на значение времени.
+// Если required не указан или false, для нулевого времени возвращается nil.
 func TimeToPointer(value time.Time, required ...bool) *time.Time {
 	if isNullable(required) && value.IsZero() {
 		return nil

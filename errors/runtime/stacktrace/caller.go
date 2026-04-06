@@ -13,12 +13,14 @@ const (
 )
 
 type (
-	// Caller - обёртка runtime.Callers для более удобного формирования стека вызовов.
+	// Caller - сборщик стека вызовов функций на основе runtime.Callers.
+	// Позволяет настраивать глубину, отображение имён функций и границы стека.
 	Caller interface {
 		Call() StackTrace
 	}
 
-	// StackTrace - объект с уже сформированным стеком вызовов функций.
+	// StackTrace - готовый стек вызовов функций.
+	// Предоставляет итератор для последовательного чтения кадров стека.
 	StackTrace interface {
 		Iterator() func() (index int, name, file string, line int)
 	}
@@ -53,7 +55,10 @@ func NewCaller(opts ...Option) Caller {
 	return c
 }
 
-// Call - формирует стек вызовов для текущего вызова функции и возвращает его.
+// Call - собирает стек вызовов функций начиная с места вызова этой функции.
+// Автоматически отсекает кадры выше функции main (upperBoundPrefix)
+// и кадры ниже нижней границы (findBottomBoundFunc).
+// Возвращает не более depth кадров.
 func (c *caller) Call() StackTrace {
 	var pcs [stackTraceMaxDepth]uintptr
 	top, n := 0, runtime.Callers(2, pcs[:])

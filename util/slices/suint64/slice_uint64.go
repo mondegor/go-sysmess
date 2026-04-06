@@ -2,7 +2,9 @@ package suint64
 
 import "slices"
 
-// FilterFunc - возвращает отфильтрованный массив (не копию).
+// FilterFunc - фильтрует слайс uint64 на месте (без выделения нового слайса).
+// Удаляет элементы, для которых check возвращает false.
+// Возвращает усечённый слайс.
 func FilterFunc(s []uint64, check func(el uint64) bool) []uint64 {
 	for i := 0; i < len(s); i++ {
 		if check(s[i]) {

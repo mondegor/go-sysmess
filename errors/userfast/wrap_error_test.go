@@ -265,17 +265,17 @@ func TestWrapError_DeepChain_ErrorsAs(t *testing.T) {
 	wrap2 := proto1.Wrap(wrap1)
 	wrap3 := proto2.Wrap(wrap2)
 
-	// errors.As находит первый ProtoError в цепочке — это wrap3 (proto2 обёртка).
+	// errors.As находит первый ProtoError в цепочке - это wrap3 (proto2 обёртка).
 	// wrapError теперь реализует ProtoError.
 	var target userfast.ProtoError
 
 	require.ErrorAs(t, wrap3, &target)
-	assert.Equal(t, "code2", target.Code()) // code2, т.к. wrap3 — это обёртка proto2
+	assert.Equal(t, "code2", target.Code()) // code2, т.к. wrap3 - это обёртка proto2
 
-	// errors.Is(wrap3, proto1) — wrap3 содержит proto1 внутри через цепочку
+	// errors.Is(wrap3, proto1) - wrap3 содержит proto1 внутри через цепочку
 	require.ErrorIs(t, wrap3, proto1)
 
-	// errors.Is(wrap3, proto2) — wrap3 сам является proto2 обёрткой
+	// errors.Is(wrap3, proto2) - wrap3 сам является proto2 обёрткой
 	assert.ErrorIs(t, wrap3, proto2)
 }
 

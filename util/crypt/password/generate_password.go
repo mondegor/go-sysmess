@@ -35,20 +35,23 @@ type (
 		letters         []byte
 	}
 
-	// Generator - библиотека для генерации стоковых последовательностей.
+	// Generator - генератор паролей с настраиваемыми наборами символов.
+	// Позволяет создавать пароли с ограничениями на последовательные символы.
 	Generator struct {
 		pwCharSets []pwCharSet
 	}
 )
 
-// NewGenerator - создаёт объект Generator.
+// NewGenerator - создаёт генератор паролей с предустановленными наборами символов.
 func NewGenerator() *Generator {
 	return &Generator{
 		pwCharSets: pwCharSets[:],
 	}
 }
 
-// Generate - возвращает сгенерированный пароль с указанной длиной и видами символов.
+// Generate - генерирует пароль указанной длины с заданным набором символов.
+// Параметр charsKinds определяет используемые символы: гласные, согласные, цифры, знаки.
+// Ограничивает количество последовательных символов одного типа для повышения надёжности.
 func (pg *Generator) Generate(length int, charsKinds CharKinds) string {
 	if length < 1 {
 		length = 1

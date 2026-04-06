@@ -11,7 +11,12 @@ const (
 	typePageParamsSize  = "PageParams.Size"
 )
 
-// PageParams - возвращает PageParams из строковых параметров по указанным ключам.
+// PageParams - парсит параметры страничной пагинации из строк.
+// Параметры:
+//   - indexValue - индекс страницы;
+//   - sizeValue - количество элементов на странице;
+//
+// Возвращает ошибку, если значения превышают math.MaxInt.
 func PageParams(indexValue, sizeValue string) (mrtype.PageParams, error) {
 	parsedIndex, err := Uint64(indexValue, false)
 	if err != nil {

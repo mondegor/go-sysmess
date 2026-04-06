@@ -11,8 +11,9 @@ const (
 	maxLenUint64List = 256
 )
 
-// Uint64 - возвращает Uint64 значение из указанной строки.
-// Если параметр пустой, то в зависимости от required возвращается 0 или ошибка.
+// Uint64 - парсит строку в значение uint64.
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает 0.
 func Uint64(value string, required bool) (uint64, error) {
 	value = strings.TrimSpace(value)
 
@@ -36,8 +37,7 @@ func Uint64(value string, required bool) (uint64, error) {
 	return item, nil
 }
 
-// Uint64List - возвращает массив Uint64 значений из указанной строки.
-// Если параметр пустой, то возвращается пустой массив.
+// Uint64List - парсит строку с разделителями-запятыми в список uint64.
 func Uint64List(value string) ([]uint64, error) {
 	value = strings.TrimSpace(value)
 

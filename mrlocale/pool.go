@@ -5,8 +5,9 @@ import (
 )
 
 type (
-	// Pool - загружает и транслирует сообщения, ошибки,
-	// справочники объектов на различные языки.
+	// Pool - управляет набором Localizer для всех поддерживаемых языков.
+	// Создаётся из Bundle и предоставляет удобный поиск локализатора
+	// по близости к указанному языку через language.Matcher.
 	Pool struct {
 		bundle           *Bundle
 		localizers       map[language.Tag]*Localizer
@@ -14,7 +15,8 @@ type (
 	}
 )
 
-// NewPool - создаёт объект Pool.
+// NewPool - создаёт Pool из Bundle.
+// Создаёт Localizer для каждого языка, поддерживаемого провайдером.
 func NewPool(bundle *Bundle) *Pool {
 	languages := bundle.provider.Languages()
 	localizers := make(map[language.Tag]*Localizer, len(languages))
@@ -33,8 +35,10 @@ func NewPool(bundle *Bundle) *Pool {
 	}
 }
 
-// Localizer - возвращает локализатор сообщений с использованием самого близкого языка для перевода из указанных.
-// Если такой язык найти не удалось, то возвращается локализатор с языком по умолчанию.
+// Localizer - возвращает Localizer для наиболее близкого языка из списка langs.
+// Использует language.Matcher для поиска лучшего совпадения.
+// Если совпадение не найдено, возвращает Localizer для языка по умолчанию.
+// Если langs пуст, также возвращает Localizer по умолчанию.
 func (p *Pool) Localizer(langs ...language.Tag) *Localizer {
 	if len(langs) > 0 {
 		lang, _, _ := p.bundle.languageMatcher.Match(langs...)

@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-// Extract - возвращает дополнительные данные, которые ассоциированы с ошибкой.
+// Extract - извлекает Hint из ошибки, если она реализует интерфейс Hint().
+// Если ошибка не имеет Hint, возвращает заглушку nopHint (пустой Hint).
 func Extract(err error) Hint {
 	if e, ok := err.(interface{ Hint() any }); ok {
 		if ht, ok := e.Hint().(Hint); ok {
@@ -16,7 +17,7 @@ func Extract(err error) Hint {
 	return nopHint{}
 }
 
-// DetailedError - детальная информация об ошибке.
+// DetailedError - возвращает детальное строковое представление ошибки со стеком вызовов.
 func DetailedError(err error) string {
 	var buf strings.Builder
 

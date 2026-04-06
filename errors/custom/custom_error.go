@@ -13,10 +13,11 @@ const (
 )
 
 type (
-	// Error - пользовательская ошибка с уточнённым кодом ошибки.
-	// Используется в слое представления, непосредственно перед выводом ошибки пользователю.
-	// Например, код может выглядеть следующим образом: EmailAlreadyExists/userEmail
-	// Где EmailAlreadyExists - пользовательская ошибка, userEmail - поле, в которой произошла ошибка.
+	// Error - пользовательская ошибка с уточнённым кодом ошибки (customCode).
+	// Применяется в слое представления, перед выводом ошибки пользователю.
+	// Позволяет добавить контекст к базовой ошибке, указав конкретное поле.
+	// Пример кода: "EmailAlreadyExists/userEmail", где EmailAlreadyExists - базовая ошибка,
+	// а userEmail - поле, в котором произошла ошибка.
 	Error interface {
 		error
 
@@ -47,9 +48,10 @@ var (
 	ErrHasUnexpectedError = errors.New("custom error has unexpected wrapped error")
 )
 
-// New - создаёт объект Error.
-// Если аргумент err содержит любую ошибку, у которой тип отличается от kind.User,
-// то созданная ошибка будет считаться невалидной и при отображении будет выдана системная ошибка.
+// New - создаёт пользовательскую ошибку с уточнённым кодом.
+// Если err == nil или err имеет тип kind.Internal или kind.System,
+// ошибка помечается как невалидная с соответствующим causeError.
+// Задача разработчика - обрабатывать ошибки ранее, чтобы не допускать такие ситуации.
 func New(err error, customCode string) Error {
 	if customCode == "" {
 		customCode = missingCode
@@ -96,19 +98,17 @@ func New(err error, customCode string) Error {
 	}
 }
 
-// IsKindUser - возвращает true, если внутри содержится пользовательская ошибка,
-// все остальные ошибки считаются невалидными,
-// программисту необходимо позаботиться их обернуть в пользовательский вид ошибки.
+// IsKindUser - сообщает, имеет ли обёрнутая ошибка тип kind.User.
 func (e *customError) IsKindUser() bool {
 	return e.isKindUser
 }
 
-// CustomCode - возвращает персональный код ошибки.
+// CustomCode - возвращает уточнённый код ошибки включая базовый код.
 func (e *customError) CustomCode() string {
 	return e.customCode
 }
 
-// Error - возвращает ошибку в виде строки.
+// Error - возвращает строковое представление ошибки.
 func (e *customError) Error() string {
 	var buf strings.Builder
 
@@ -131,7 +131,8 @@ func (e *customError) Error() string {
 	return buf.String()
 }
 
-// Unwrap - возвращает вложенную ошибку.
+// Unwrap - реализует интерфейс errors.Unwrap.
+// Возвращает вложенную ошибку или ErrHasNilError, если исходная ошибка была nil.
 func (e *customError) Unwrap() error {
 	if e.err != nil {
 		return e.err

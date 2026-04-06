@@ -20,6 +20,7 @@ import (
 )
 
 type (
+	// runtimeError - интерфейс runtime-ошибки с указанием типа и подсказки.
 	runtimeError interface {
 		error
 
@@ -27,13 +28,18 @@ type (
 		Hint() any
 	}
 
+	// errorHint - интерфейс подсказки runtime-ошибки с ID и стеком вызовов.
 	errorHint interface {
 		ErrorID() string
 		StackTraceIterator() func() (index int, name, file string, line int)
 	}
 )
 
-// InitLogger - создаёт и инициализирует slog.LoggerAdapter.
+// InitLogger - создаёт и настраивает slog.LoggerAdapter согласно конфигурации.
+// Автоматически добавляет middleware для извлечения ID ошибки, стека вызовов
+// и идентификаторов процессов из контекста.
+// Добавляет атрибуты окружения и версии (кроме окружений с префиксом "local").
+// Возвращает ошибку при невалидных параметрах конфигурации.
 func InitLogger(cfg wire.LoggerConfig) (logger *slog.LoggerAdapter, err error) {
 	opts := initLoggerOptions(cfg)
 

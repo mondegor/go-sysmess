@@ -5,14 +5,16 @@ import (
 )
 
 type (
-	// ParamIncorrectError - param contains incorrect value.
+	// ParamIncorrectError - ошибка некорректного значения параметра.
+	// Содержит исходную ошибку парсинга или валидации.
 	ParamIncorrectError struct {
 		Type  string
 		Cause error
 	}
 )
 
-// NewParamIncorrectError - создаёт объект ParamIncorrectError.
+// NewParamIncorrectError - создаёт ошибку ParamIncorrectError для указанного типа параметра.
+// cause - исходная ошибка, приведшая к ошибке парсинга.
 func NewParamIncorrectError(paramType string, cause error) *ParamIncorrectError {
 	return &ParamIncorrectError{
 		Type:  paramType,

@@ -41,7 +41,11 @@ var passStrengthName = map[PassStrength]string{ //nolint:gochecknoglobals
 	PassStrengthBest:     "THE_BEST",
 }
 
-// CalcStrength - возвращает вычисленную сложность пароля.
+// CalcStrength - вычисляет сложность (надёжность) пароля на основе:
+// - количества уникальных символов;
+// - разнообразия наборов символов (цифры, буквы, знаки);
+// - информационной энтропии.
+// Возвращает PassStrengthNotRated для пустого пароля.
 func CalcStrength(value string) PassStrength {
 	length := len(value)
 

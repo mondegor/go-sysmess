@@ -5,14 +5,15 @@ import (
 )
 
 type (
-	// ParamRegexpError - param value doesn't match regexp.
+	// ParamRegexpError - ошибка несоответствия значения параметра регулярному выражению.
 	ParamRegexpError struct {
 		Type   string
 		Regexp string
 	}
 )
 
-// NewParamRegexpError - создаёт объект ParamRegexpError.
+// NewParamRegexpError - создаёт ошибку ParamRegexpError для указанного типа параметра.
+// regexp - строка регулярного выражения, которому значение не соответствует.
 func NewParamRegexpError(paramType, regexp string) *ParamRegexpError {
 	return &ParamRegexpError{
 		Type:   paramType,

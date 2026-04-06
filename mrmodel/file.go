@@ -6,19 +6,22 @@ import (
 )
 
 type (
-	// File - мета-информация файла вместе с источником файла.
+	// File - файл с мета-информацией и потоком данных для чтения.
+	// Body представляет io.ReadCloser для чтения содержимого файла.
 	File struct {
 		FileInfo
 		Body io.ReadCloser
 	}
 
-	// FileContent - файл с мета-информацией.
+	// FileContent - файл с мета-информацией и содержимым в памяти.
+	// Body содержит все данные файла в виде байтового слайса.
 	FileContent struct {
 		FileInfo
 		Body []byte
 	}
 
-	// FileHeader - мета-информация файла вместе с источником файла (multipart/form-data).
+	// FileHeader - файл с мета-информацией из multipart/form-data запроса.
+	// Header содержит заголовок multipart-файла для доступа к оригинальным метаданным.
 	FileHeader struct {
 		FileInfo
 		Header *multipart.FileHeader

@@ -14,8 +14,9 @@ const (
 )
 
 type (
-	// Bundle - загружает и транслирует сообщения, ошибки,
-	// справочники объектов на различные языки.
+	// Bundle - управляет локализацией сообщений, ошибок и справочников.
+	// Загружает переводы из провайдера, выбирает подходящий язык
+	// и форматирует сообщения с учётом переданных аргументов.
 	Bundle struct {
 		provider        MessageProvider
 		messagesDomain  string
@@ -27,7 +28,12 @@ type (
 	}
 )
 
-// NewBundle - создаёт объект Bundle.
+// NewBundle - создаёт Bundle для локализации сообщений.
+// Параметры:
+//   - languages - список поддерживаемых языков в формате BCP 47 (например, "en", "ru", "en-US");
+//   - opts - дополнительные опции настройки (WithMessageProvider, WithDefaultLanguage и др.);
+//
+// Первый язык в списке становится языком по умолчанию, если не задан явно через WithDefaultLanguage.
 func NewBundle(languages []string, opts ...BundleOption) (*Bundle, error) {
 	o := bundleOptions{
 		messagesDomain: DefaultMessagesDomain,
@@ -104,12 +110,15 @@ func NewBundle(languages []string, opts ...BundleOption) (*Bundle, error) {
 	}, nil
 }
 
+// localize - выполняет локализацию сообщения в указанном домене.
+// Предварительно обрабатывает сообщение и аргументы через formatMessage.
 func (b *Bundle) localize(domain string, lang language.Tag, msg string, args []any) string {
 	msg, args = b.formatMessage(msg, args)
 
 	return b.provider.Localize(domain, lang, msg, args)
 }
 
+// isDomainInArray - проверяет наличие домена в массиве доменов.
 func isDomainInArray(domain string, domains []string) bool {
 	for _, val := range domains {
 		if val == domain {

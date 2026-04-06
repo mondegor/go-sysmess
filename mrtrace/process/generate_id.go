@@ -1,33 +1,59 @@
 package process
 
 import (
-	"bytes"
 	"crypto/rand"
 	"encoding/binary"
-	"strconv"
 	"time"
 )
 
-// GenerateID - возвращает ID в формате C5R32KBPEIR-9AVDBA-SU2CN9-VDBA
-// используемый при трейсинге.
+const (
+	bufferLen   = 13 // math.Ceil(64 * math.Log(2) / math.Log(float64(baseNCharsLen)))
+	idBufferLen = 22 // trim(2) + timestamp(10) + dash(1) + random1(4) + dash(1) + random2(4)
+)
+
+//nolint:gochecknoglobals
+var (
+	baseNChars    = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")        // символы для кодирования Base-N
+	baseNCharsLen = uint64(len(baseNChars))                               // количество символов для кодирования
+	rndIfError    = [...]byte{0x0, 0x0, 0xee, 0xee, 0xee, 0xee, 0x0, 0x0} // данные по умолчанию при ошибке
+)
+
+// GenerateID - генерирует уникальный идентификатор в формате XXXXXXXXXX-XXXX-XXXX.
+// Используется для идентификации процессов при трассировке запросов.
 func GenerateID() string {
 	var (
-		value [40]byte // real 34 - 38
-		rnd   [8]byte
+		buf [bufferLen * 2]byte // (timestamp + random)
+		rnd [len(rndIfError)]byte
 	)
 
-	buf := strconv.AppendInt(value[:0], time.Now().UnixNano(), 36)
+	pos := encodeBaseN(buf[:], uint64(time.Now().UnixNano())) //nolint:gosec
 
 	if _, err := rand.Read(rnd[:]); err != nil {
-		rnd = [8]byte{0x0, 0x0, 0xee, 0xee, 0xee, 0xee, 0x0, 0x0}
+		rnd = rndIfError
 	}
 
-	buf = strconv.AppendUint(buf, binary.BigEndian.Uint64(rnd[:]), 36)
-	buf = strconv.AppendUint(buf, binary.BigEndian.Uint64(rnd[:]), 36)
+	encodeBaseN(buf[pos:], binary.BigEndian.Uint64(rnd[:]))
 
 	buf[12] = '-'
-	buf[19] = '-'
-	buf[26] = '-'
+	buf[17] = '-'
 
-	return string(bytes.ToUpper(buf[1:31]))
+	return string(buf[2:idBufferLen]) // xxXXXXXXXXXX-XXXX-XXXXxxxx
+}
+
+func encodeBaseN(buf []byte, n uint64) (pos int) {
+	var digits [bufferLen]byte
+
+	// цифры переводятся в символы в обратном порядке
+	for n > 0 {
+		q := n / baseNCharsLen
+		digits[pos] = baseNChars[n-q*baseNCharsLen]
+		pos++
+		n = q
+	}
+
+	for i := 0; i < pos; i++ {
+		buf[i] = digits[pos-1-i]
+	}
+
+	return pos
 }

@@ -43,8 +43,10 @@ type (
 // 	return ctx
 // }
 
-// ExtractKeysValues - возвращает попарно (key/id-value) все имеющиеся
-// ID процессов из указанного контекста.
+// ExtractKeysValues - извлекает ID процессов из контекста по указанному списку ключей.
+// Возвращает плоский слайс пар ключ/значение: ["key1", "value1", "key2", "value2", ...].
+// Пропускает ключи с пустыми значениями.
+// Возвращает nil для nil-контекста, context.Background() или пустого списка ключей.
 func ExtractKeysValues(ctx context.Context, values []KeyGetID) (keyValue []any) {
 	if ctx == nil || ctx == context.Background() || len(values) == 0 {
 		return nil
@@ -61,8 +63,9 @@ func ExtractKeysValues(ctx context.Context, values []KeyGetID) (keyValue []any) 
 	return keyValue[0:len(keyValue):len(keyValue)]
 }
 
-// ExtractCorrelationID - возвращает первый попавшийся ID из указанного контекста,
-// который можно использовать в качестве CorrelationID.
+// ExtractCorrelationID - ищет первый непустой ID в контексте из списка ключей.
+// Используется для определения ID корреляции, который может храниться под разными ключами.
+// Возвращает пустую строку, если ни один ключ не найден.
 func ExtractCorrelationID(ctx context.Context, values []KeyGetID) string {
 	for _, v := range values {
 		if id := v.GetID(ctx); id != "" {
@@ -73,7 +76,8 @@ func ExtractCorrelationID(ctx context.Context, values []KeyGetID) string {
 	return ""
 }
 
-// ToKeyGetID - возвращает преобразование []KeyGetIDWithID в []KeyGetID.
+// ToKeyGetID - преобразует слайс KeyGetIDWithID в слайс KeyGetID,
+// отбрасывая функции установки значений (WithID).
 func ToKeyGetID(values []KeyGetIDWithID) []KeyGetID {
 	if len(values) == 0 {
 		return nil

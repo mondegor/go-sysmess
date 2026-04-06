@@ -6,20 +6,20 @@ import (
 )
 
 type (
-	// UserError - пользовательская ошибка с поддержкой локализации.
+	// UserError - прототип пользовательской ошибки с поддержкой обёртывания и локализации.
+	// Используется для пользовательских ошибок без аргументов.
 	UserError = userfast.ProtoError
 
-	// UserProtoError - пользовательская ошибка с поддержкой аргументов и враппинга ошибки.
+	// UserProtoError - прототип пользовательской ошибки с поддержкой аргументов, обёртывания и локализации.
 	UserProtoError = user.ProtoError
 )
 
-// NewUserError - создаёт ошибку типа kind.User с поддержкой локализации.
+// NewUserError - создаёт пользовательскую ошибку с кодом и сообщением.
 func NewUserError(code, message string) UserError {
 	return userfast.New(code, message)
 }
 
-// NewUserProto - создаёт UserProtoError для создания ошибок
-// типа kind.User с поддержкой аргументов, враппинга и локализации.
+// NewUserProto - создаёт прототип пользовательской ошибки с поддержкой аргументов.
 func NewUserProto(code, message string) UserProtoError {
 	return user.New(code, message)
 }

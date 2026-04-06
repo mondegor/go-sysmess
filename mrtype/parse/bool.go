@@ -10,8 +10,8 @@ const (
 	typeNullableBool = "NullableBool"
 )
 
-// RequiredBool - возвращает Bool значение из указанной строки.
-// Если параметр пустой, то возвращается ошибка.
+// RequiredBool - парсит строку в значение bool.
+// Возвращает ошибку, если значение пустое или не является допустимым булевым значением.
 func RequiredBool(value string) (bool, error) {
 	value = strings.TrimSpace(value)
 
@@ -27,8 +27,9 @@ func RequiredBool(value string) (bool, error) {
 	return item, nil
 }
 
-// NullableBool - возвращает Bool значение из указанной строки.
-// Если параметр пустой, то возвращается nil.
+// NullableBool - парсит строку в указатель на bool.
+// Возвращает nil, если значение пустое.
+// Возвращает ошибку, если значение не является допустимым булевым значением.
 func NullableBool(value string) (*bool, error) {
 	value = strings.TrimSpace(value)
 

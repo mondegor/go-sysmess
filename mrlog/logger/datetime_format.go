@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
-// ParseDateTimeFormat - возвращает формат времени предназначенный
-// для использования Time.Format при логировании.
+// ParseDateTimeFormat - преобразует имя формата времени в константу time.
+// Поддерживаемые значения: "RFC3339", "RFC3339Nano", "DateTime", "TimeOnly", "Kitchen".
+// Возвращает строку формата для time.Time.Format при успехе,
+// или ошибку при нераспознанном значении.
 func ParseDateTimeFormat(value string) (string, error) {
 	switch value {
 	case "RFC3339":

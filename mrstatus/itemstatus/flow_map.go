@@ -4,7 +4,11 @@ import (
 	"github.com/mondegor/go-sysmess/mrstatus"
 )
 
-// NewFlowMap - возвращает карту возможных переходов ItemStatus.
+// NewFlowMap - создаёт карту допустимых переходов для статусов элементов (ItemStatus).
+// Правила переходов:
+//   - Draft → Enabled, Disabled
+//   - Enabled → Disabled
+//   - Disabled → Enabled
 func NewFlowMap() mrstatus.FlowMap[Enum] {
 	return mrstatus.NewFlowMap(
 		[]mrstatus.FlowNode[Enum]{

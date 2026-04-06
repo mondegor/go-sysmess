@@ -5,8 +5,9 @@ import (
 	"log/slog"
 )
 
-// BeforeHandle - вспомогательная функция возвращающая функцию в формате middleware с целью модификации
-// объекта slog.Record непосредственно перед вызовом метода Handle в интерфейсе slog.Handler.
+// BeforeHandle - создаёт middleware-функцию для модификации slog.Record
+// перед его обработкой в slog.Handler.
+// Параметр fn вызывается для каждой записи лога и может изменять атрибуты, сообщение или контекст.
 func BeforeHandle(fn func(ctx context.Context, record slog.Record) slog.Record) func(next slog.Handler) slog.Handler {
 	return func(next slog.Handler) slog.Handler {
 		return &decorator{

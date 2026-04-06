@@ -10,7 +10,8 @@ type (
 	IDGeneratorFunc func() string
 )
 
-// GenerateID - реализация интерфейса IDGenerator в виде функции.
+// GenerateID - реализует интерфейс IDGenerator, вызывая саму функцию f.
+// Позволяет использовать обычную функцию как генератор идентификаторов.
 func (f IDGeneratorFunc) GenerateID() string {
 	return f()
 }

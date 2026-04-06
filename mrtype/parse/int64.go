@@ -15,8 +15,9 @@ const (
 	maxLenInt64List   = 256
 )
 
-// Int64 - возвращает Int64 значение из указанной строки.
-// Если параметр пустой, то в зависимости от required возвращается 0 или ошибка.
+// Int64 - парсит строку в значение int64.
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает 0.
 func Int64(value string, required bool) (int64, error) {
 	value = strings.TrimSpace(value)
 
@@ -40,8 +41,7 @@ func Int64(value string, required bool) (int64, error) {
 	return item, nil
 }
 
-// Int64List - возвращает массив Int64 значений из указанной строки.
-// Если параметр пустой, то возвращается пустой массив.
+// Int64List - парсит строку с разделителями-запятыми в список int64.
 func Int64List(value string) ([]int64, error) {
 	value = strings.TrimSpace(value)
 
@@ -68,7 +68,8 @@ func Int64List(value string) ([]int64, error) {
 	return items, nil
 }
 
-// RangeInt64 - возвращает RangeInt64 из строковых параметров по указанному префиксу ключа.
+// RangeInt64 - парсит два строковых значения в RangeInt64.
+// Если maxValue меньше minValue и maxValue > 0, автоматически меняет их местами.
 func RangeInt64(minValue, maxValue string) (mrtype.RangeInt64, error) {
 	parsedMinValue, err := Int64(minValue, false)
 	if err != nil {

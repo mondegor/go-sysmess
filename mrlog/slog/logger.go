@@ -12,19 +12,23 @@ import (
 )
 
 type (
-	// LoggerAdapter - логгер на крайний случай, например,
-	// когда не был установлен логгер в контексте.
+	// LoggerAdapter - адаптер логгера на основе slog.Logger.
+	// Используется как резервный логгер, когда основной логгер
+	// не был установлен в контексте, или для автономного логирования.
+	// Поддерживает цветной вывод, JSON-формат и middleware.
 	LoggerAdapter struct {
 		sl *stdlog.Logger
 	}
 
+	// attrColor - цветовая схема для атрибута (ключ/значение).
 	attrColor struct {
-		keyColor   string
-		valueColor string
+		key   string
+		value string
 	}
 )
 
-// NewLoggerAdapter - создаёт объект LoggerAdapter.
+// NewLoggerAdapter - создаёт LoggerAdapter с заданными параметрами.
+// При включенном colorMode и jsonFormat=true приоритет у JSON.
 func NewLoggerAdapter(opts ...Option) (logger *LoggerAdapter, err error) {
 	o := options{
 		levelString:   level.Debug.String(),
@@ -33,8 +37,8 @@ func NewLoggerAdapter(opts ...Option) (logger *LoggerAdapter, err error) {
 		colorMode:     true,
 		attrKey2color: make(map[string]attrColor),
 		attrColorByDefault: attrColor{
-			keyColor:   color.Cyan,
-			valueColor: color.LightGray,
+			key:   color.Cyan,
+			value: color.LightGray,
 		},
 	}
 
@@ -80,7 +84,8 @@ func NewLoggerAdapter(opts ...Option) (logger *LoggerAdapter, err error) {
 	return New(handler), nil
 }
 
-// New - создаёт объект LoggerAdapter.
+// New - создаёт LoggerAdapter из готового slog.Handler.
+// Позволяет использовать кастомные обработчики slog напрямую.
 func New(handler stdlog.Handler) *LoggerAdapter {
 	return &LoggerAdapter{
 		sl: stdlog.New(handler),

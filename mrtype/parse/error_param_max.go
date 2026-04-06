@@ -5,14 +5,15 @@ import (
 )
 
 type (
-	// ParamMaxValueError - param contains value greater then max.
+	// ParamMaxValueError - ошибка превышения максимального допустимого значения параметра.
 	ParamMaxValueError struct {
 		Type     string
 		MaxValue any
 	}
 )
 
-// NewParamMaxValueError - создаёт объект ParamMaxValueError.
+// NewParamMaxValueError - создаёт ошибку ParamMaxValueError для указанного типа параметра.
+// maxValue - максимально допустимое значение.
 func NewParamMaxValueError(paramType string, maxValue any) *ParamMaxValueError {
 	return &ParamMaxValueError{
 		Type:     paramType,

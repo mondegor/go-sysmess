@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	// Option - настройка объекта Provider.
+	// Option - функция-опция для настройки Provider.
 	Option func(o *options)
 
 	options struct {
@@ -14,7 +14,12 @@ type (
 	}
 )
 
-// WithDomainCatalog - добавляет справочник фраз привязывая его к указанному домену.
+// WithDomainCatalog - добавляет каталог переводов для указанного домена.
+// Параметры:
+//   - domain - имя домена (например, "messages" или "errors");
+//   - cat - каталог с переводами типа catalog.Catalog из golang.org/x/text/message/catalog;
+//
+// Если cat равен nil, опция игнорируется.
 func WithDomainCatalog(domain string, cat catalog.Catalog) Option {
 	return func(o *options) {
 		if cat == nil {

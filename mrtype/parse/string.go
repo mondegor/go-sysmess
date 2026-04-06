@@ -10,8 +10,9 @@ const (
 	maxLenStringsList = 2048
 )
 
-// String - возвращает строковое значение из указанной строки.
-// Если параметр пустой, то в зависимости от required возвращается пустая строка или ошибка.
+// String - возвращает строковое значение после обрезки пробелов.
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает пустую строку.
 func String(value string, required bool) (string, error) {
 	value = strings.TrimSpace(value)
 
@@ -30,8 +31,8 @@ func String(value string, required bool) (string, error) {
 	return value, nil
 }
 
-// StringList - возвращает массив строковых значений из указанной строки.
-// Если параметр пустой, то возвращается пустой массив.
+// StringList - парсит строку с разделителями-запятыми в список строк.
+// Обрезает пробелы вокруг каждого элемента.
 func StringList(value string) ([]string, error) {
 	value = strings.TrimSpace(value)
 

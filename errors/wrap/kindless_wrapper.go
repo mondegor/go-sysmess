@@ -5,8 +5,9 @@ import (
 )
 
 type (
-	// kindlessErrorWrapper - помощник для оборачивания ошибок,
-	// которые не реализуют interface{ Kind() kind.Enum }.
+	// kindlessErrorWrapper - помощник для оборачивания ошибок, не реализующих интерфейс Kind().
+	// Ошибки с известным типом (User, System, Internal) пропускаются,
+	// а необработанные ошибки оборачиваются через defaultWrapper.
 	kindlessErrorWrapper struct {
 		defaultWrapper ErrorWrapper
 	}
@@ -25,10 +26,13 @@ func NewKindlessErrorWrapper(
 	}
 }
 
-// Wrap - возвращает указанную ошибку как есть, если она реализует метод Kind(),
-// иначе её оборачивает в defaultWrapper и возвращает результат.
-// Если ошибка типа kind.Internal и указаны атрибуты, то она
-// дополнительно будет обёрнута в defaultWrapper.
+// Wrap - возвращает ошибки с известным типом (User, System, Internal без атрибутов) как есть.
+// Ошибки без Kind() и Internal с атрибутами оборачиваются через defaultWrapper.
+// Алгоритм:
+//   - kind.User, kind.System - возвращаются как есть.
+//   - kind.Internal без атрибутов - возвращается как есть.
+//   - kind.Internal с атрибутами - оборачивается в defaultWrapper.
+//   - Без Kind() - оборачивается в defaultWrapper.
 func (w *kindlessErrorWrapper) Wrap(err error, attrs ...any) error {
 	switch kind.Extract(err) {
 	case kind.User, kind.System:

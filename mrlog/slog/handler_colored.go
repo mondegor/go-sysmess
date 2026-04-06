@@ -64,14 +64,14 @@ func newColoredHandler(w io.Writer, opts options) stdlog.Handler {
 	)
 }
 
-func colorizeAttr(attr stdlog.Attr, clr attrColor) stdlog.Attr {
-	if clr.keyColor != "" {
-		attr.Key = color.ColorizeText(clr.keyColor, attr.Key)
+func colorizeAttr(attr stdlog.Attr, attrColor attrColor) stdlog.Attr {
+	if attrColor.key != "" {
+		attr.Key = color.ColorizeText(attrColor.key, attr.Key)
 	}
 
-	if clr.valueColor == "" {
+	if attrColor.value == "" {
 		return attr
 	}
 
-	return stdlog.String(attr.Key, color.ColorizeText(clr.valueColor, attr.Value.String()))
+	return stdlog.String(attr.Key, color.ColorizeText(attrColor.value, attr.Value.String()))
 }

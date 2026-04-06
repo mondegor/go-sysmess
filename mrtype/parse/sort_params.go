@@ -9,31 +9,37 @@ import (
 )
 
 const (
-	typeSortParamsField     = "SortParams.Field"
+	typeSortParamsColumn    = "SortParams.Column"
 	typeSortParamsDirection = "SortParams.Direction"
-	maxLenSortField         = 32
+	maxLenSortColumn        = 32
 )
 
-var regexpSorterField = regexp.MustCompile(`^[a-z]([a-zA-Z0-9]+)?[a-zA-Z0-9]$`)
+var regexpSorterColumn = regexp.MustCompile(`^[a-z]([a-zA-Z0-9]+)?[a-zA-Z0-9]$`)
 
-// SortParams - возвращает SortParams из строковых параметров по указанным ключам.
-func SortParams(fieldValue, directionValue string) (mrtype.SortParams, error) {
-	fieldValue = strings.TrimSpace(fieldValue)
+// SortParams - парсит параметры сортировки из строк.
+// Параметры:
+//   - columnValue - имя колонки сортировки (допустимые символы: латинские буквы и цифры, начинается с буквы);
+//   - directionValue - направление сортировки ("ASC" или "DESC", регистр не важен);
+//
+// Если columnValue пустое, возвращает пустые SortParams.
+// По умолчанию направление сортировки - ASC.
+func SortParams(columnValue, directionValue string) (mrtype.SortParams, error) {
+	columnValue = strings.TrimSpace(columnValue)
 
-	if fieldValue == "" {
+	if columnValue == "" {
 		return mrtype.SortParams{}, nil
 	}
 
-	if len(fieldValue) > maxLenSortField {
-		return mrtype.SortParams{}, NewParamLenMaxError(typeSortParamsField, maxLenSortField)
+	if len(columnValue) > maxLenSortColumn {
+		return mrtype.SortParams{}, NewParamLenMaxError(typeSortParamsColumn, maxLenSortColumn)
 	}
 
-	if !regexpSorterField.MatchString(fieldValue) {
-		return mrtype.SortParams{}, NewParamRegexpError(typeSortParamsField, regexpSorterField.String())
+	if !regexpSorterColumn.MatchString(columnValue) {
+		return mrtype.SortParams{}, NewParamRegexpError(typeSortParamsColumn, regexpSorterColumn.String())
 	}
 
 	params := mrtype.SortParams{
-		Column:    fieldValue,
+		Column:    columnValue,
 		Direction: sortdirection.ASC,
 	}
 

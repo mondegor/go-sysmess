@@ -15,7 +15,8 @@ type (
 	}
 )
 
-// NewCloseManager - создаёт объект CloseManager.
+// NewCloseManager - создаёт менеджер для закрытия зарегистрированных ресурсов.
+// Параметр logger используется для логирования успешного закрытия и ошибок.
 func NewCloseManager(logger logger) *CloseManager {
 	return &CloseManager{
 		logger: logger,

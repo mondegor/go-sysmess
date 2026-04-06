@@ -5,6 +5,8 @@ import (
 )
 
 type (
+	// nopLogger - заглушка, реализующая интерфейс Logger.
+	// Игнорирует все логируемые сообщения.
 	nopLogger struct{}
 )
 

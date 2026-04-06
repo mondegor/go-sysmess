@@ -8,12 +8,13 @@ type (
 	ctxWorkerKey struct{}
 )
 
-// WithWorkerID - возвращает контекст с установленным в него указанным идентификатором воркера.
+// WithWorkerID - возвращает новый контекст с установленным ID воркера.
 func WithWorkerID(ctx context.Context, workerID string) context.Context {
 	return context.WithValue(ctx, ctxWorkerKey{}, workerID)
 }
 
-// WorkerID - возвращает из контекста указанный идентификатор текущего воркера.
+// WorkerID - извлекает ID воркера из контекста.
+// Возвращает пустую строку, если ID не установлен.
 func WorkerID(ctx context.Context) string {
 	if value, ok := ctx.Value(ctxWorkerKey{}).(string); ok {
 		return value

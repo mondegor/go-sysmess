@@ -7,6 +7,8 @@ import (
 )
 
 type (
+	// wrapError - обёртка пользовательской ошибки вокруг другой ошибки.
+	// Сохраняет тот же прототип (код и сообщение), но добавляет вложенную ошибку.
 	wrapError struct {
 		proto *protoError
 		err   error
@@ -33,30 +35,31 @@ func (e *wrapError) Kind() kind.Enum {
 	return kind.User
 }
 
-// Message - возвращает сообщение об ошибке (для поддержки локализации).
+// Message - возвращает текст ошибки из прототипа (для локализации).
 func (e *wrapError) Message() string {
 	return e.proto.Message()
 }
 
-// Args - всегда возвращает пустой слайс аргументов (для поддержки локализации).
+// Args - возвращает пустой слайс аргументов.
 func (e *wrapError) Args() []any {
 	return nil
 }
 
-// Code - возвращает код ошибки.
+// Code - возвращает код ошибки из прототипа.
 func (e *wrapError) Code() string {
 	return e.proto.Code()
 }
 
-// Error - возвращает ошибку в виде строки.
+// Error - возвращает строковое представление обёрнутой ошибки.
 func (e *wrapError) Error() string {
 	// e.err никогда не будет nil, т.к. wrapError
 	// создаётся только с реальной ошибкой.
 	return e.proto.message + ": " + e.err.Error()
 }
 
-// Is - сообщает, имеет ли указанная ошибка тот же
-// прототип ошибки (errors.Is использует этот интерфейс).
+// Is - реализует интерфейс errors.Is.
+// Сравнивает: саму обёртку, прототип, другой wrapError с тем же прототипом,
+// а также рекурсивно проверяет вложенную ошибку.
 func (e *wrapError) Is(target error) bool {
 	if e == target || e.proto == target {
 		return true
@@ -69,7 +72,8 @@ func (e *wrapError) Is(target error) bool {
 	return errors.Is(e.err, target)
 }
 
-// Unwrap - возвращает вложенную ошибку (errors.Is использует этот интерфейс).
+// Unwrap - реализует интерфейс errors.Unwrap.
+// Возвращает вложенную ошибку.
 func (e *wrapError) Unwrap() error {
 	return e.err
 }

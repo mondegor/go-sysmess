@@ -18,8 +18,8 @@ var (
 	rndIfError    = [...]byte{0x0, 0x0, 0xee, 0xee, 0xee, 0xee, 0x0, 0x0} // данные по умолчанию при ошибке
 )
 
-// GenerateID - возвращает ID в формате 4R4K8OE9XZ-MWFN-4L6R используемый
-// при создании конкретного экземпляра ошибки.
+// GenerateID - генерирует уникальный идентификатор в формате XXXXXXXXXX-XXXX-XXXX.
+// Используется для идентификации конкретных экземпляров runtime-ошибок.
 func GenerateID() string {
 	var (
 		buf [bufferLen * 2]byte // (timestamp + random)

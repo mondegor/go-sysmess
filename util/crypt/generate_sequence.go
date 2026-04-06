@@ -18,22 +18,26 @@ var (
 	charsetToken = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 )
 
-// GenerateDigits - возвращает сгенерированную последовательность из цифр указанной длины.
+// GenerateDigits - генерирует криптографически случайную последовательность из цифр указанной длины.
 func GenerateDigits(length int) (string, error) {
 	return GenerateSequence(charsetDigit, length)
 }
 
-// GenerateHex - возвращает сгенерированную последовательность из шестнадцатеричных цифр указанной длины.
+// GenerateHex - генерирует криптографически случайную последовательность из шестнадцатеричных цифр указанной длины.
 func GenerateHex(length int) (string, error) {
 	return GenerateSequence(charsetHex, length)
 }
 
-// GenerateToken - возвращает сгенерированную последовательность указанной длины используемую для уникальных токенов.
+// GenerateToken - генерирует криптографически случайную последовательность указанной длины для уникальных токенов.
+// Использует алфавитно-цифровой набор (a-z, A-Z, 0-9).
 func GenerateToken(length int) (string, error) {
 	return GenerateSequence(charsetToken, length)
 }
 
-// GenerateSequence - возвращает сгенерированную последовательность из указанных символов (ascii) указанной длины.
+// GenerateSequence - генерирует криптографически случайную последовательность из указанного набора ASCII-символов.
+// Параметры:
+//   - charset - набор допустимых символов (максимум 128);
+//   - length - длина результата (минимум 1).
 func GenerateSequence(charset []byte, length int) (string, error) {
 	s, err := GenerateBytes(charset, length)
 	if err != nil {
@@ -43,7 +47,10 @@ func GenerateSequence(charset []byte, length int) (string, error) {
 	return string(s), nil
 }
 
-// GenerateBytes - возвращает сгенерированную байт последовательность из указанных символов (ascii) указанной длины.
+// GenerateBytes - генерирует криптографически случайный слайс байтов из указанного набора символов.
+// Параметры:
+//   - charset - набор допустимых символов (максимум 128);
+//   - length - длина результата (минимум 1).
 func GenerateBytes(charset []byte, length int) ([]byte, error) {
 	if len(charset) > maxCharsetLen {
 		return nil, errors.New("charset length exceeds max length")

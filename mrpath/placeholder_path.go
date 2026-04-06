@@ -11,14 +11,22 @@ const (
 )
 
 type (
+	// placeholderBuilder - построитель путей с плейсхолдером в середине пути.
+	// Разбивает базовый путь на префикс и постфикс относительно плейсхолдера,
+	// затем вставляет переданное значение между ними.
 	placeholderBuilder struct {
 		basePath string
 		postfix  string
 	}
 )
 
-// NewPlaceholder - создаёт объект Builder.
-// sample: /dir/{{path}}/postfix -> /dir/real-value/postfix
+// NewPlaceholder - создаёт Builder, который заменяет плейсхолдер в basePath на переданный путь.
+// Параметры:
+//   - basePath - шаблон пути с плейсхолдером (например, "/dir/{{path}}/postfix");
+//   - placeholder - строка-плейсхолдер для замены (например, "{{path}}").
+//
+// Возвращает ошибку, если плейсхолдер пуст или не найден в basePath.
+// Пример: basePath="/dir/{{path}}/postfix", placeholder="{{path}}" → "/dir/real-value/postfix".
 func NewPlaceholder(basePath, placeholder string) (Builder, error) {
 	if placeholder == "" {
 		return nil, fmt.Errorf("placeholder is empty for path '%s'", basePath)
@@ -34,7 +42,9 @@ func NewPlaceholder(basePath, placeholder string) (Builder, error) {
 	return nil, fmt.Errorf("placeholder is not found in path (placeholder='%s', path='%s')", placeholder, basePath)
 }
 
-// BuildPath - возвращает полный путь вставляя в базовый указанный путь.
+// BuildPath - вставляет указанный путь на место плейсхолдера в базовом шаблоне.
+// Убирает ведущие и завершающие "/" из path для корректной склейки.
+// Возвращает пустую строку, если path пуст.
 func (p *placeholderBuilder) BuildPath(path string) string {
 	if path == "" {
 		return ""

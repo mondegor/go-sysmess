@@ -41,7 +41,9 @@ func (e Enum) String() string {
 	return "UNKNOWN"
 }
 
-// Parse - парсит указанное значение и если оно валидно, то устанавливает его числовое значение.
+// Parse - преобразует строку в значение направления сортировки.
+// Поддерживаемые значения: "ASC", "DESC".
+// Возвращает найденное значение при успехе, или ошибку при нераспознанном значении.
 func Parse(value string) (Enum, error) {
 	if parsedValue, ok := enumValues[value]; ok {
 		return parsedValue, nil

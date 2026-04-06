@@ -17,8 +17,12 @@ const (
 	ErrorMessageKindUnexpected = "unexpected internal error"
 )
 
-// ExtractMessageForLocalization - возвращает сообщение об ошибки и переданные ей аргументы
-// для дальнейшего её локализации и отображения пользователю.
+// ExtractMessageForLocalization - извлекает сообщение и аргументы ошибки для локализации.
+// Алгоритм:
+//   - Если ошибка имеет тип kind.User, возвращает её Message() и Args().
+//   - Для kind.System - возвращает ErrorMessageKindSystem.
+//   - Для kind.Internal - возвращает ErrorMessageKindInternal.
+//   - Для остальных (необработанных) - возвращает ErrorMessageKindUnexpected.
 func ExtractMessageForLocalization(err error) (message string, args []any) {
 	// сначала предполагается, что передана пользовательская ошибка
 	if e, ok := err.(interface {
@@ -41,8 +45,9 @@ func ExtractMessageForLocalization(err error) (message string, args []any) {
 	}
 }
 
-// ExtractAttrs - возвращает попарно все атрибуты (ключ/значение)
-// прикреплённые данной ошибке и её вложенным ошибкам.
+// ExtractAttrs - собирает все атрибуты (пары ключ/значение),
+// прикреплённые к ошибке и всем её вложенным ошибкам.
+// Параметр filter - функция-фильтр: возвращает true для ключей, которые нужно включить в результат.
 func ExtractAttrs(err error, filter func(key string) bool) []any {
 	var n int
 
@@ -72,6 +77,7 @@ func ExtractAttrs(err error, filter func(key string) bool) []any {
 
 			for len(errAttrs) > 1 {
 				if key, ok := errAttrs[0].(string); ok {
+					// TODO: дублирующие ключи можно объединять или отбрасывать
 					if filter(key) {
 						attrs = append(attrs, errAttrs[0], errAttrs[1])
 					}

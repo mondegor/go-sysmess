@@ -10,8 +10,8 @@ const (
 )
 
 type (
-	// ProtoError - пользовательская ошибка с поддержкой локализации.
-	// Используется в слоях бизнес логики.
+	// ProtoError - быстрый прототип пользовательской ошибки с поддержкой локализации.
+	// Хранит код ошибки и сообщение в единой строке формата "#CODE - message".
 	ProtoError interface {
 		error
 
@@ -19,13 +19,17 @@ type (
 		Wrap(err error) error
 	}
 
+	// protoError - внутренняя реализация ProtoError.
+	// Хранит код и сообщение в компактном формате: "#CODE - message".
+	// pos - позиция конца кода в строке (для быстрого извлечения).
 	protoError struct {
 		message string
 		pos     int
 	}
 )
 
-// New - создаёт объект ProtoError.
+// New - создаёт прототип пользовательской ошибки с указанным кодом и сообщением.
+// Если code пустой, подставляется missingCode.
 func New(code, message string) ProtoError {
 	if code == "" {
 		code = missingCode
@@ -55,28 +59,28 @@ func (e *protoError) Kind() kind.Enum {
 	return kind.User
 }
 
-// Message - возвращает сообщение об ошибке (для поддержки локализации).
+// Message - возвращает текст ошибки (без кода) для локализации.
 func (e *protoError) Message() string {
 	return e.message[e.pos+len(codeMessageSeparator):]
 }
 
-// Args - всегда возвращает пустой слайс аргументов (для поддержки локализации).
+// Args - возвращает пустой слайс аргументов.
 func (e *protoError) Args() []any {
 	return nil
 }
 
-// Code - возвращает код ошибки.
+// Code - возвращает код ошибки для локализации.
 func (e *protoError) Code() string {
 	return e.message[1:e.pos]
 }
 
-// Error - возвращает ошибку в виде строки.
+// Error - возвращает строковое представление ошибки.
 func (e *protoError) Error() string {
 	return e.message
 }
 
-// Is - сообщает, имеет ли указанная ошибка тот же
-// прототип ошибки (errors.Is использует этот интерфейс).
+// Is - реализует интерфейс errors.Is.
+// Сравнивает прототипы ошибок по указателю.
 func (e *protoError) Is(target error) bool {
 	if e == target {
 		return true

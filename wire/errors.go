@@ -8,9 +8,9 @@ import (
 	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
 )
 
-// InitErrors - инициализирует работу с runtime ошибками.
-// Для ошибок типа Internal при их создании формируется стек вызова и ID ошибки.
-// Для системной ошибки только ID ошибки.
+// InitErrors - инициализирует опции для разного типа runtime-ошибок.
+// Для Internal-ошибок формируется стек вызовов (если HasCaller=true) и ID ошибки.
+// Для System-ошибок формируется только ID ошибки.
 func InitErrors(opts ErrorConfig) {
 	var (
 		internalOptions []runtime.Option

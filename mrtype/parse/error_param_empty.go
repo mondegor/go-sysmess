@@ -5,13 +5,14 @@ import (
 )
 
 type (
-	// ParamEmptyError - param value is empty.
+	// ParamEmptyError - ошибка пустого значения параметра.
+	// Возникает, когда обязательный параметр не передан.
 	ParamEmptyError struct {
 		Type string
 	}
 )
 
-// NewParamEmptyError - создаёт объект ParamEmptyError.
+// NewParamEmptyError - создаёт ошибку ParamEmptyError для указанного типа параметра.
 func NewParamEmptyError(paramType string) *ParamEmptyError {
 	return &ParamEmptyError{
 		Type: paramType,

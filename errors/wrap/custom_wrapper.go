@@ -5,7 +5,9 @@ import (
 )
 
 type (
-	// CustomErrorWrapper - помощник для оборачивания пользовательских ошибок в ошибки типа Custom.
+	// CustomErrorWrapper - помощник для оборачивания пользовательских ошибок
+	// в ошибки типа Custom. Позволяет маппить коды стандартных пользовательских
+	// ошибок в кастомные коды для слоя представления.
 	CustomErrorWrapper interface {
 		Wrap(err error) error
 	}
@@ -16,7 +18,13 @@ type (
 	}
 )
 
-// NewCustomErrorWrapper - создаёт объект CustomErrorWrapper.
+// NewCustomErrorWrapper - создаёт обёртку, транслирующую коды пользовательских ошибок в кастомные.
+// Параметры:
+//   - wrapperCustom - функция, создающая кастомную ошибку из исходной ошибки и кастомного кода;
+//   - codeCustom - плоский слайс пар "исходныйКод(string)/кастомныйКод(string)",
+//     например: ["userErr1", "fieldEmail", "userErr2", ""];
+//
+// Если количество элементов нечётное, последний элемент транслируется в пустой кастомный код.
 func NewCustomErrorWrapper(
 	wrapperCustom func(err error, code string) error,
 	codeCustom ...string,
@@ -37,8 +45,9 @@ func NewCustomErrorWrapper(
 	}
 }
 
-// Wrap - оборачивает пользовательские ошибки в ошибки типа Custom.
-// Остальные ошибки оставляет без изменения.
+// Wrap - оборачивает пользовательские ошибки (kind.User) в кастомные ошибки.
+// Если код ошибки найден в таблице маппинга, вызывает wrapFunc с кастомным кодом.
+// Ошибки других типов (System, Internal, без Kind) возвращаются без изменений.
 func (w *customErrorWrapper) Wrap(err error) error {
 	if err == nil {
 		return w.wrapFunc(err, "")
@@ -57,10 +66,12 @@ func (w *customErrorWrapper) Wrap(err error) error {
 }
 
 type (
+	// nopCustomErrorWrapper - заглушка, реализующая интерфейс CustomErrorWrapper.
+	// Возвращает переданную ошибку без изменений.
 	nopCustomErrorWrapper struct{}
 )
 
-// NopCustomErrorWrapper - создаёт объект ErrorWrapper, который возвращает переданную ему ошибку как есть.
+// NopCustomErrorWrapper - создаёт CustomErrorWrapper-заглушку.
 func NopCustomErrorWrapper() CustomErrorWrapper {
 	return nopCustomErrorWrapper{}
 }

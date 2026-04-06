@@ -10,8 +10,9 @@ type (
 	CustomWrapper = wrap.CustomErrorWrapper
 )
 
-// NewCustomWrapper - оборачивает ошибки с указанными кодами.
-// Коды передаются попарно: 1 - код пользовательской ошибки, 2 - переопределённый код.
+// NewCustomWrapper - создаёт обёртку с маппингом кодов пользовательских ошибок.
+// Параметр codeCustom - плоский слайс пар "исходныйКод/кастомныйКод".
+// Пример: NewCustomWrapper("userErr1", "fieldEmail").
 func NewCustomWrapper(codeCustom ...string) CustomWrapper {
 	return wrap.NewCustomErrorWrapper(
 		func(err error, customCode string) error {
@@ -45,7 +46,7 @@ func NewDownloadImageWrapper(customCode string) CustomWrapper {
 	)
 }
 
-// NopCustomWrapper - создаёт объект CustomWrapper, который возвращает переданную ему ошибку как есть.
+// NopCustomWrapper - создаёт CustomWrapper-заглушку.
 func NopCustomWrapper() CustomWrapper {
 	return wrap.NopCustomErrorWrapper()
 }

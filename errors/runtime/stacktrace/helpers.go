@@ -37,7 +37,8 @@ func cutPostfix(value string) string {
 	return value
 }
 
-// ToStrings - функция возвращает стек вызовов в виде строки.
+// ToStrings - преобразует итератор стека вызовов в слайс строк.
+// Формат каждой строки: "[имя_функции] файл:строка" или "файл:строка" (если имя функции пусто).
 func ToStrings(stackIterator func() (index int, name, file string, line int)) []string {
 	if stackIterator == nil {
 		return nil

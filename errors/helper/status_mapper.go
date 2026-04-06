@@ -8,7 +8,9 @@ import (
 )
 
 type (
-	// ErrorStatusMapper - меппинг кодов пользовательских ошибок в статусы ответа сервиса.
+	// ErrorStatusMapper - маппинг кодов пользовательских ошибок в HTTP-статусы ответа.
+	// Позволяет настроить соответствие между конкретными кодами ошибок и статусами,
+	// а также задать статусы по умолчанию для системных, внутренних и необработанных ошибок.
 	ErrorStatusMapper struct {
 		defaultStatus    int
 		systemStatus     int
@@ -19,6 +21,7 @@ type (
 )
 
 // NewErrorStatusMapper - создаёт объект ErrorStatusMapper.
+// codeStatus - плоский слайс пар "код(string)/статус(int)", например: ["code1", 400, "code2", 404].
 func NewErrorStatusMapper(
 	defaultStatus, systemStatus, internalStatus, unexpectedStatus int,
 	codeStatus []any,
@@ -48,7 +51,13 @@ func NewErrorStatusMapper(
 	}, nil
 }
 
-// ErrorStatus - возвращает http код ответа на основе проанализированного типа ошибки и самой ошибки.
+// ErrorStatus - возвращает HTTP-статус на основе типа и кода ошибки.
+// Алгоритм:
+//   - kind.User: ищет код ошибки в маппинге code2status, проверяя цепочку обёрнутых ошибок.
+//     Если код не найден, возвращает defaultStatus.
+//   - kind.System: возвращает systemStatus.
+//   - kind.Internal: возвращает internalStatus.
+//   - Остальные (без метода Kind()): возвращает unexpectedStatus.
 func (m *ErrorStatusMapper) ErrorStatus(err error) int {
 	switch kind.Analyze(err) {
 	case kind.User:

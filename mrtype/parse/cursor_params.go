@@ -11,7 +11,12 @@ const (
 	typeCursorParamsLimit = "CursorParams.Limit"
 )
 
-// CursorParams - возвращает CursorParams из строковых параметров по указанным ключам.
+// CursorParams - парсит параметры курсорной пагинации из строк.
+// Параметры:
+//   - cursorValue - значение курсора (может быть пустым для первой страницы);
+//   - limitValue - максимальное количество элементов.
+//
+// Возвращает ошибку, если limit превышает math.MaxInt.
 func CursorParams(cursorValue, limitValue string) (mrtype.CursorParams, error) {
 	parsedValue, err := String(cursorValue, false)
 	if err != nil {

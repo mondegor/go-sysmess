@@ -7,16 +7,18 @@ import (
 )
 
 type (
-	// OptionsHandler - обработчик формирования списка опций для указанных кодов ошибок.
+	// OptionsHandler - обработчик формирования списка опций для указанного типа ошибки.
+	// Позволяет динамически настраивать опции ошибок при их создании.
 	OptionsHandler interface {
 		Options(kindErr kind.Enum, message string) []Option
 	}
 
-	// OptionsHandlerFunc - обработчик формирования списка опций в виде функции.
+	// OptionsHandlerFunc - адаптер, позволяющий использовать обычную функцию как OptionsHandler.
 	OptionsHandlerFunc func(kindErr kind.Enum, message string) []Option
 )
 
-// Options - реализация интерфейса OptionsHandler в виде функции для формирования списка опций.
+// Options - реализует интерфейс OptionsHandler, вызывая саму функцию f.
+// Позволяет использовать обычную функцию как обработчик опций.
 func (f OptionsHandlerFunc) Options(kindErr kind.Enum, message string) []Option {
 	return f(kindErr, message)
 }
@@ -36,8 +38,11 @@ var defopts = struct { //nolint:gochecknoglobals
 	handler OptionsHandler
 }{}
 
-// NewDelayed - создаёт объект ProtoError и запоминает его до вызова InitDelayedOptions
-// чтобы была возможность изменить его опции.
+// NewDelayed - создаёт прототип ошибки с отложенной инициализацией опций.
+// Прототип запоминается до вызова InitDelayedOptions(), который применит к нему
+// опции по умолчанию через указанный OptionsHandler.
+// Если InitDelayedOptions() уже вызван, опции применяются немедленно.
+// Используется для глобальных переменных ошибок (var Err...), которые объявляются до инициализации приложения.
 func NewDelayed(errKind kind.Enum, text string, opts ...Option) ProtoError {
 	p := newProto(errKind, text, opts)
 
@@ -62,11 +67,14 @@ func NewDelayed(errKind kind.Enum, text string, opts ...Option) ProtoError {
 	return p
 }
 
-// InitDelayedOptions - с помощью указанного обработчика одноразово присваивает опции
-// по умолчанию всем созданным через NewDelayed() ошибкам в момент инициализации приложения,
-// при этом, не изменяет опции, которые были явно переданы в конструктор такой ошибки.
-// После этого, этот обработчик запоминается и начинает вызываться каждый раз в момент
-// создания очередной такой ошибки (в момент вызова NewDelayed()).
+// InitDelayedOptions - одноразово инициализирует опции всем прототипам ошибок,
+// созданным через NewDelayed() до этого вызова.
+// Параметр handler - обработчик, формирующий опции по умолчанию для каждого прототипа.
+//
+// Явно переданные в NewDelayed() опции не перезаписываются.
+// После вызова handler сохраняется и применяется ко всем последующим вызовам NewDelayed().
+// Повторный вызов игнорируется (обработчик устанавливается только один раз).
+// Если будет nil handler, устанавливается заглушка, блокирующая повторную инициализацию.
 func InitDelayedOptions(handler OptionsHandler) {
 	defopts.mu.Lock()
 	defer defopts.mu.Unlock()

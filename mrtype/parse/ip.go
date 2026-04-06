@@ -10,7 +10,10 @@ const (
 	maxLenIP = 32
 )
 
-// IP - возвращает валидный IP адрес из указанной строки или ошибку, если парсинг не удался.
+// IP - парсит строку в net.IP.
+// Поддерживает форматы: чистый IP-адрес и "host:port" (извлекает host).
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает nil.
 func IP(value string, required bool) (ip net.IP, err error) {
 	value = strings.TrimSpace(value)
 

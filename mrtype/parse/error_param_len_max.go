@@ -5,18 +5,19 @@ import (
 )
 
 type (
-	// ParamLenMaxError - param has value length greater then max characters.
+	// ParamLenMaxError - ошибка превышения максимальной длины значения параметра.
 	ParamLenMaxError struct {
 		Type   string
 		MaxLen int
 	}
 )
 
-// NewParamLenMaxError - создаёт объект ParamLenMaxError.
-func NewParamLenMaxError(paramType string, maxValue int) *ParamLenMaxError {
+// NewParamLenMaxError - создаёт ошибку ParamLenMaxError для указанного типа параметра.
+// maxLen - максимально допустимая длина значения.
+func NewParamLenMaxError(paramType string, maxLen int) *ParamLenMaxError {
 	return &ParamLenMaxError{
 		Type:   paramType,
-		MaxLen: maxValue,
+		MaxLen: maxLen,
 	}
 }
 

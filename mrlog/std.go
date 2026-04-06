@@ -30,6 +30,8 @@ func Panicf(format string, v ...any) {
 	stdlog.Panicf(format, v...)
 }
 
+// extractLogger - извлекает logger.Logger и сообщение из слайса аргументов.
+// Ожидает, что первый аргумент - logger.Logger, а второй - строка.
 func extractLogger(v []any) (l logger.Logger, msg string, ok bool) {
 	if len(v) < 2 {
 		return nil, "", false

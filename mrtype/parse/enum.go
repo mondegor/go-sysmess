@@ -13,8 +13,10 @@ const (
 
 var regexpEnum = regexp.MustCompile(`^[A-Z]([A-Z0-9_]+)?[A-Z0-9]$`)
 
-// Enum - возвращает Enum значение из указанной строки.
-// Если параметр пустой, то в зависимости от required возвращается пустая строка или ошибка.
+// Enum - парсит строку в значение перечисления.
+// Допустимый формат: заглавные латинские буквы, цифры и подчёркивания (например, "MY_VALUE").
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает пустую строку.
 func Enum(value string, required bool) (string, error) {
 	value = strings.TrimSpace(value)
 
@@ -39,8 +41,8 @@ func Enum(value string, required bool) (string, error) {
 	return value, nil
 }
 
-// EnumList - возвращает массив Enum значений из указанной строки.
-// Если параметр пустой, то возвращается пустой массив.
+// EnumList - парсит строку с разделителями-запятыми в список значений перечисления.
+// Каждый элемент приводится к верхнему регистру и проверяется по тому же формату, что и Enum.
 func EnumList(value string) ([]string, error) {
 	value = strings.TrimSpace(value)
 

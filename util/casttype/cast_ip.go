@@ -6,7 +6,9 @@ import (
 	"net"
 )
 
-// IP2uint - возвращает IP в виде числа или ошибку, если конвертация невозможна.
+// IP2uint - преобразует IPv4-адрес в числовое представление (uint32).
+// Возвращает 0 без ошибки для пустого IP.
+// Возвращает ошибку для IPv6 и некорректных адресов.
 func IP2uint(ip net.IP) (uint32, error) {
 	if len(ip) == 0 {
 		return 0, nil
@@ -23,7 +25,8 @@ func IP2uint(ip net.IP) (uint32, error) {
 	return 0, errors.New("ip is incorrect")
 }
 
-// Uint2ip - возвращает net.IP полученного из указанного целого числа.
+// Uint2ip - преобразует числовое представление (uint32) в IPv4-адрес net.IP.
+// Использует big-endian порядок байтов.
 func Uint2ip(number uint32) net.IP {
 	ip := make(net.IP, 4)
 

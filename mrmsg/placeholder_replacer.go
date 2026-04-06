@@ -12,14 +12,18 @@ const (
 )
 
 type (
-	// PlaceholderReplacer - реплейсер параметров сообщения на основе strings.Replacer.
+	// PlaceholderReplacer - замена именованных плейсхолдеров в сообщении через strings.Replacer.
+	// Плейсхолдеры заменяются на строковые представления аргументов по порядку.
 	PlaceholderReplacer struct {
 		message      string
 		placeholders []string
 	}
 )
 
-// NewPlaceholderReplacer - создаёт объект PlaceholderReplacer.
+// NewPlaceholderReplacer - создаёт PlaceholderReplacer для замены плейсхолдеров.
+// Параметры:
+//   - message - сообщение с именованными плейсхолдерами (например, "Hello {name}, you are {age}");
+//   - placeholders - список плейсхолдеров для замены в порядке их появления.
 func NewPlaceholderReplacer(message string, placeholders []string) *PlaceholderReplacer {
 	return &PlaceholderReplacer{
 		message:      message,
@@ -27,8 +31,10 @@ func NewPlaceholderReplacer(message string, placeholders []string) *PlaceholderR
 	}
 }
 
-// NewMessageReplacer - создаёт объект PlaceholderReplacer.
-// Из указанного сообщения предварительно извлекаются аргументы помеченные указанными разделителями.
+// NewMessageReplacer - создаёт PlaceholderReplacer, автоматически извлекая плейсхолдеры из сообщения.
+// Параметры:
+//   - leftDelim, rightDelim - ограничители плейсхолдеров (например, "{" и "}");
+//   - message - сообщение с плейсхолдерами для последующей замены.
 func NewMessageReplacer(leftDelim, rightDelim, message string) *PlaceholderReplacer {
 	return NewPlaceholderReplacer(
 		message,
@@ -36,7 +42,9 @@ func NewMessageReplacer(leftDelim, rightDelim, message string) *PlaceholderRepla
 	)
 }
 
-// Replace - возвращает заранее подготовленное сообщение с заменёнными его аргументами на указанные значения.
+// Replace - подставляет аргументы в подготовленное сообщение, заменяя плейсхолдеры.
+// Аргументы преобразуются в строки через conv.String.
+// Если аргументов меньше, чем плейсхолдеров, недостающие заменяются на "!MISSINGARG".
 func (p *PlaceholderReplacer) Replace(args []any) (replacedMessage string, err error) {
 	if p.message == "" {
 		return "", nil
@@ -49,8 +57,8 @@ func (p *PlaceholderReplacer) Replace(args []any) (replacedMessage string, err e
 	return strings.NewReplacer(p.merge(args)...).Replace(p.message), nil
 }
 
-// ReplaceTo - записывает в указанный Writer заранее подготовленное сообщение
-// с заменёнными его аргументами на указанные значения.
+// ReplaceTo - записывает сообщение с подставленными аргументами в io.Writer.
+// Поведение обработки недостающих/лишних аргументов аналогично Replace.
 func (p *PlaceholderReplacer) ReplaceTo(wr io.Writer, args []any) error {
 	if p.message == "" {
 		return nil
@@ -67,7 +75,7 @@ func (p *PlaceholderReplacer) ReplaceTo(wr io.Writer, args []any) error {
 	return err //nolint:wrapcheck
 }
 
-// CountArgs - возвращает кол-во аргументов в подготовленном сообщении.
+// CountArgs - возвращает количество плейсхолдеров, ожидаемых сообщением.
 func (p *PlaceholderReplacer) CountArgs() int {
 	return len(p.placeholders)
 }

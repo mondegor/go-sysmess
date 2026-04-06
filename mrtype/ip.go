@@ -16,7 +16,12 @@ type (
 	}
 )
 
-// NewDetailedIP - создаёт объект DetailedIP.
+// NewDetailedIP - создаёт DetailedIP из числовых представлений IPv4.
+// Параметры:
+//   - realIP - числовое представление реального IP клиента;
+//   - proxyIP - числовое представление IP прокси-сервера;
+//
+// Если аргументы равны 0, соответствующие поля остаются nil.
 func NewDetailedIP(realIP, proxyIP uint32) (ip DetailedIP) {
 	if realIP > 0 {
 		ip.Real = casttype.Uint2ip(realIP)
@@ -29,7 +34,8 @@ func NewDetailedIP(realIP, proxyIP uint32) (ip DetailedIP) {
 	return ip
 }
 
-// String - возвращает IP в виде стоки.
+// String - возвращает IP-адреса в виде строки.
+// Формат: "real" или "real, proxy" (если proxy задан).
 func (ip *DetailedIP) String() string {
 	if len(ip.Proxy) == 0 || ip.Proxy.IsUnspecified() {
 		return ip.Real.String()
@@ -38,7 +44,8 @@ func (ip *DetailedIP) String() string {
 	return ip.Real.String() + ", " + ip.Proxy.String()
 }
 
-// ToUint - возвращает IP в виде uint32 если это возможно.
+// ToUint - преобразует IP-адреса в числовое представление (uint32).
+// Возвращает ошибку, если IP не является IPv4 или имеет неверную длину.
 func (ip *DetailedIP) ToUint() (realIP, proxyIP uint32, err error) {
 	realIP, err = casttype.IP2uint(ip.Real)
 	if err != nil {

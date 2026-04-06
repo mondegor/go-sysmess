@@ -170,7 +170,7 @@ func TestProto_Wrap_Error(t *testing.T) {
 
 	require.ErrorAs(t, wrapped, &target)
 
-	// Сравнение через proto.Is — совпадает по id
+	// Сравнение через proto.Is - совпадает по id
 	require.ErrorIs(t, wrapped, target)
 	require.ErrorIs(t, target, proto)
 	assert.Equal(t, "code", target.Code())

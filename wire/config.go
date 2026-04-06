@@ -7,26 +7,50 @@ import (
 )
 
 type (
-	// ErrorConfig - опции инициализации ошибок.
+	// ErrorConfig - конфигурация для инициализации runtime-ошибок.
+	// Определяет, использовать ли стек вызовов и с какой глубиной.
 	ErrorConfig struct {
-		HasCaller         bool
-		CallerDepth       uint8
-		CallerShowFunc    bool
+		// HasCaller - включает сбор информации (файл/строка/функция).
+		HasCaller bool
+
+		// CallerDepth - глубина стека вызовов (количество кадров).
+		CallerDepth uint8
+
+		// CallerShowFunc - включает отображение имени функции.
+		CallerShowFunc bool
+
+		// CallerUpperBounds - список имён пакетов/функций для ограничения стека вызова.
 		CallerUpperBounds []string
 	}
 
-	// LoggerConfig - опции создаваемого логгера.
+	// LoggerConfig - конфигурация для создания slog.LoggerAdapter.
+	// Содержит параметры окружения, форматирования и контекстных идентификаторов.
 	LoggerConfig struct {
-		Environment       string
-		Version           string
-		Level             string
-		JsonFormat        bool
-		TimeFormat        string
-		ColorMode         bool
+		// Environment - название окружения (например, "production", "staging", "local").
+		Environment string
+
+		// Version - версия приложения.
+		Version string
+
+		// Level - минимальный уровень логирования (debug, info, warn, error).
+		Level string
+
+		// JsonFormat - включает вывод в формате JSON.
+		JsonFormat bool
+
+		// TimeFormat - формат вывода времени (RFC3339, DateTime и др.).
+		TimeFormat string
+
+		// ColorMode - включает цветной вывод в консоль (игнорируется при JsonFormat=true).
+		ColorMode bool
+
+		// ContextProcessIDs - список идентификаторов процессов для извлечения/установки в контекст.
 		ContextProcessIDs []process.KeyGetIDWithID
 	}
 )
 
+// defaultProcessIDs - предустановленные ключи всех поддерживаемых идентификаторов процессов.
+// Включает: correlation_id, request_id, process_id, worker_id, task_id.
 var defaultProcessIDs = []process.KeyGetIDWithID{ //nolint:gochecknoglobals
 	{
 		Key:    mrtrace.KeyCorrelationID,
@@ -55,8 +79,9 @@ var defaultProcessIDs = []process.KeyGetIDWithID{ //nolint:gochecknoglobals
 	},
 }
 
-// DefaultProcessIDs - возвращает настроенные ключи процессов,
-// которые записываются в контекст и читаются из него.
+// DefaultProcessIDs - возвращает копию списка ключей процессов по умолчанию.
+// Эти ключи используются для записи и чтения идентификаторов из контекста:
+// correlation_id, request_id, process_id, worker_id, task_id.
 func DefaultProcessIDs() []process.KeyGetIDWithID {
 	return defaultProcessIDs
 }

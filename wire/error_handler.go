@@ -8,7 +8,11 @@ import (
 	"github.com/mondegor/go-sysmess/mrlog"
 )
 
-// InitErrorHandler - создаёт объект errors.Handler.
+// InitErrorHandler - создаёт обработчик ошибок для пакета errors.
+// Маршрутизирует логирование в зависимости от типа ошибки:
+//   - User - логируется на уровне Debug (пользовательские ошибки);
+//   - System, Internal - логируется на уровне Error (системные и внутренние ошибки);
+//   - Неизвестные - логируется на уровне Error с пометкой "unexpected".
 func InitErrorHandler(logger mrlog.Logger) errors.Handler {
 	return errors.HandlerFunc(
 		func(ctx context.Context, err error) {

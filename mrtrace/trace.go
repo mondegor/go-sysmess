@@ -22,18 +22,18 @@ const (
 )
 
 type (
-	// Tracer - трейсер для фиксации запросов к сервисам и их ответов.
+	// Tracer - интерфейс для трассировки запросов между сервисами.
+	// Фиксирует входящие/исходящие запросы и их параметры для аудита и отладки.
 	Tracer interface {
 		Trace(ctx context.Context, args ...any)
 	}
 
-	// ContextManager - отвечает за установку ID процессов в контекст и за доступ к ним используемых в трейсинге.
+	// ContextManager - управляет идентификаторами процессов в контексте для трассировки.
+	// Позволяет получать, устанавливать и генерировать ID процессов (request_id, process_id и др.).
 	ContextManager interface {
 		ProcessID(ctx context.Context, key string) string
 		WithProcessID(ctx context.Context, key, value string) context.Context
 		WithGeneratedProcessID(ctx context.Context, key string) context.Context
-
-		// NewContextWithIDs(originalCtx context.Context) context.Context
 		ExtractCorrelationID(ctx context.Context) string
 		ExtractKeysValues(ctx context.Context) []any
 	}

@@ -15,8 +15,9 @@ const (
 )
 
 type (
-	// ProtoError - пользовательская ошибка с поддержкой аргументов и враппинга ошибки.
-	// Используется в слоях бизнес логики.
+	// ProtoError - прототип пользовательской ошибки с поддержкой аргументов и вложенных ошибок.
+	// Позволяет создавать конкретные экземпляры с привязанными аргументами для локализации.
+	// Используется в слоях бизнес-логики.
 	ProtoError interface {
 		error
 
@@ -25,6 +26,8 @@ type (
 		Wrap(err error, args ...any) error
 	}
 
+	// protoError - внутренняя реализация ProtoError.
+	// Хранит код, шаблон сообщения, аргументы и вложенную ошибку.
 	protoError struct {
 		id      *protoError
 		code    string
@@ -34,10 +37,12 @@ type (
 	}
 )
 
-// ErrHasNilError - не указана ошибка для враппинга.
+// ErrHasNilError - ошибка, подставляемая вместо nil при обёртывании.
 var ErrHasNilError = errors.New("user error has a nil wrapped error")
 
-// New - создаёт объект ProtoError.
+// New - создаёт прототип пользовательской ошибки с указанным кодом и сообщением.
+// Код и сообщение используются для локализации.
+// Возвращённый прототип служит фабрикой конкретных ошибок с аргументами.
 func New(code, message string) ProtoError {
 	p := &protoError{
 		code:    code,
@@ -53,12 +58,15 @@ func New(code, message string) ProtoError {
 	return p
 }
 
-// New - создаётся новая ошибка на основе текущей ProtoError ошибки.
+// New - создаёт новый экземпляр ошибки на основе прототипа.
+// Параметр args - аргументы, подставляемые в сообщение ошибки для локализации.
 func (e *protoError) New(args ...any) error {
 	return e.newError(nil, args...)
 }
 
-// Wrap - создаёт новую ошибку на основе текущей ProtoError и оборачивает в неё указанную.
+// Wrap создаёт экземпляр ошибки, обёртывающий указанную ошибку.
+// args - аргументы, подставляемые в сообщение ошибки для локализации.
+// Если err == nil, подставляется ErrHasNilError.
 func (e *protoError) Wrap(err error, args ...any) error {
 	if err == nil {
 		err = ErrHasNilError
@@ -86,24 +94,24 @@ func (e *protoError) newError(err error, args ...any) error {
 	}
 }
 
-// Kind - возвращает всегда kind.User.
+// Kind - возвращает тип ошибки - всегда kind.User.
 func (e *protoError) Kind() kind.Enum {
 	return kind.User
 }
 
-// Code - возвращает код ошибки.
+// Code - возвращает код ошибки для локализации.
 func (e *protoError) Code() string {
 	return e.code
 }
 
-// Message - возвращает оригинальное сообщение
-// без подстановки аргументов (для поддержки локализации).
+// Message - возвращает исходный шаблон сообщения ошибки без подстановки аргументов.
+// Используется системой локализации для получения переводимого текста.
 func (e *protoError) Message() string {
 	return e.message
 }
 
-// Args - возвращает аргументы используемые
-// в сообщении ошибки (для поддержки локализации).
+// Args - возвращает копию аргументов ошибки для подстановки в сообщение.
+// Используется системой локализации вместе с Message().
 func (e *protoError) Args() []any {
 	if len(e.args) == 0 {
 		return nil
@@ -115,11 +123,9 @@ func (e *protoError) Args() []any {
 	return args
 }
 
-// Error - возвращает ошибку в виде строки.
-// Сообщение об ошибке формируется налету, потому как
-// в пользовательских ошибках метод Error() вызывается только
-// для отладки, а ошибки для пользователя формируется с помощью
-// методов Message() и Args().
+// Error - возвращает строковое представление ошибки.
+// Метод вызывается только для отладки; для пользовательского вывода
+// предназначены Message() и Args().
 func (e *protoError) Error() string {
 	// оптимизация: когда нет аргументов и вложенной ошибки
 	if len(e.args) == 0 && e.err == nil {
@@ -178,8 +184,8 @@ func (e *protoError) Error() string {
 	return buf.String()
 }
 
-// Is - сообщает, имеет ли указанная ошибка тот же
-// прототип ошибки (errors.Is использует этот интерфейс).
+// Is - реализует интерфейс errors.Is.
+// Сравнивает прототипы ошибок по указателю id (общий прототип = одинаковые ошибки).
 func (e *protoError) Is(target error) bool {
 	if e == target {
 		return true
@@ -192,7 +198,8 @@ func (e *protoError) Is(target error) bool {
 	return false
 }
 
-// Unwrap - возвращает вложенную ошибку (errors.Is использует этот интерфейс).
+// Unwrap - реализует интерфейс errors.Unwrap.
+// Возвращает вложенную ошибку или nil.
 func (e *protoError) Unwrap() error {
 	return e.err
 }
@@ -212,7 +219,7 @@ func estimatedArgLen(arg any) int {
 	}
 }
 
-// formatArg - функция для небольшой оптимизации.
+// formatArg - преобразует аргумент в строковое представление для вывода в Error().
 func formatArg(value any) string {
 	switch val := value.(type) {
 	case string:

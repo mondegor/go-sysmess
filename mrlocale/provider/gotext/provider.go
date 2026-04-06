@@ -10,7 +10,8 @@ import (
 )
 
 type (
-	// Provider - локализатор сообщений построенный на библиотеке gotext.
+	// Provider - провайдер локализации, построенный на golang.org/x/text/message.
+	// Поддерживает несколько доменов и языков, используя каталоги переводов.
 	Provider struct {
 		defaultPrinter     *message.Printer
 		domains            []string
@@ -19,7 +20,12 @@ type (
 	}
 )
 
-// NewProvider - создаёт объект Provider.
+// NewProvider - создаёт Provider локализации сообщений.
+// Параметры:
+//   - languages - список языков для которых будет настроена локализация;
+//   - opts - опции для добавления каталогов переводов через WithDomainCatalog;
+//
+// Первый язык в списке становится языком по умолчанию.
 func NewProvider(
 	languages []language.Tag,
 	opts ...Option,
@@ -61,17 +67,18 @@ func NewProvider(
 	return p, nil
 }
 
-// Domains - возвращает список используемых доменов.
+// Domains - возвращает список доступных доменов для локализации.
 func (p *Provider) Domains() []string {
 	return p.domains
 }
 
-// Languages - возвращает список используемых языков.
+// Languages - возвращает список поддерживаемых языков.
 func (p *Provider) Languages() []language.Tag {
 	return p.languages
 }
 
 // Localize - возвращает локализованное сообщение с подставленными аргументами.
+// Если для указанной пары domain/lang не найден каталог, используется язык по умолчанию.
 func (p *Provider) Localize(domain string, lang language.Tag, msg string, args []any) string {
 	printer := p.defaultPrinter
 

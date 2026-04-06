@@ -14,16 +14,16 @@ const (
 	maxLenDateTime        = 64
 )
 
-// DateTime - возвращает time.Time значение из указанной строки.
-// Значение строкового параметра должно быть указано в формате RFC3339.
-// Если параметр пустой, то в зависимости от required возвращается нулевое время или ошибка.
+// DateTime - парсит строку в time.Time в формате RFC3339.
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает нулевое время.
 func DateTime(value string, required bool) (time.Time, error) {
 	return dateTime(value, time.RFC3339, required)
 }
 
-// Date - возвращает time.Time значение из указанной строки.
-// Значение строкового параметра должно быть указано в формате DateOnly.
-// Если параметр пустой, то в зависимости от required возвращается нулевое время или ошибка.
+// Date - парсит строку в time.Time в формате DateOnly ("2006-01-02").
+// Если значение пустое и required=true, возвращает ошибку.
+// Если значение пустое и required=false, возвращает нулевое время.
 func Date(value string, required bool) (time.Time, error) {
 	return dateTime(value, time.DateOnly, required)
 }
@@ -51,12 +51,14 @@ func dateTime(value, format string, required bool) (time.Time, error) {
 	return item, nil
 }
 
-// RangeDateTime - возвращает RangeDateTime из строковых параметров в формате RFC3339.
+// RangeDateTime - парсит два строковых значения в RangeDateTime в формате RFC3339.
+// Если toValue меньше fromValue, автоматически меняет их местами.
 func RangeDateTime(fromValue, toValue string) (mrtype.RangeDateTime, error) {
 	return rangeDateTime(fromValue, toValue, time.RFC3339)
 }
 
-// RangeDate - возвращает RangeDateTime из строковых параметров в формате DateOnly.
+// RangeDate - парсит два строковых значения в RangeDateTime в формате DateOnly.
+// Если toValue меньше fromValue, автоматически меняет их местами.
 func RangeDate(fromValue, toValue string) (mrtype.RangeDateTime, error) {
 	return rangeDateTime(fromValue, toValue, time.DateOnly)
 }

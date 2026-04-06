@@ -11,10 +11,11 @@ const (
 
 type (
 	// Enum - тип ошибки.
+	// Определяет источник и характер ошибки: внутренняя, системная или пользовательская.
 	Enum uint8
 )
 
-// String - возвращает тип ошибки в виде строки.
+// String - возвращает строковое представление типа ошибки.
 func (e Enum) String() string {
 	switch e {
 	case Internal:
@@ -28,7 +29,8 @@ func (e Enum) String() string {
 	return "UNKNOWN"
 }
 
-// Extract - возвращает тип ошибки.
+// Extract - извлекает тип ошибки из ошибки, реализующей интерфейс Kind().
+// Возвращает 0, если ошибка не реализует этот интерфейс.
 func Extract(err error) (userKind Enum) {
 	if e, ok := err.(interface{ Kind() Enum }); ok {
 		return e.Kind()
@@ -37,9 +39,13 @@ func Extract(err error) (userKind Enum) {
 	return 0
 }
 
-// Analyze - возвращает тип ошибки с учётом её вложенных ошибок.
-// Если пользовательская ошибка содержит вложенную ошибку
-// типа Internal или System, то вернётся этот тип ошибки.
+// Analyze - возвращает тип ошибки с учётом вложенных ошибок.
+// Алгоритм:
+//   - Если ошибка имеет тип Internal или System, то вернётся её тип.
+//   - Если ошибка имеет тип User, разворачивает её (errors.Unwrap) и анализирует вложенную ошибку.
+//   - Если развёрнутая ошибка - Internal или System, возвращает её тип.
+//   - Если цепочка разворачивания закончилась без нахождения Internal/System, возвращает User.
+//   - Если ошибка не реализует Kind(), возвращает последний найденный User или 0.
 func Analyze(err error) (userKind Enum) {
 	for {
 		if e, ok := err.(interface{ Kind() Enum }); ok {
