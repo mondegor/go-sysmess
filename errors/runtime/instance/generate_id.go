@@ -8,7 +8,8 @@ import (
 
 const (
 	bufferLen   = 13 // math.Ceil(64 * math.Log(2) / math.Log(float64(baseNCharsLen)))
-	idBufferLen = 22 // trim(2) + timestamp(10) + dash(1) + random1(4) + dash(1) + random2(4)
+	idOffset    = 1  // ведущие обрезанные символы
+	idBufferLen = 20 // timestamp(10) + dash(1) + random1(4) + dash(1) + random2(4)
 )
 
 //nolint:gochecknoglobals
@@ -22,7 +23,7 @@ var (
 // Используется для идентификации конкретных экземпляров runtime-ошибок.
 func GenerateID() string {
 	var (
-		buf [bufferLen * 2]byte // (timestamp + random)
+		buf [bufferLen*2 - 1]byte // (timestamp + random)
 		rnd [len(rndIfError)]byte
 	)
 
@@ -32,12 +33,18 @@ func GenerateID() string {
 		rnd = rndIfError
 	}
 
+	// если timestamp занял 13 символов, сдвигаем начало random-секции на 1
+	// влево, чтобы последний символ timestamp не вылез за дефис
+	if pos > 11 {
+		pos--
+	}
+
 	encodeBaseN(buf[pos:], binary.BigEndian.Uint64(rnd[:]))
 
-	buf[12] = '-'
-	buf[17] = '-'
+	buf[11] = '-'
+	buf[16] = '-'
 
-	return string(buf[2:idBufferLen]) // xxXXXXXXXXXX-XXXX-XXXXxxxx
+	return string(buf[idOffset : idOffset+idBufferLen]) // xXXXXXXXXXX-XXXX-XXXXxxxx
 }
 
 func encodeBaseN(buf []byte, n uint64) (pos int) {
