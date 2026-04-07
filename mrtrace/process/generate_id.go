@@ -7,8 +7,10 @@ import (
 )
 
 const (
-	bufferLen   = 13 // math.Ceil(64 * math.Log(2) / math.Log(float64(baseNCharsLen)))
-	idBufferLen = 22 // trim(2) + timestamp(10) + dash(1) + random1(4) + dash(1) + random2(4)
+	bufferLen   = 12 // math.Ceil(64 * math.Log(2) / math.Log(float64(baseNCharsLen)))
+	idDash1Pos  = 12
+	idDash2Pos  = 19
+	idBufferLen = 24 // timestamp(12) + dash(1) + random1(6) + dash(1) + random2(4)
 )
 
 //nolint:gochecknoglobals
@@ -18,7 +20,7 @@ var (
 	rndIfError    = [...]byte{0x0, 0x0, 0xee, 0xee, 0xee, 0xee, 0x0, 0x0} // данные по умолчанию при ошибке
 )
 
-// GenerateID - генерирует уникальный идентификатор в формате XXXXXXXXXX-XXXX-XXXX.
+// GenerateID - генерирует уникальный идентификатор в формате XXXXXXXXXXXX-XXXXXX-XXXX.
 // Используется для идентификации процессов при трассировке запросов.
 func GenerateID() string {
 	var (
@@ -34,14 +36,14 @@ func GenerateID() string {
 
 	encodeBaseN(buf[pos:], binary.BigEndian.Uint64(rnd[:]))
 
-	buf[12] = '-'
-	buf[17] = '-'
+	buf[idDash1Pos] = '-'
+	buf[idDash2Pos] = '-'
 
-	return string(buf[2:idBufferLen]) // xxXXXXXXXXXX-XXXX-XXXXxxxx
+	return string(buf[:idBufferLen]) // TTTTTTTTTTTT-XXXXXX-XXXX
 }
 
 func encodeBaseN(buf []byte, n uint64) (pos int) {
-	var digits [bufferLen]byte
+	var digits [bufferLen + 1]byte // 1 byte для защиты от переполнения
 
 	// цифры переводятся в символы в обратном порядке
 	for n > 0 {
@@ -51,9 +53,19 @@ func encodeBaseN(buf []byte, n uint64) (pos int) {
 		n = q
 	}
 
+	if pos > bufferLen {
+		pos = bufferLen
+	}
+
 	for i := 0; i < pos; i++ {
 		buf[i] = digits[pos-1-i]
 	}
 
+	// остаток заполняется символом '0'
+	for i := pos; i < bufferLen; i++ {
+		buf[i] = baseNChars[0]
+	}
+
+	// pos всегда не больше bufferLen
 	return pos
 }

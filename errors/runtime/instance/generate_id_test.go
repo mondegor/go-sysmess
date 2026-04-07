@@ -12,19 +12,23 @@ import (
 )
 
 // TestGenerateID_Format проверяет базовый формат генерируемого ID.
-// ID должен состоять из 3 частей, разделённых дефисами.
-// Длина частей может варьироваться в зависимости от длины timestamp в base36.
+// ID должен состоять из 3 частей, разделённых дефисами: XXXXXXXXXX-XXXX-XXXX.
+// Формат: 10 символов timestamp, дефис, 4 символа random, дефис, 4 символа random.
 func TestGenerateID_Format(t *testing.T) {
 	t.Parallel()
 
 	id := instance.GenerateID()
 
-	parts := strings.Split(id, "-")
-	require.Len(t, parts, 3)
+	// Проверяем общую длину
+	require.Len(t, id, 20, "Длина ID должна быть 20 символов")
 
-	assert.Greater(t, len(parts[0]), 10-1)
-	assert.Greater(t, len(parts[1]), 4-1)
-	assert.Greater(t, len(parts[2]), 4-1)
+	parts := strings.Split(id, "-")
+	require.Len(t, parts, 3, "ID должен содержать ровно 3 части, разделённые дефисами")
+
+	// Проверяем длину каждой части
+	assert.Len(t, parts[0], 10, "Первая часть (timestamp) должна быть 10 символов")
+	assert.Len(t, parts[1], 4, "Вторая часть (random1) должна быть 4 символа")
+	assert.Len(t, parts[2], 4, "Третья часть (random2) должна быть 4 символа")
 }
 
 // TestGenerateID_ContainsOnlyUppercaseAlphanumeric проверяет, что ID содержит
@@ -41,14 +45,15 @@ func TestGenerateID_ContainsOnlyUppercaseAlphanumeric(t *testing.T) {
 
 // TestGenerateID_DashesAtCorrectPositions проверяет наличие и расположение дефисов.
 // В ID должно быть ровно 2 дефиса, разделяющих timestamp и случайные компоненты.
+// Формат: XXXXXXXXXX-XXXX-XXXX (дефисы на позициях 10 и 15).
 func TestGenerateID_DashesAtCorrectPositions(t *testing.T) {
 	t.Parallel()
 
 	id := instance.GenerateID()
 
-	require.Len(t, id, 20)
-	assert.Equal(t, uint8('-'), id[10])
-	assert.Equal(t, uint8('-'), id[15])
+	require.Len(t, id, 20, "Длина ID должна быть 20 символов")
+	assert.Equal(t, uint8('-'), id[10], "Дефис должен быть на позиции 10")
+	assert.Equal(t, uint8('-'), id[15], "Дефис должен быть на позиции 15")
 }
 
 // TestGenerateID_Unique проверяет уникальность генерируемых ID.

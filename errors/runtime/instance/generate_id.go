@@ -7,8 +7,10 @@ import (
 )
 
 const (
-	bufferLen   = 13 // math.Ceil(64 * math.Log(2) / math.Log(float64(baseNCharsLen)))
+	bufferLen   = 12 // math.Ceil(64 * math.Log(2) / math.Log(float64(baseNCharsLen)))
 	idOffset    = 1  // ведущие обрезанные символы
+	idDash1Pos  = 11
+	idDash2Pos  = 16
 	idBufferLen = 20 // timestamp(10) + dash(1) + random1(4) + dash(1) + random2(4)
 )
 
@@ -23,7 +25,7 @@ var (
 // Используется для идентификации конкретных экземпляров runtime-ошибок.
 func GenerateID() string {
 	var (
-		buf [bufferLen*2 - 1]byte // (timestamp + random)
+		buf [bufferLen * 2]byte // (timestamp + random)
 		rnd [len(rndIfError)]byte
 	)
 
@@ -33,22 +35,16 @@ func GenerateID() string {
 		rnd = rndIfError
 	}
 
-	// если timestamp занял 13 символов, сдвигаем начало random-секции на 1
-	// влево, чтобы последний символ timestamp не вылез за дефис
-	if pos > 11 {
-		pos--
-	}
-
 	encodeBaseN(buf[pos:], binary.BigEndian.Uint64(rnd[:]))
 
-	buf[11] = '-'
-	buf[16] = '-'
+	buf[idDash1Pos] = '-'
+	buf[idDash2Pos] = '-'
 
-	return string(buf[idOffset : idOffset+idBufferLen]) // xXXXXXXXXXX-XXXX-XXXXxxxx
+	return string(buf[idOffset : idOffset+idBufferLen]) // tTTTTTTTTTT-XXXX-XXXXxxx
 }
 
 func encodeBaseN(buf []byte, n uint64) (pos int) {
-	var digits [bufferLen]byte
+	var digits [bufferLen + 1]byte // 1 byte для защиты от переполнения
 
 	// цифры переводятся в символы в обратном порядке
 	for n > 0 {
@@ -58,9 +54,19 @@ func encodeBaseN(buf []byte, n uint64) (pos int) {
 		n = q
 	}
 
+	if pos > bufferLen {
+		pos = bufferLen
+	}
+
 	for i := 0; i < pos; i++ {
 		buf[i] = digits[pos-1-i]
 	}
 
+	// остаток заполняется символом '0'
+	for i := pos; i < bufferLen; i++ {
+		buf[i] = baseNChars[0]
+	}
+
+	// pos всегда не больше bufferLen
 	return pos
 }
