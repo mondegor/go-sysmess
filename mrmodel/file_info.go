@@ -9,7 +9,7 @@ type (
 	// FileInfo - мета-информация о файле.
 	// Используется для описания файловых данных без их содержимого.
 	FileInfo struct {
-		// ContentType - MIME-тип файла (например, "image/jpeg", "application/pdf").
+		// ContentType - MIME-тип файла (например: "image/jpeg", "application/pdf").
 		ContentType string `json:"content_type,omitempty"`
 
 		// OriginalName - оригинальное имя файла при загрузке.

@@ -16,7 +16,7 @@ type (
 
 // NewMessageFormatter - создаёт MessageFormatter для преобразования плейсхолдеров.
 // Параметры:
-//   - leftDelim, rightDelim - ограничители плейсхолдеров (например, "{{" и "}}");
+//   - leftDelim, rightDelim - ограничители плейсхолдеров (например: "{{" и "}}");
 //   - formatter - функция преобразования плейсхолдера в новый формат, принимает исходный плейсхолдер и его индекс.
 func NewMessageFormatter(leftDelim, rightDelim string, formatter func(placeholder string, index int) (newPlaceholder string)) *MessageFormatter {
 	return &MessageFormatter{

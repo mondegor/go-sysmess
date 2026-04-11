@@ -11,7 +11,7 @@ type (
 	// ImageInfo - мета-информация об изображении.
 	// Расширяет FileInfo дополнительной информацией о размерах изображения.
 	ImageInfo struct {
-		// ContentType - MIME-тип изображения (например, "image/jpeg", "image/png").
+		// ContentType - MIME-тип изображения (например: "image/jpeg", "image/png").
 		ContentType string `json:"content_type,omitempty"`
 
 		// OriginalName - оригинальное имя изображения при загрузке.

@@ -13,7 +13,7 @@ type (
 )
 
 // WithCustomCode - создаёт CustomError, оборачивающую ошибку типа kind.User
-// с дополнительным уточняющим кодом (например, имя поля: "userEmail").
+// с дополнительным уточняющим кодом (например: имя поля: "userEmail").
 // Если err не является kind.User, ошибка помечается как невалидная.
 func WithCustomCode(err error, customCode string) CustomError {
 	return custom.New(err, customCode)

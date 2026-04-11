@@ -38,7 +38,7 @@ type (
 var ErrHasNilError = errors.New("runtime error has a nil wrapped error")
 
 // New создаёт прототип runtime-ошибки указанного типа с заданным текстом.
-// opts - дополнительные опции настройки (например, WithOnCreate для генерации hint).
+// opts - дополнительные опции настройки (например: WithOnCreate для генерации hint).
 // Возвращённый прототип можно использовать как фабрику конкретных ошибок.
 func New(errKind kind.Enum, text string, opts ...Option) ProtoError {
 	return newProto(errKind, text, opts)

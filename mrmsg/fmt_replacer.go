@@ -16,7 +16,7 @@ type (
 
 // NewFmtReplacer - создаёт FmtReplacer для замены плейсхолдеров в сообщении.
 // Параметры:
-//   - message - строка формата для fmt.Sprintf (например, "Hello %[1]s, you are %[2]d");
+//   - message - строка формата для fmt.Sprintf (например: "Hello %[1]s, you are %[2]d");
 //   - placeholders - список плейсхолдеров, которые будут заменены аргументами.
 func NewFmtReplacer(message string, placeholders []string) *FmtReplacer {
 	return &FmtReplacer{

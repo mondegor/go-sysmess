@@ -13,7 +13,7 @@ type (
 	}
 )
 
-// Language - возвращает код текущего языка локализации в формате BCP 47 (например, "en", "ru").
+// Language - возвращает код текущего языка локализации в формате BCP 47 (например: "en", "ru").
 func (l *Localizer) Language() string {
 	return l.language.String()
 }

@@ -22,7 +22,7 @@ type (
 
 // NewPlaceholderReplacer - создаёт PlaceholderReplacer для замены плейсхолдеров.
 // Параметры:
-//   - message - сообщение с именованными плейсхолдерами (например, "Hello {name}, you are {age}");
+//   - message - сообщение с именованными плейсхолдерами (например: "Hello {name}, you are {age}");
 //   - placeholders - список плейсхолдеров для замены в порядке их появления.
 func NewPlaceholderReplacer(message string, placeholders []string) *PlaceholderReplacer {
 	return &PlaceholderReplacer{
@@ -33,7 +33,7 @@ func NewPlaceholderReplacer(message string, placeholders []string) *PlaceholderR
 
 // NewMessageReplacer - создаёт PlaceholderReplacer, автоматически извлекая плейсхолдеры из сообщения.
 // Параметры:
-//   - leftDelim, rightDelim - ограничители плейсхолдеров (например, "{" и "}");
+//   - leftDelim, rightDelim - ограничители плейсхолдеров (например: "{" и "}");
 //   - message - сообщение с плейсхолдерами для последующей замены.
 func NewMessageReplacer(leftDelim, rightDelim, message string) *PlaceholderReplacer {
 	return NewPlaceholderReplacer(

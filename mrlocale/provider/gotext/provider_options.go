@@ -16,7 +16,7 @@ type (
 
 // WithDomainCatalog - добавляет каталог переводов для указанного домена.
 // Параметры:
-//   - domain - имя домена (например, "messages" или "errors");
+//   - domain - имя домена (например: "messages" или "errors");
 //   - cat - каталог с переводами типа catalog.Catalog из golang.org/x/text/message/catalog;
 //
 // Если cat равен nil, опция игнорируется.

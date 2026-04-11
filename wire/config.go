@@ -26,7 +26,7 @@ type (
 	// LoggerConfig - конфигурация для создания slog.LoggerAdapter.
 	// Содержит параметры окружения, форматирования и контекстных идентификаторов.
 	LoggerConfig struct {
-		// Environment - название окружения (например, "production", "staging", "local").
+		// Environment - название окружения (например: "production", "testing", "local").
 		Environment string
 
 		// Version - версия приложения.

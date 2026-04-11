@@ -8,7 +8,7 @@ import (
 
 // NewMessageFormatter - создаёт MessageFormatter для преобразования
 // плейсхолдеров в формат, совместимый с fmt.Sprintf.
-// Параметры leftDelim и rightDelim - ограничители плейсхолдеров (например, "{{" и "}}").
+// Параметры leftDelim и rightDelim - ограничители плейсхолдеров (например: "{{" и "}}").
 // Плейсхолдеры преобразуются в формат "%[N]s", где N - порядковый номер аргумента.
 func NewMessageFormatter(leftDelim, rightDelim string) *mrmsg.MessageFormatter {
 	return mrmsg.NewMessageFormatter(

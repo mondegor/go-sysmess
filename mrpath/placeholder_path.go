@@ -22,8 +22,8 @@ type (
 
 // NewPlaceholder - создаёт Builder, который заменяет плейсхолдер в basePath на переданный путь.
 // Параметры:
-//   - basePath - шаблон пути с плейсхолдером (например, "/dir/{{path}}/postfix");
-//   - placeholder - строка-плейсхолдер для замены (например, "{{path}}").
+//   - basePath - шаблон пути с плейсхолдером (например: "/dir/{{path}}/postfix");
+//   - placeholder - строка-плейсхолдер для замены (например: "{{path}}").
 //
 // Возвращает ошибку, если плейсхолдер пуст или не найден в basePath.
 // Пример: basePath="/dir/{{path}}/postfix", placeholder="{{path}}" → "/dir/real-value/postfix".

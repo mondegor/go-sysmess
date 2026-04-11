@@ -12,7 +12,7 @@ type (
 )
 
 // NewTail - создаёт Builder, который добавляет переданный путь в конец basePath.
-// Параметр basePath - базовый путь, к которому будет добавляться значение (например, "/base/dir/").
+// Параметр basePath - базовый путь, к которому будет добавляться значение (например: "/base/dir/").
 // Нормализует trailing slash: убирает все завершающие "/" и добавляет одну.
 // Пример: basePath="/base/dir/" → "/base/dir/path".
 func NewTail(basePath string) Builder {
