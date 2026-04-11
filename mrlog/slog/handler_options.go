@@ -13,13 +13,13 @@ func handlerOptions(opts options) *stdlog.HandlerOptions {
 		ReplaceAttr: func(_ []string, attr stdlog.Attr) stdlog.Attr {
 			attr = opts.replaceAttr(attr)
 
-			switch {
-			case attr.Key == stdlog.TimeKey:
+			switch attr.Key {
+			case stdlog.TimeKey:
 				if tm, ok := attr.Value.Any().(time.Time); ok {
 					attr.Value = stdlog.StringValue(tm.Format(opts.timeFormat))
 				}
 
-			case attr.Key == stdlog.LevelKey:
+			case stdlog.LevelKey:
 				if lv, ok := attr.Value.Any().(stdlog.Level); ok {
 					if lv < stdlog.LevelInfo || lv > stdlog.LevelError {
 						attr.Value = stdlog.StringValue(level.Enum(lv).String())

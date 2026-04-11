@@ -11,6 +11,7 @@ import (
 // - Round(NaN) = NaN.
 func RoundFloat(x float64, precision int) float64 {
 	const baseDecimal = 10
+
 	pow := math.Pow(baseDecimal, float64(precision))
 
 	return math.Round(x*pow) / pow

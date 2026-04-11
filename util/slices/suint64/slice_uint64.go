@@ -88,7 +88,7 @@ func binaryIndex(s []uint64, value uint64) int {
 
 	for i < j {
 		// avoid overflow
-		h := int(uint(i+j) >> 1) //nolint:gosec
+		h := int(uint(i+j) >> 1)
 
 		switch {
 		case s[h] < value:

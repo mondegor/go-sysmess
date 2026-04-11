@@ -47,5 +47,5 @@ func translateError(err error) string {
 		return fmt.Sprintf("translateError()->%s + args: %+v", message, args)
 	}
 
-	return fmt.Sprintf("translateError()->%s", message)
+	return "translateError()->" + message
 }

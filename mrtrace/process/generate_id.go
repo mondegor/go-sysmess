@@ -28,7 +28,7 @@ func GenerateID() string {
 		rnd [len(rndIfError)]byte
 	)
 
-	pos := encodeBaseN(buf[:], uint64(time.Now().UnixNano())) //nolint:gosec
+	pos := encodeBaseN(buf[:], uint64(time.Now().UnixNano()))
 
 	if _, err := rand.Read(rnd[:]); err != nil {
 		rnd = rndIfError

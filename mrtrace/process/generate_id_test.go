@@ -62,6 +62,7 @@ func TestGenerateID_Unique(t *testing.T) {
 	t.Parallel()
 
 	const iterations = 1000
+
 	ids := make(map[string]bool, iterations)
 
 	for i := 0; i < iterations; i++ {
@@ -157,6 +158,7 @@ func TestGenerateID_RandomComponent(t *testing.T) {
 
 	// Генерируем множество ID быстро (вероятно одинаковый timestamp)
 	const count = 100
+
 	ids := make([]string, count)
 
 	for i := 0; i < count; i++ {

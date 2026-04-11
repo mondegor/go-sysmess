@@ -49,5 +49,5 @@ func translateError(err error) string {
 	p := mrmsg.NewMessageReplacer("{", "}", message)
 	message, _ = p.Replace(args)
 
-	return fmt.Sprintf("translateError()->%s", message)
+	return "translateError()->" + message
 }

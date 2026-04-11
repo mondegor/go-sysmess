@@ -61,6 +61,7 @@ func NewCaller(opts ...Option) Caller {
 // Возвращает не более depth кадров.
 func (c *caller) Call() StackTrace {
 	var pcs [stackTraceMaxDepth]uintptr
+
 	top, n := 0, runtime.Callers(2, pcs[:])
 
 	// TODO: здесь достаточно проверить 3-5 элементов стека: i >= max(0, n - 1 - 3)
