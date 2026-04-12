@@ -7,7 +7,6 @@ import (
 
 	"github.com/mondegor/go-sysmess/errors"
 	"github.com/mondegor/go-sysmess/errors/helper"
-	"github.com/mondegor/go-sysmess/errors/kind"
 	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/errcat"
 	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/fruitcat"
 	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/msgcat"
@@ -28,14 +27,12 @@ func main() {
 		mrlocale.WithFormatError(helper.ExtractMessageForLocalization),
 		mrlocale.WithMessageProvider(
 			func(languages []language.Tag) (mrlocale.MessageProvider, error) {
-				localeProvider, err = gotext.NewProvider(
+				return gotext.NewProvider(
 					languages,
 					gotext.WithDomainCatalog(mrlocale.DefaultMessagesDomain, msgcat.NewCatalog()),
 					gotext.WithDomainCatalog(mrlocale.DefaultErrorsDomain, errcat.NewCatalog()),
 					gotext.WithDomainCatalog("fruitcat", fruitcat.NewCatalog()),
 				)
-
-				return localeProvider, err
 			},
 		),
 	)
@@ -101,9 +98,4 @@ func main() {
 	// fr - not found
 	lz = pool.Localizer(language.MustParse("fr"))
 	fmt.Println(lz.Language()) // print default lang
-}
-
-type localizedError interface {
-	Kind() kind.Enum
-	Code() string
 }

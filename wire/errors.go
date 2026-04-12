@@ -12,11 +12,6 @@ import (
 // Для Internal-ошибок формируется стек вызовов (если HasCaller=true) и ID ошибки.
 // Для System-ошибок формируется только ID ошибки.
 func InitErrors(opts ErrorConfig) {
-	var (
-		internalOptions []runtime.Option
-		systemOptions   []runtime.Option
-	)
-
 	// применяется для System и Internal ошибок по умолчанию
 	onCreateOption := runtime.WithOnCreate(
 		func(kind kind.Enum, wrappedErr error) (bag any) {
@@ -32,7 +27,7 @@ func InitErrors(opts ErrorConfig) {
 		},
 	)
 
-	systemOptions = append(systemOptions, onCreateOption)
+	systemOptions := []runtime.Option{onCreateOption}
 
 	if opts.HasCaller {
 		caller := stacktrace.NewCaller(
@@ -59,7 +54,7 @@ func InitErrors(opts ErrorConfig) {
 		)
 	}
 
-	internalOptions = append(internalOptions, onCreateOption)
+	internalOptions := []runtime.Option{onCreateOption}
 
 	runtime.InitDelayedOptions(
 		runtime.OptionsHandlerFunc(func(kindErr kind.Enum, _ string) []runtime.Option {

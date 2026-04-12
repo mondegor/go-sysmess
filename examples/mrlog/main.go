@@ -14,6 +14,10 @@ import (
 	"github.com/mondegor/go-sysmess/mrlog/slog/middleware"
 )
 
+type (
+	ctxKeyEnv struct{}
+)
+
 // main - пример создания логгера и его использование с различными опциями.
 func main() {
 	logger, err := slog.NewLoggerAdapter(
@@ -26,7 +30,7 @@ func main() {
 		mrlog.Fatal(err.Error())
 	}
 
-	ctx := context.WithValue(context.Background(), "env", "dev")
+	ctx := context.WithValue(context.Background(), ctxKeyEnv{}, "dev")
 
 	printMsg(ctx, logger)
 
@@ -53,7 +57,7 @@ func main() {
 					})
 
 					// data from context
-					rec.Add("env", ctx.Value("env"))
+					rec.Add("env", ctx.Value(ctxKeyEnv{}))
 
 					return rec
 				},

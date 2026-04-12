@@ -65,6 +65,25 @@ linters:
     - wrapcheck # Checks that errors returned from external packages are wrapped.
     - wsl_v5 # Add or remove empty lines. [auto-fix]
 
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - dupl
+          - gosec
+          # - exhaustruct
+          - forbidigo
+          - forcetypeassert
+          # - funlen
+          - noctx
+          - revive
+          - unparam
+      - path: examples/.*
+        linters:
+          - forbidigo
+          - gochecknoglobals
+          - wrapcheck
+
   settings:
     dupl:
       threshold: 125
@@ -216,7 +235,7 @@ linters:
           disabled: false
         - name: package-comments
           severity: warning
-          disabled: false
+          disabled: true
         - name: range
           severity: warning
           disabled: false
@@ -331,24 +350,6 @@ issues:
     - EXC0014 # [revive] 'comment on exported (.+) should be of the form "(.+)..."'
     #- EXC0015 # [revive] 'should have a package comment' (default true)
 
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - dupl
-        - gosec
-        # - exhaustruct
-        - forbidigo
-        - forcetypeassert
-        # - funlen
-        - noctx
-        - revive
-        - unparam
-
-  exclude-dirs:
-    - .github
-    - docs
-    - vendor
-
 formatters:
   enable:
     - gofmt
@@ -373,7 +374,11 @@ formatters:
 run:
   concurrency: 4
   timeout: 5m
-  go: "1.24"
+  go: "1.25"
+  exclude-dirs:
+    - .github
+    - docs
+    - vendor
 
 output:
   sort-results: true

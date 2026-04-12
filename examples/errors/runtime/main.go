@@ -49,7 +49,7 @@ func execute(err errors.RuntimeProtoError, numberStart int) {
 	err1 := createErrLevel1(err)
 	echoErrorInfo(err1, numberStart)
 
-	err2 := createErrLevel2_step1(err)
+	err2 := createErrLevel2Step1(err)
 	echoErrorInfo(err2, numberStart+1)
 
 	if errors.Is(err1, err) && errors.Is(err2, err) {
@@ -70,11 +70,11 @@ func createErrLevel1(err errors.RuntimeProtoError) error {
 	)
 }
 
-func createErrLevel2_step1(err errors.RuntimeProtoError) error {
-	return createErrLevel2_step2(err)
+func createErrLevel2Step1(err errors.RuntimeProtoError) error {
+	return createErrLevel2Step2(err)
 }
 
-func createErrLevel2_step2(err errors.RuntimeProtoError) error {
+func createErrLevel2Step2(err errors.RuntimeProtoError) error {
 	return err.New("attr4", "value4")
 }
 
