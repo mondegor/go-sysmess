@@ -10,6 +10,7 @@ type (
 	// Body представляет io.ReadCloser для чтения содержимого файла.
 	File struct {
 		FileInfo
+
 		Body io.ReadCloser
 	}
 
@@ -17,6 +18,7 @@ type (
 	// Body содержит все данные файла в виде байтового слайса.
 	FileContent struct {
 		FileInfo
+
 		Body []byte
 	}
 
@@ -24,6 +26,7 @@ type (
 	// Header содержит заголовок multipart-файла для доступа к оригинальным метаданным.
 	FileHeader struct {
 		FileInfo
+
 		Header *multipart.FileHeader
 	}
 )

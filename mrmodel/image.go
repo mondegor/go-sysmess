@@ -10,6 +10,7 @@ type (
 	// Body представляет io.ReadCloser для чтения содержимого изображения.
 	Image struct {
 		ImageInfo
+
 		Body io.ReadCloser
 	}
 
@@ -17,6 +18,7 @@ type (
 	// Body содержит все данные изображения в виде байтового слайса.
 	ImageContent struct {
 		ImageInfo
+
 		Body []byte
 	}
 
@@ -24,6 +26,7 @@ type (
 	// Header содержит заголовок multipart-файла для доступа к оригинальным метаданным.
 	ImageHeader struct {
 		ImageInfo
+
 		Header *multipart.FileHeader
 	}
 )
@@ -32,7 +35,7 @@ type (
 // (с потерей дополнительной информации об изображении).
 func (im Image) ToFile() File {
 	return File{
-		FileInfo: im.ToFileInfo(),
+		FileInfo: im.ImageInfo.ToFileInfo(),
 		Body:     im.Body,
 	}
 }
@@ -41,7 +44,7 @@ func (im Image) ToFile() File {
 // (с потерей дополнительной информации об изображении).
 func (im ImageContent) ToFileContent() FileContent {
 	return FileContent{
-		FileInfo: im.ToFileInfo(),
+		FileInfo: im.ImageInfo.ToFileInfo(),
 		Body:     im.Body,
 	}
 }
@@ -50,7 +53,7 @@ func (im ImageContent) ToFileContent() FileContent {
 // (с потерей дополнительной информации об изображении).
 func (im ImageHeader) ToFileHeader() FileHeader {
 	return FileHeader{
-		FileInfo: im.ToFileInfo(),
+		FileInfo: im.ImageInfo.ToFileInfo(),
 		Header:   im.Header,
 	}
 }

@@ -6,11 +6,16 @@ import (
 	"strings"
 )
 
-// Version возвращает версию приложения из системы контроля версий Git.
+// Version - реализация VersionContext без контекста.
+func Version() string {
+	return VersionContext(context.Background())
+}
+
+// VersionContext возвращает версию приложения из системы контроля версий Git.
 // Если текущая ветка отличается от master, main или HEAD, возвращается название ветки.
 // В противном случае возвращается результат git describe с информацией о теге, коммите и состоянии изменений.
 // Если Git недоступен или произошла ошибка, возвращается пустая строка или название ветки.
-func Version(ctx context.Context) string {
+func VersionContext(ctx context.Context) string {
 	if _, err := exec.LookPath("git"); err != nil {
 		return ""
 	}
