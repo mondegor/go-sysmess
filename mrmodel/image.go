@@ -35,7 +35,7 @@ type (
 // (с потерей дополнительной информации об изображении).
 func (im Image) ToFile() File {
 	return File{
-		FileInfo: im.ImageInfo.ToFileInfo(),
+		FileInfo: im.ToFileInfo(),
 		Body:     im.Body,
 	}
 }
@@ -44,7 +44,7 @@ func (im Image) ToFile() File {
 // (с потерей дополнительной информации об изображении).
 func (im ImageContent) ToFileContent() FileContent {
 	return FileContent{
-		FileInfo: im.ImageInfo.ToFileInfo(),
+		FileInfo: im.ToFileInfo(),
 		Body:     im.Body,
 	}
 }
@@ -53,7 +53,7 @@ func (im ImageContent) ToFileContent() FileContent {
 // (с потерей дополнительной информации об изображении).
 func (im ImageHeader) ToFileHeader() FileHeader {
 	return FileHeader{
-		FileInfo: im.ImageInfo.ToFileInfo(),
+		FileInfo: im.ToFileInfo(),
 		Header:   im.Header,
 	}
 }
