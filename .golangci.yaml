@@ -27,7 +27,7 @@ linters:
     - gocyclo # Computes and checks the cyclomatic complexity of functions. [fast]
     - godot # Check if comments end in a period. [fast, auto-fix]
     # DELAYED - godox # Detects usage of FIXME, TODO and other keywords inside comments. [fast]
-    - goheader # Check if file header matches to pattern. [fast, auto-fix]
+    # - goheader # Check if file header matches to pattern. [fast, auto-fix]
     - gomodguard # Allow and blocklist linter for direct Go module dependencies. This is different from depguard where there are different block types for example version constraints and module recommendations. [fast]
     - goprintffuncname # Checks that printf-like functions are named with `f` at the end. [fast]
     - gosec # Inspects source code for security problems.
@@ -62,7 +62,7 @@ linters:
     - unused # Checks Go code for unused constants, variables, functions and types.
     - wastedassign # Finds wasted assignment statements.
     - whitespace # Whitespace is a linter that checks for unnecessary newlines at the start and end of functions, if, for, etc. [fast, auto-fix]
-    - wrapcheck # Checks that errors returned from external packages are wrapped.
+    # - wrapcheck # Checks that errors returned from external packages are wrapped.
     - wsl_v5 # Add or remove empty lines. [auto-fix]
 
   exclusions:

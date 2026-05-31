@@ -4,7 +4,9 @@ import (
 	"runtime"
 )
 
-type runtimeFrame uintptr
+type (
+	runtimeFrame uintptr
+)
 
 // Name - возвращает имя функции этого кадра стека.
 // Если функция не определена, возвращает "unknown".
