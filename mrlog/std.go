@@ -2,8 +2,6 @@ package mrlog
 
 import (
 	stdlog "log"
-
-	"github.com/mondegor/go-sysmess/mrlog/logger"
 )
 
 // Fatal is equivalent to [Print] followed by a call to [os.Exit](1).
@@ -15,29 +13,14 @@ func Fatal(v ...any) {
 	stdlog.Fatal(v...)
 }
 
-// Fatalf is equivalent to [Printf] followed by a call to [os.Exit](1).
-func Fatalf(format string, v ...any) {
-	stdlog.Fatalf(format, v...)
-}
-
-// Panic is equivalent to [Print] followed by a call to panic().
-func Panic(v ...any) {
-	stdlog.Panic(v...)
-}
-
-// Panicf is equivalent to [Printf] followed by a call to panic().
-func Panicf(format string, v ...any) {
-	stdlog.Panicf(format, v...)
-}
-
-// extractLogger - извлекает logger.Logger и сообщение из слайса аргументов.
-// Ожидает, что первый аргумент - logger.Logger, а второй - строка.
-func extractLogger(v []any) (l logger.Logger, msg string, ok bool) {
+// extractLogger - извлекает Logger и сообщение из слайса аргументов.
+// Ожидает, что первый аргумент - Logger, а второй - строка.
+func extractLogger(v []any) (l Logger, msg string, ok bool) {
 	if len(v) < 2 {
 		return nil, "", false
 	}
 
-	if l, ok = v[0].(logger.Logger); !ok {
+	if l, ok = v[0].(Logger); !ok {
 		return nil, "", false
 	}
 

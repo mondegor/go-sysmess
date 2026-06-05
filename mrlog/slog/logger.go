@@ -6,9 +6,9 @@ import (
 	stdlog "log/slog"
 	"os"
 
+	"github.com/mondegor/go-sysmess/mrlog"
 	"github.com/mondegor/go-sysmess/mrlog/color"
 	"github.com/mondegor/go-sysmess/mrlog/level"
-	log "github.com/mondegor/go-sysmess/mrlog/logger"
 )
 
 type (
@@ -55,7 +55,7 @@ func NewLoggerAdapter(opts ...Option) (logger *LoggerAdapter, err error) {
 		return nil, fmt.Errorf("error parsing level: %w", err)
 	}
 
-	o.timeFormat, err = log.ParseDateTimeFormat(o.timeFormat)
+	o.timeFormat, err = mrlog.ParseDateTimeFormat(o.timeFormat)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing time: %w", err)
 	}
@@ -106,7 +106,7 @@ func (l *LoggerAdapter) WithAttributes(attrs ...any) *LoggerAdapter {
 }
 
 // WithAttrs - cм. WithAttributes.
-func (l *LoggerAdapter) WithAttrs(attrs ...any) log.Logger {
+func (l *LoggerAdapter) WithAttrs(attrs ...any) mrlog.Logger {
 	return l.WithAttributes(attrs...)
 }
 

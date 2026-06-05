@@ -1,4 +1,4 @@
-package parse
+package errors
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type (
 
 // NewParamRegexpError - создаёт ошибку ParamRegexpError для указанного типа параметра.
 // regexp - строка регулярного выражения, которому значение не соответствует.
-func NewParamRegexpError(paramType, regexp string) *ParamRegexpError {
+func NewParamRegexpError(paramType, regexp string) error {
 	return &ParamRegexpError{
 		Type:   paramType,
 		Regexp: regexp,

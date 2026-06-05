@@ -3,6 +3,8 @@ package parse
 import (
 	"strconv"
 	"strings"
+
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -16,12 +18,12 @@ func RequiredBool(value string) (bool, error) {
 	value = strings.TrimSpace(value)
 
 	if value == "" {
-		return false, NewParamEmptyError(typeRequiredBool)
+		return false, errors.NewParamEmptyError(typeRequiredBool)
 	}
 
 	item, err := strconv.ParseBool(value)
 	if err != nil {
-		return false, NewParamIncorrectError(typeRequiredBool, err)
+		return false, errors.NewParamIncorrectError(typeRequiredBool, err)
 	}
 
 	return item, nil
@@ -39,7 +41,7 @@ func NullableBool(value string) (*bool, error) {
 
 	item, err := strconv.ParseBool(value)
 	if err != nil {
-		return nil, NewParamIncorrectError(typeNullableBool, err)
+		return nil, errors.NewParamIncorrectError(typeNullableBool, err)
 	}
 
 	return &item, nil

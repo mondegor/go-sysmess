@@ -1,4 +1,4 @@
-package mrstatus
+package mrworkflow
 
 type (
 	// FlowMap - интерфейс управления переходами между статусами.

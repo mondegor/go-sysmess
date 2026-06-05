@@ -4,7 +4,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/util/conv"
+	"github.com/mondegor/go-sysmess/internal/util"
 )
 
 const (
@@ -85,7 +85,7 @@ func (p *PlaceholderReplacer) merge(args []any) (keyValues []string) {
 
 	if len(args) >= len(p.placeholders) {
 		for i := range p.placeholders {
-			keyValues = append(keyValues, p.placeholders[i], conv.String(args[i]))
+			keyValues = append(keyValues, p.placeholders[i], util.ConvString(args[i]))
 		}
 
 		return keyValues
@@ -95,7 +95,7 @@ func (p *PlaceholderReplacer) merge(args []any) (keyValues []string) {
 
 	// len(p.placeholders) > len(args)
 	for range args {
-		keyValues = append(keyValues, p.placeholders[i], conv.String(args[i]))
+		keyValues = append(keyValues, p.placeholders[i], util.ConvString(args[i]))
 		i++
 	}
 

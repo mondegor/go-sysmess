@@ -1,4 +1,4 @@
-package parse
+package errors
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type (
 
 // NewParamMaxValueError - создаёт ошибку ParamMaxValueError для указанного типа параметра.
 // maxValue - максимально допустимое значение.
-func NewParamMaxValueError(paramType string, maxValue any) *ParamMaxValueError {
+func NewParamMaxValueError(paramType string, maxValue any) error {
 	return &ParamMaxValueError{
 		Type:     paramType,
 		MaxValue: maxValue,

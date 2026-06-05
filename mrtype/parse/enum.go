@@ -3,6 +3,8 @@ package parse
 import (
 	"regexp"
 	"strings"
+
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -22,20 +24,20 @@ func Enum(value string, required bool) (string, error) {
 
 	if value == "" {
 		if required {
-			return "", NewParamEmptyError(typeEnum)
+			return "", errors.NewParamEmptyError(typeEnum)
 		}
 
 		return "", nil
 	}
 
 	if len(value) > maxLenEnum {
-		return "", NewParamLenMaxError(typeEnum, maxLenEnum)
+		return "", errors.NewParamLenMaxError(typeEnum, maxLenEnum)
 	}
 
 	value = strings.ToUpper(value)
 
 	if !regexpEnum.MatchString(value) {
-		return "", NewParamRegexpError(typeEnum, regexpEnum.String())
+		return "", errors.NewParamRegexpError(typeEnum, regexpEnum.String())
 	}
 
 	return value, nil
@@ -51,7 +53,7 @@ func EnumList(value string) ([]string, error) {
 	}
 
 	if len(value) > maxLenEnumList {
-		return nil, NewParamLenMaxError(typeEnum, maxLenEnumList)
+		return nil, errors.NewParamLenMaxError(typeEnum, maxLenEnumList)
 	}
 
 	items := strings.Split(strings.ToUpper(value), ",")
@@ -60,7 +62,7 @@ func EnumList(value string) ([]string, error) {
 		item = strings.TrimSpace(item)
 
 		if !regexpEnum.MatchString(item) {
-			return nil, NewParamRegexpError(typeEnum, regexpEnum.String())
+			return nil, errors.NewParamRegexpError(typeEnum, regexpEnum.String())
 		}
 
 		items[i] = item

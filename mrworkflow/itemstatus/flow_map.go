@@ -1,7 +1,7 @@
 package itemstatus
 
 import (
-	"github.com/mondegor/go-sysmess/mrstatus"
+	"github.com/mondegor/go-sysmess/mrworkflow"
 )
 
 // NewFlowMap - создаёт карту допустимых переходов для статусов элементов (ItemStatus).
@@ -9,9 +9,9 @@ import (
 //   - Draft → Enabled, Disabled
 //   - Enabled → Disabled
 //   - Disabled → Enabled
-func NewFlowMap() mrstatus.FlowMap[Enum] {
-	return mrstatus.NewFlowMap(
-		[]mrstatus.FlowNode[Enum]{
+func NewFlowMap() mrworkflow.FlowMap[Enum] {
+	return mrworkflow.NewFlowMap(
+		[]mrworkflow.FlowNode[Enum]{
 			{
 				From: Draft,
 				To: []Enum{

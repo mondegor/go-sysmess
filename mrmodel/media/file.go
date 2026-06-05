@@ -1,4 +1,4 @@
-package mrmodel
+package media
 
 import (
 	"io"

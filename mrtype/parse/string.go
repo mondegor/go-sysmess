@@ -2,6 +2,8 @@ package parse
 
 import (
 	"strings"
+
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -18,14 +20,14 @@ func String(value string, required bool) (string, error) {
 
 	if value == "" {
 		if required {
-			return "", NewParamEmptyError(typeString)
+			return "", errors.NewParamEmptyError(typeString)
 		}
 
 		return "", nil
 	}
 
 	if len(value) > maxLenString {
-		return "", NewParamLenMaxError(typeString, maxLenString)
+		return "", errors.NewParamLenMaxError(typeString, maxLenString)
 	}
 
 	return value, nil
@@ -41,7 +43,7 @@ func StringList(value string) ([]string, error) {
 	}
 
 	if len(value) > maxLenStringsList {
-		return nil, NewParamLenMaxError(typeString, maxLenStringsList)
+		return nil, errors.NewParamLenMaxError(typeString, maxLenStringsList)
 	}
 
 	items := strings.Split(value, ",")

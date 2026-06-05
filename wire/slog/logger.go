@@ -14,7 +14,7 @@ import (
 	"github.com/mondegor/go-sysmess/mrlog/color"
 	"github.com/mondegor/go-sysmess/mrlog/slog"
 	"github.com/mondegor/go-sysmess/mrlog/slog/middleware"
-	"github.com/mondegor/go-sysmess/mrtrace"
+	tracectx "github.com/mondegor/go-sysmess/mrtrace/context"
 	"github.com/mondegor/go-sysmess/mrtrace/process"
 	"github.com/mondegor/go-sysmess/wire"
 )
@@ -147,12 +147,12 @@ func initLoggerOptions(cfg wire.LoggerConfig) []slog.Option {
 			slog.WithColorizeAttr(mrapp.KeyAppVersion, color.Yellow, color.LightGray),
 			slog.WithColorizeAttr(mrapp.KeyErrorID, color.Yellow, color.Red),
 
-			slog.WithColorizeAttr(mrtrace.KeyProcessID, color.Yellow, color.LightGray),
-			slog.WithColorizeAttr(mrtrace.KeyWorkerID, color.Yellow, color.LightGray),
+			slog.WithColorizeAttr(tracectx.KeyProcessID, color.Yellow, color.LightGray),
+			slog.WithColorizeAttr(tracectx.KeyWorkerID, color.Yellow, color.LightGray),
 
-			slog.WithColorizeAttr(mrtrace.KeyCorrelationID, color.LightYellow, color.LightGray),
-			slog.WithColorizeAttr(mrtrace.KeyTaskID, color.LightYellow, color.LightGray),
-			slog.WithColorizeAttr(mrtrace.KeyRequestID, color.LightYellow, color.LightGray),
+			slog.WithColorizeAttr(tracectx.KeyCorrelationID, color.LightYellow, color.LightGray),
+			slog.WithColorizeAttr(tracectx.KeyTaskID, color.LightYellow, color.LightGray),
+			slog.WithColorizeAttr(tracectx.KeyRequestID, color.LightYellow, color.LightGray),
 
 			slog.WithColorizeAttr("sql", color.Cyan, color.Green),
 		)

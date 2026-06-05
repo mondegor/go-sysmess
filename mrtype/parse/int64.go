@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/mondegor/go-sysmess/mrtype"
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -23,19 +24,19 @@ func Int64(value string, required bool) (int64, error) {
 
 	if value == "" {
 		if required {
-			return 0, NewParamEmptyError(typeInt64)
+			return 0, errors.NewParamEmptyError(typeInt64)
 		}
 
 		return 0, nil
 	}
 
 	if len(value) > maxLenInt64 {
-		return 0, NewParamLenMaxError(typeInt64, maxLenInt64)
+		return 0, errors.NewParamLenMaxError(typeInt64, maxLenInt64)
 	}
 
 	item, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {
-		return 0, NewParamIncorrectError(typeInt64, err)
+		return 0, errors.NewParamIncorrectError(typeInt64, err)
 	}
 
 	return item, nil
@@ -50,7 +51,7 @@ func Int64List(value string) ([]int64, error) {
 	}
 
 	if len(value) > maxLenInt64List {
-		return nil, NewParamLenMaxError(typeInt64, maxLenInt64List)
+		return nil, errors.NewParamLenMaxError(typeInt64, maxLenInt64List)
 	}
 
 	itemsTmp := strings.Split(value, ",")
@@ -59,7 +60,7 @@ func Int64List(value string) ([]int64, error) {
 	for i := range itemsTmp {
 		item, err := strconv.ParseInt(strings.TrimSpace(itemsTmp[i]), 10, 64)
 		if err != nil {
-			return nil, NewParamIncorrectError(typeInt64, err)
+			return nil, errors.NewParamIncorrectError(typeInt64, err)
 		}
 
 		items = append(items, item)
@@ -73,12 +74,12 @@ func Int64List(value string) ([]int64, error) {
 func RangeInt64(minValue, maxValue string) (mrtype.RangeInt64, error) {
 	parsedMinValue, err := Int64(minValue, false)
 	if err != nil {
-		return mrtype.RangeInt64{}, NewParamIncorrectError(typeRangeInt64Min, err)
+		return mrtype.RangeInt64{}, errors.NewParamIncorrectError(typeRangeInt64Min, err)
 	}
 
 	parsedMaxValue, err := Int64(maxValue, false)
 	if err != nil {
-		return mrtype.RangeInt64{}, NewParamIncorrectError(typeRangeInt64Max, err)
+		return mrtype.RangeInt64{}, errors.NewParamIncorrectError(typeRangeInt64Max, err)
 	}
 
 	if parsedMaxValue > 0 && parsedMinValue > parsedMaxValue { // change

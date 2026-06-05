@@ -1,4 +1,4 @@
-package parse
+package errors
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ type (
 )
 
 // NewParamEmptyError - создаёт ошибку ParamEmptyError для указанного типа параметра.
-func NewParamEmptyError(paramType string) *ParamEmptyError {
+func NewParamEmptyError(paramType string) error {
 	return &ParamEmptyError{
 		Type: paramType,
 	}

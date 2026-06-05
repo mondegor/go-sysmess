@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/mondegor/go-sysmess/mrtype"
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -33,19 +34,19 @@ func dateTime(value, format string, required bool) (time.Time, error) {
 
 	if value == "" {
 		if required {
-			return time.Time{}, NewParamEmptyError(typeDateTime)
+			return time.Time{}, errors.NewParamEmptyError(typeDateTime)
 		}
 
 		return time.Time{}, nil
 	}
 
 	if len(value) > maxLenDateTime {
-		return time.Time{}, NewParamLenMaxError(typeDateTime, maxLenDateTime)
+		return time.Time{}, errors.NewParamLenMaxError(typeDateTime, maxLenDateTime)
 	}
 
 	item, err := time.Parse(format, value)
 	if err != nil {
-		return time.Time{}, NewParamIncorrectError(typeDateTime, err)
+		return time.Time{}, errors.NewParamIncorrectError(typeDateTime, err)
 	}
 
 	return item, nil
@@ -66,12 +67,12 @@ func RangeDate(fromValue, toValue string) (mrtype.RangeDateTime, error) {
 func rangeDateTime(fromValue, toValue, format string) (mrtype.RangeDateTime, error) {
 	parsedFromValue, err := dateTime(fromValue, format, false)
 	if err != nil {
-		return mrtype.RangeDateTime{}, NewParamIncorrectError(typeRangeDateTimeFrom, err)
+		return mrtype.RangeDateTime{}, errors.NewParamIncorrectError(typeRangeDateTimeFrom, err)
 	}
 
 	parsedToValue, err := dateTime(toValue, format, false)
 	if err != nil {
-		return mrtype.RangeDateTime{}, NewParamIncorrectError(typeRangeDateTimeTo, err)
+		return mrtype.RangeDateTime{}, errors.NewParamIncorrectError(typeRangeDateTimeTo, err)
 	}
 
 	if !parsedToValue.IsZero() && parsedToValue.Before(parsedFromValue) { // change

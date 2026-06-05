@@ -3,6 +3,8 @@ package parse
 import (
 	"strconv"
 	"strings"
+
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -19,19 +21,19 @@ func Uint64(value string, required bool) (uint64, error) {
 
 	if value == "" {
 		if required {
-			return 0, NewParamEmptyError(typeUint64)
+			return 0, errors.NewParamEmptyError(typeUint64)
 		}
 
 		return 0, nil
 	}
 
 	if len(value) > maxLenUint64 {
-		return 0, NewParamLenMaxError(typeUint64, maxLenUint64)
+		return 0, errors.NewParamLenMaxError(typeUint64, maxLenUint64)
 	}
 
 	item, err := strconv.ParseUint(value, 10, 64)
 	if err != nil {
-		return 0, NewParamIncorrectError(typeUint64, err)
+		return 0, errors.NewParamIncorrectError(typeUint64, err)
 	}
 
 	return item, nil
@@ -46,7 +48,7 @@ func Uint64List(value string) ([]uint64, error) {
 	}
 
 	if len(value) > maxLenUint64List {
-		return nil, NewParamLenMaxError(typeUint64, maxLenUint64List)
+		return nil, errors.NewParamLenMaxError(typeUint64, maxLenUint64List)
 	}
 
 	itemsTmp := strings.Split(value, ",")
@@ -55,7 +57,7 @@ func Uint64List(value string) ([]uint64, error) {
 	for i := range itemsTmp {
 		item, err := strconv.ParseUint(strings.TrimSpace(itemsTmp[i]), 10, 64)
 		if err != nil {
-			return nil, NewParamIncorrectError(typeUint64, err)
+			return nil, errors.NewParamIncorrectError(typeUint64, err)
 		}
 
 		items = append(items, item)

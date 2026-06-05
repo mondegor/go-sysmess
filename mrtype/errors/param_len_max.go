@@ -1,4 +1,4 @@
-package parse
+package errors
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type (
 
 // NewParamLenMaxError - создаёт ошибку ParamLenMaxError для указанного типа параметра.
 // maxLen - максимально допустимая длина значения.
-func NewParamLenMaxError(paramType string, maxLen int) *ParamLenMaxError {
+func NewParamLenMaxError(paramType string, maxLen int) error {
 	return &ParamLenMaxError{
 		Type:   paramType,
 		MaxLen: maxLen,

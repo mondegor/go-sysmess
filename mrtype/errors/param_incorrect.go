@@ -1,4 +1,4 @@
-package parse
+package errors
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ type (
 
 // NewParamIncorrectError - создаёт ошибку ParamIncorrectError для указанного типа параметра.
 // cause - исходная ошибка, приведшая к ошибке парсинга.
-func NewParamIncorrectError(paramType string, cause error) *ParamIncorrectError {
+func NewParamIncorrectError(paramType string, cause error) error {
 	return &ParamIncorrectError{
 		Type:  paramType,
 		Cause: cause,

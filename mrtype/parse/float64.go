@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/mondegor/go-sysmess/mrtype"
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -22,19 +23,19 @@ func Float64(value string, required bool) (float64, error) {
 
 	if value == "" {
 		if required {
-			return 0, NewParamEmptyError(typeFloat64)
+			return 0, errors.NewParamEmptyError(typeFloat64)
 		}
 
 		return 0, nil
 	}
 
 	if len(value) > maxLenFloat64 {
-		return 0, NewParamLenMaxError(typeFloat64, maxLenFloat64)
+		return 0, errors.NewParamLenMaxError(typeFloat64, maxLenFloat64)
 	}
 
 	item, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		return 0, NewParamIncorrectError(typeFloat64, err)
+		return 0, errors.NewParamIncorrectError(typeFloat64, err)
 	}
 
 	return item, nil
@@ -45,12 +46,12 @@ func Float64(value string, required bool) (float64, error) {
 func RangeFloat64(minValue, maxValue string) (mrtype.RangeFloat64, error) {
 	parsedMinValue, err := Float64(minValue, false)
 	if err != nil {
-		return mrtype.RangeFloat64{}, NewParamIncorrectError(typeRangeFloat64Min, err)
+		return mrtype.RangeFloat64{}, errors.NewParamIncorrectError(typeRangeFloat64Min, err)
 	}
 
 	parsedMaxValue, err := Float64(maxValue, false)
 	if err != nil {
-		return mrtype.RangeFloat64{}, NewParamIncorrectError(typeRangeFloat64Max, err)
+		return mrtype.RangeFloat64{}, errors.NewParamIncorrectError(typeRangeFloat64Max, err)
 	}
 
 	if parsedMaxValue > 0 && parsedMinValue > parsedMaxValue { // change

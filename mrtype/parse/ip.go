@@ -3,6 +3,8 @@ package parse
 import (
 	"net"
 	"strings"
+
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 )
 
 const (
@@ -19,14 +21,14 @@ func IP(value string, required bool) (ip net.IP, err error) {
 
 	if value == "" {
 		if required {
-			return nil, NewParamEmptyError(typeIP)
+			return nil, errors.NewParamEmptyError(typeIP)
 		}
 
 		return nil, nil
 	}
 
 	if len(value) > maxLenIP {
-		return nil, NewParamLenMaxError(typeIP, maxLenIP)
+		return nil, errors.NewParamLenMaxError(typeIP, maxLenIP)
 	}
 
 	host := value
@@ -34,7 +36,7 @@ func IP(value string, required bool) (ip net.IP, err error) {
 	if strings.Contains(value, ":") {
 		host, _, err = net.SplitHostPort(value)
 		if err != nil {
-			return nil, NewParamIncorrectError(typeIP, err)
+			return nil, errors.NewParamIncorrectError(typeIP, err)
 		}
 	}
 
@@ -42,5 +44,5 @@ func IP(value string, required bool) (ip net.IP, err error) {
 		return ip, nil
 	}
 
-	return nil, NewParamIncorrectError(typeIP, nil)
+	return nil, errors.NewParamIncorrectError(typeIP, nil)
 }

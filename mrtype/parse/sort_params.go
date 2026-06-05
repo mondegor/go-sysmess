@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/mondegor/go-sysmess/mrtype"
+	"github.com/mondegor/go-sysmess/mrtype/errors"
 	"github.com/mondegor/go-sysmess/mrtype/sortdirection"
 )
 
@@ -31,11 +32,11 @@ func SortParams(columnValue, directionValue string) (mrtype.SortParams, error) {
 	}
 
 	if len(columnValue) > maxLenSortColumn {
-		return mrtype.SortParams{}, NewParamLenMaxError(typeSortParamsColumn, maxLenSortColumn)
+		return mrtype.SortParams{}, errors.NewParamLenMaxError(typeSortParamsColumn, maxLenSortColumn)
 	}
 
 	if !regexpSorterColumn.MatchString(columnValue) {
-		return mrtype.SortParams{}, NewParamRegexpError(typeSortParamsColumn, regexpSorterColumn.String())
+		return mrtype.SortParams{}, errors.NewParamRegexpError(typeSortParamsColumn, regexpSorterColumn.String())
 	}
 
 	params := mrtype.SortParams{
@@ -46,7 +47,7 @@ func SortParams(columnValue, directionValue string) (mrtype.SortParams, error) {
 	if directionValue != "" {
 		sortDirection, err := sortdirection.Parse(strings.ToUpper(directionValue))
 		if err != nil {
-			return mrtype.SortParams{}, NewParamIncorrectError(typeSortParamsDirection, err)
+			return mrtype.SortParams{}, errors.NewParamIncorrectError(typeSortParamsDirection, err)
 		}
 
 		params.Direction = sortDirection
