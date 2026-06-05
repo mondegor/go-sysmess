@@ -3,15 +3,15 @@ package gotext
 import (
 	"strconv"
 
-	"github.com/mondegor/go-sysmess/internal/msg"
+	"github.com/mondegor/go-sysmess/mrmsg"
 )
 
 // NewMessageFormatter - создаёт MessageFormatter для преобразования
 // плейсхолдеров в формат, совместимый с fmt.Sprintf.
 // Параметры leftDelim и rightDelim - ограничители плейсхолдеров (например: "{{" и "}}").
 // Плейсхолдеры преобразуются в формат "%[N]s", где N - порядковый номер аргумента.
-func NewMessageFormatter(leftDelim, rightDelim string) *msg.MessageFormatter {
-	return msg.NewMessageFormatter(
+func NewMessageFormatter(leftDelim, rightDelim string) *mrmsg.MessageFormatter {
+	return mrmsg.NewMessageFormatter(
 		leftDelim,
 		rightDelim,
 		func(_ string, i int) (newPlaceholder string) {

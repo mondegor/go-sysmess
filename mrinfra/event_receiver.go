@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/mondegor/go-sysmess/internal/event"
-	"github.com/mondegor/go-sysmess/internal/trace"
+	"github.com/mondegor/go-sysmess/mrevent"
+	tracectx "github.com/mondegor/go-sysmess/mrtrace/context"
+	"github.com/mondegor/go-sysmess/mrtrace/process"
 )
 
 const (
@@ -18,9 +19,9 @@ type (
 	// между зарегистрированными получателями с индивидуальным таймаутом для каждого.
 	// Каждый получатель выполняется в отдельной горутине.
 	EventReceiver struct {
-		traceManager   trace.ContextManager
+		traceManager   process.ContextManager
 		receiveTimeout time.Duration
-		receivers      []event.Receiver
+		receivers      []mrevent.Receiver
 	}
 )
 
@@ -29,7 +30,7 @@ type (
 //   - traceManager - менеджер трейсинга для добавления ID процесса в контекст;
 //   - receiveTimeout - таймаут на обработку события каждым получателем (если 0, используется defaultReceiveTimeout);
 //   - receivers - список получателей, которым будут отправляться события.
-func NewEventReceiver(traceManager trace.ContextManager, receiveTimeout time.Duration, receivers []event.Receiver) *EventReceiver {
+func NewEventReceiver(traceManager process.ContextManager, receiveTimeout time.Duration, receivers []mrevent.Receiver) *EventReceiver {
 	if receiveTimeout == 0 {
 		receiveTimeout = defaultReceiveTimeout
 	}
@@ -50,7 +51,7 @@ func (er *EventReceiver) Receive(ctx context.Context, eventName string, args ...
 		go func(ctx context.Context) {
 			// устанавливается индивидуальный таймаут, чтобы ограничить работу получателей
 			ctx, cancel := context.WithTimeout(
-				er.traceManager.WithGeneratedProcessID(ctx, trace.KeyTaskID),
+				er.traceManager.WithGeneratedProcessID(ctx, tracectx.KeyTaskID),
 				er.receiveTimeout,
 			)
 			defer cancel()
