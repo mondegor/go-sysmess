@@ -3,8 +3,6 @@ package media
 import (
 	"path"
 	"time"
-
-	"github.com/mondegor/go-sysmess/util/copyptr"
 )
 
 type (
@@ -67,7 +65,19 @@ func (im ImageInfo) ToFileInfo() FileInfo {
 		Path:         im.Path,
 		URL:          im.URL,
 		Size:         im.Size,
-		CreatedAt:    copyptr.Time(im.CreatedAt),
-		UpdatedAt:    copyptr.Time(im.UpdatedAt),
+		CreatedAt:    copyTime(im.CreatedAt),
+		UpdatedAt:    copyTime(im.UpdatedAt),
 	}
+}
+
+// copyTime - возвращает копию указателя на time.Time.
+// Если value равен nil или нулевому времени, возвращает nil.
+func copyTime(value *time.Time) *time.Time {
+	if value == nil || value.IsZero() {
+		return nil
+	}
+
+	c := *value
+
+	return &c
 }

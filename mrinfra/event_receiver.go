@@ -3,15 +3,14 @@ package mrinfra
 import (
 	"context"
 	"time"
-
-	"github.com/mondegor/go-sysmess/mrevent"
-	tracectx "github.com/mondegor/go-sysmess/mrtrace/context"
-	"github.com/mondegor/go-sysmess/mrtrace/process"
 )
 
 const (
 	// defaultReceiveTimeout - таймаут обработки события получателем по умолчанию.
 	defaultReceiveTimeout = 5 * time.Second
+
+	// keyTaskID - название ключа ID задачи, добавляемого в контекст получателя.
+	keyTaskID = "task_id"
 )
 
 type (
@@ -19,9 +18,17 @@ type (
 	// между зарегистрированными получателями с индивидуальным таймаутом для каждого.
 	// Каждый получатель выполняется в отдельной горутине.
 	EventReceiver struct {
-		traceManager   process.ContextManager
+		traceManager   traceManager
 		receiveTimeout time.Duration
-		receivers      []mrevent.Receiver
+		receivers      []receiver
+	}
+
+	receiver interface {
+		Receive(ctx context.Context, eventName string, args ...any)
+	}
+
+	traceManager interface {
+		WithGeneratedProcessID(ctx context.Context, key string) context.Context
 	}
 )
 
@@ -30,7 +37,11 @@ type (
 //   - traceManager - менеджер трейсинга для добавления ID процесса в контекст;
 //   - receiveTimeout - таймаут на обработку события каждым получателем (если 0, используется defaultReceiveTimeout);
 //   - receivers - список получателей, которым будут отправляться события.
-func NewEventReceiver(traceManager process.ContextManager, receiveTimeout time.Duration, receivers []mrevent.Receiver) *EventReceiver {
+func NewEventReceiver(
+	traceManager traceManager,
+	receiveTimeout time.Duration,
+	receivers ...receiver,
+) *EventReceiver {
 	if receiveTimeout == 0 {
 		receiveTimeout = defaultReceiveTimeout
 	}
@@ -51,7 +62,7 @@ func (er *EventReceiver) Receive(ctx context.Context, eventName string, args ...
 		go func(ctx context.Context) {
 			// устанавливается индивидуальный таймаут, чтобы ограничить работу получателей
 			ctx, cancel := context.WithTimeout(
-				er.traceManager.WithGeneratedProcessID(ctx, tracectx.KeyTaskID),
+				er.traceManager.WithGeneratedProcessID(ctx, keyTaskID),
 				er.receiveTimeout,
 			)
 			defer cancel()
