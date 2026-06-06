@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrtrace/context"
+	"github.com/mondegor/go-sysmess/mrtrace"
 	"github.com/mondegor/go-sysmess/mrtrace/process"
 	"github.com/mondegor/go-sysmess/util/crypt"
 )
@@ -17,15 +17,15 @@ import (
 func InitTraceContextManager(
 	processIDs []process.KeyGetIDWithID,
 	logger mrlog.Logger,
-) (process.ContextManager, error) {
+) (mrtrace.ContextManager, error) {
 	cm, err := process.NewContextManager(
 		processIDs,
 		[]string{
-			context.KeyCorrelationID,
-			context.KeyRequestID,
-			context.KeyTaskID,
-			context.KeyWorkerID,
-			context.KeyProcessID,
+			mrtrace.KeyCorrelationID,
+			mrtrace.KeyRequestID,
+			mrtrace.KeyTaskID,
+			mrtrace.KeyWorkerID,
+			mrtrace.KeyProcessID,
 		},
 		crypt.IDGeneratorFunc(process.GenerateID),
 		logger,

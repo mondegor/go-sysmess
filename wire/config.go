@@ -1,6 +1,7 @@
 package wire
 
 import (
+	"github.com/mondegor/go-sysmess/mrtrace"
 	"github.com/mondegor/go-sysmess/mrtrace/context"
 	"github.com/mondegor/go-sysmess/mrtrace/process"
 )
@@ -52,27 +53,27 @@ type (
 // Включает: correlation_id, request_id, process_id, worker_id, task_id.
 var defaultProcessIDs = []process.KeyGetIDWithID{ //nolint:gochecknoglobals
 	{
-		Key:    context.KeyCorrelationID,
+		Key:    mrtrace.KeyCorrelationID,
 		GetID:  context.CorrelationID,
 		WithID: context.WithCorrelationID,
 	},
 	{
-		Key:    context.KeyRequestID,
+		Key:    mrtrace.KeyRequestID,
 		GetID:  context.RequestID,
 		WithID: context.WithRequestID,
 	},
 	{
-		Key:    context.KeyProcessID,
+		Key:    mrtrace.KeyProcessID,
 		GetID:  context.ProcessID,
 		WithID: context.WithProcessID,
 	},
 	{
-		Key:    context.KeyWorkerID,
+		Key:    mrtrace.KeyWorkerID,
 		GetID:  context.WorkerID,
 		WithID: context.WithWorkerID,
 	},
 	{
-		Key:    context.KeyTaskID,
+		Key:    mrtrace.KeyTaskID,
 		GetID:  context.TaskID,
 		WithID: context.WithTaskID,
 	},

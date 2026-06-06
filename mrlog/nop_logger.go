@@ -10,8 +10,8 @@ type (
 	nopLogger struct{}
 )
 
-// Nop - создаёт объект Logger, который ничего не делает.
-func Nop() Logger {
+// NopLogger - создаёт объект Logger, который ничего не делает.
+func NopLogger() Logger {
 	return nopLogger{}
 }
 

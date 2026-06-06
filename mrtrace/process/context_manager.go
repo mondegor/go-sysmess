@@ -3,19 +3,11 @@ package process
 import (
 	"context"
 	"fmt"
+
+	"github.com/mondegor/go-sysmess/mrtrace"
 )
 
 type (
-	// ContextManager - управляет идентификаторами процессов в контексте для трассировки.
-	// Позволяет получать, устанавливать и генерировать ID процессов (request_id, process_id и др.).
-	ContextManager interface {
-		ProcessID(ctx context.Context, key string) string
-		WithProcessID(ctx context.Context, key, value string) context.Context
-		WithGeneratedProcessID(ctx context.Context, key string) context.Context
-		ExtractCorrelationID(ctx context.Context) string
-		ExtractKeysValues(ctx context.Context) []any
-	}
-
 	contextManager struct {
 		keyGetID  map[string]func(ctx context.Context) string
 		keyWithID map[string]func(ctx context.Context, id string) context.Context
@@ -50,7 +42,7 @@ func NewContextManager(
 	correlationKeys []string,
 	idGenerator idGenerator,
 	logger logger,
-) (ContextManager, error) {
+) (mrtrace.ContextManager, error) {
 	cm := contextManager{
 		logger:      logger,
 		idGenerator: idGenerator,

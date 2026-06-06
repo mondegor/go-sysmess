@@ -29,6 +29,18 @@ func WithAttrs(l Logger, attrs ...any) Logger {
 	return l
 }
 
+// DebugEnabled - сообщает логирует ли указанный логгер сообщения уровня level.Debug.
+// Если logger = nil, то будет возвращено false.
+func DebugEnabled(l Logger) bool {
+	return Enabled(l, level.Debug)
+}
+
+// InfoEnabled - сообщает логирует ли указанный логгер сообщения уровня level.Info.
+// Если logger = nil, то будет возвращено false.
+func InfoEnabled(l Logger) bool {
+	return Enabled(l, level.Info)
+}
+
 // Enabled - информирует включён ли указанный уровень логирования.
 func Enabled(l Logger, lvl level.Enum) bool {
 	if ll, ok := l.(interface{ Enabled(lvl level.Enum) bool }); ok {
