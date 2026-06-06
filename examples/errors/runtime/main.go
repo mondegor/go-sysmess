@@ -8,7 +8,7 @@ import (
 	"github.com/mondegor/go-sysmess/errors/kind"
 	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
 	"github.com/mondegor/go-sysmess/util/conv"
-	"github.com/mondegor/go-sysmess/wire"
+	wireerrors "github.com/mondegor/go-sysmess/wire/errors"
 )
 
 type (
@@ -27,8 +27,8 @@ type (
 
 // main - пример internal ошибки c уникальным ID и со stack trace.
 func main() {
-	wire.InitErrors(
-		wire.ErrorConfig{
+	wireerrors.InitErrors(
+		wireerrors.ErrorConfig{
 			HasCaller:      true,
 			CallerDepth:    3,
 			CallerShowFunc: true,

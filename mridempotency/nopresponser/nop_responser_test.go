@@ -1,0 +1,17 @@
+package nopresponser_test
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/mondegor/go-sysmess/mridempotency"
+	"github.com/mondegor/go-sysmess/mridempotency/nopresponser"
+)
+
+// Make sure the Responser conforms with the mridempotency.Responser interface.
+func TestResponserImplementsResponser(t *testing.T) {
+	t.Parallel()
+
+	assert.Implements(t, (*mridempotency.Responser)(nil), &nopresponser.Responser{})
+}

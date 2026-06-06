@@ -89,7 +89,7 @@ the final kind and decides handling.
 
 ## Conventions
 
-- Exported symbols are documented in Russian; match that style when editing existing packages.
+- Exported symbols are documented in **English** or **Russian**; match that style when editing existing packages.
 - The "Proto" pattern is pervasive: a proto error is an immutable factory; concrete errors are
   derived from it. Don't mutate protos after construction.
 - Files end with a trailing newline (enforced; recent commits fixed this) and code must pass the
