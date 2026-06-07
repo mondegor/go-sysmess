@@ -135,6 +135,10 @@ func NewMessageProcessor[T any](
 		o.processor.workersCount = defaultWorkersCount
 	}
 
+	if o.processor.handlerTimeout <= 0 {
+		o.processor.handlerTimeout = defaultHandlerTimeout
+	}
+
 	if o.consumerReadTimeout > 0 || o.consumerWriteTimeout > 0 {
 		o.processor.consumer = NewConsumerWithTimeout(
 			o.processor.consumer,
@@ -214,12 +218,12 @@ func (p *MessageProcessor[T]) Start(ctx context.Context, ready func()) error {
 
 		ticker.Reset(p.readPeriodStrategy.Period())
 
-		ctx = p.traceManager.WithGeneratedProcessID(ctx, keyTaskID) // producerID
+		taskCtx := p.traceManager.WithGeneratedProcessID(ctx, keyTaskID) // producerID
 
-		messages, err := p.consumer.ReadMessages(ctx, p.queueSize)
+		messages, err := p.consumer.ReadMessages(taskCtx, p.queueSize)
 		if err != nil {
 			if errors.Is(err, mrprocess.ErrSystemTemporaryProblemHasOccurred) {
-				p.errorHandler.Handle(ctx, err)
+				p.errorHandler.Handle(taskCtx, err)
 
 				continue
 			}
@@ -227,13 +231,13 @@ func (p *MessageProcessor[T]) Start(ctx context.Context, ready func()) error {
 			return err
 		}
 
-		p.logger.Info(ctx, "Got messages in the message processor...", "count_messages", len(messages))
+		p.logger.Info(taskCtx, "Got messages in the message processor...", "count_messages", len(messages))
 
 		for i, message := range messages {
 			select {
 			case <-workersStopped:
-				if err = p.consumer.CancelMessages(ctx, messages[i:]); err != nil {
-					p.errorHandler.Handle(ctx, err)
+				if err = p.consumer.CancelMessages(taskCtx, messages[i:]); err != nil {
+					p.errorHandler.Handle(taskCtx, err)
 				}
 
 				return fmt.Errorf("%w [processor_name=%s]", ErrInternalProcessorWorkersAreStopped, p.caption)
@@ -262,26 +266,30 @@ func (p *MessageProcessor[T]) startWorkers(ctx context.Context, wg *sync.WaitGro
 		wg.Add(1)
 
 		go func(ctx context.Context) {
+			defer wg.Done()
+
 			ctx = p.traceManager.WithGeneratedProcessID(ctx, keyWorkerID)
 
-			defer func() {
-				wg.Done()
-
-				if rvr := recover(); rvr != nil {
-					p.errorHandler.Handle(
-						ctx,
-						mrprocess.NewCaughtPanicError("message processor: "+p.caption, rvr),
-					)
-				}
-			}()
-
 			for fn := range p.workersQueue {
-				fn(ctx)
+				p.execWorkerFunc(ctx, fn)
 			}
 
 			p.logger.Debug(ctx, "The worker has been stopped")
 		}(ctx)
 	}
+}
+
+func (p *MessageProcessor[T]) execWorkerFunc(ctx context.Context, fn func(ctx context.Context)) {
+	defer func() {
+		if rvr := recover(); rvr != nil {
+			p.errorHandler.Handle(
+				ctx,
+				mrprocess.NewCaughtPanicError("message processor: "+p.caption, rvr),
+			)
+		}
+	}()
+
+	fn(ctx)
 }
 
 // workerFunc - создаёт функцию обработки одного сообщения для отправки в воркер.

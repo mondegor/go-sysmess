@@ -22,8 +22,8 @@ const (
 var defaultPeriod = mrprocess.NewStaticPeriodStrategy(60 * time.Second) //nolint:gochecknoglobals
 
 type (
-	// JobWrapper - обёртка, реализующая интерфейс mrworker.Task для использования
-	// в планировщике задач (TaskScheduler). Позволяет адаптировать любой mrworker.Job
+	// JobWrapper - обёртка, реализующая интерфейс mrprocess.Task для использования
+	// в планировщике задач (TaskScheduler). Позволяет адаптировать любой mrprocess.Job
 	// к требованиям планировщика, добавляя настройки периода, таймаута и сигналов.
 	JobWrapper struct {
 		caption        string

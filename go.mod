@@ -3,11 +3,11 @@ module github.com/mondegor/go-sysmess
 go 1.25.0
 
 require (
-	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/stretchr/testify v1.11.1
+	go.uber.org/mock v0.6.0
 	golang.org/x/exp v0.0.0-20260603202125-055de637280b
 	golang.org/x/text v0.37.0
 	gopkg.in/yaml.v3 v3.0.1

@@ -64,7 +64,7 @@ func (p *delayedPeriod) Period() time.Duration {
 
 	p.delayed.Store(p.truncateMs(newDelayed)) // best-effort
 
-	return fixedPeriod(time.Duration(delayed) + p.periodStrategy.Period())
+	return fixedPeriod(addPeriod(time.Duration(delayed), p.periodStrategy.Period()))
 }
 
 func (p *delayedPeriod) truncateMs(value time.Duration) int64 {

@@ -146,17 +146,7 @@ func (p *TaskScheduler) Start(ctx context.Context, ready func()) error {
 			p.logger.Info(ctx, "Starting the worker", "task_name", task.Caption())
 
 			ticker := time.NewTicker(task.Period())
-
-			defer func() {
-				ticker.Stop()
-
-				if rvr := recover(); rvr != nil {
-					p.errorHandler.Handle(
-						ctx,
-						mrprocess.NewCaughtPanicError("task worker: "+task.Caption(), rvr),
-					)
-				}
-			}()
+			defer ticker.Stop()
 
 			for {
 				select {
@@ -237,14 +227,20 @@ func (p *TaskScheduler) startup(ctx context.Context) error {
 	return nil
 }
 
-func (p *TaskScheduler) execTask(ctx context.Context, task mrprocess.Task) error {
+func (p *TaskScheduler) execTask(ctx context.Context, task mrprocess.Task) (err error) {
 	ctx = p.traceManager.WithGeneratedProcessID(ctx, keyTaskID)
 	p.logger.Info(ctx, "Execute the task", "task_name", task.Caption())
 
 	ctx, cancel := context.WithTimeout(ctx, task.Timeout())
 	defer cancel()
 
-	if err := task.Do(ctx); err != nil {
+	defer func() {
+		if rvr := recover(); rvr != nil {
+			err = mrprocess.NewCaughtPanicError("task worker: "+task.Caption(), rvr)
+		}
+	}()
+
+	if err = task.Do(ctx); err != nil {
 		return err
 	}
 

@@ -132,6 +132,10 @@ func NewMessageCollector[T any](
 		o.collector.workersCount = defaultWorkersCount
 	}
 
+	if o.collector.handlerTimeout <= 0 {
+		o.collector.handlerTimeout = defaultHandlerTimeout
+	}
+
 	return o.collector
 }
 
@@ -212,14 +216,30 @@ func (p *MessageCollector[T]) Start(ctx context.Context, ready func()) error {
 			// предварительно завершается приём данных
 			p.isSendStopped.Store(true)
 
-			// принудительная очистка очереди,
-			// т.к. контекст отменён и данные уже не получится обработать
+			// контекст отменён, поэтому накопленный пакет и оставшиеся в очереди сообщения
+			// обрабатываются синхронно с отсоединённым от отмены контекстом,
+			// чтобы данные не были потеряны
+			flushCtx := context.WithoutCancel(ctx)
+
 			for {
 				select {
-				case <-p.messageQueue:
+				case message := <-p.messageQueue:
+					messageBatch = append(messageBatch, message)
+
+					if len(messageBatch) < p.batchSize {
+						continue
+					}
 				default:
-					return nil
 				}
+
+				if len(messageBatch) > 0 {
+					p.flushBatch(flushCtx, messageBatch)
+					messageBatch = messageBatch[:0]
+
+					continue
+				}
+
+				return nil
 			}
 		case message := <-p.messageQueue:
 			messageBatch = append(messageBatch, message)
@@ -262,6 +282,8 @@ func (p *MessageCollector[T]) PushMessage(ctx context.Context, message T) error 
 	select {
 	case p.messageQueue <- message:
 		return nil
+	case <-p.done:
+		return fmt.Errorf("%w [collector_name=%s]", ErrInternalMessageReceptionStopped, p.caption)
 	case <-ctx.Done():
 		return ctx.Err()
 	}
@@ -287,21 +309,12 @@ func (p *MessageCollector[T]) startWorkers(ctx context.Context, wg *sync.WaitGro
 		wg.Add(1)
 
 		go func(ctx context.Context) {
+			defer wg.Done()
+
 			ctx = p.traceManager.WithGeneratedProcessID(ctx, keyWorkerID)
 
-			defer func() {
-				wg.Done()
-
-				if rvr := recover(); rvr != nil {
-					p.errorHandler.Handle(
-						ctx,
-						mrprocess.NewCaughtPanicError("message collector: "+p.caption, rvr),
-					)
-				}
-			}()
-
 			for fn := range p.workersQueue {
-				fn(ctx)
+				p.execWorkerFunc(ctx, fn)
 			}
 
 			p.logger.Debug(ctx, "The worker has been stopped")
@@ -309,19 +322,39 @@ func (p *MessageCollector[T]) startWorkers(ctx context.Context, wg *sync.WaitGro
 	}
 }
 
+// execWorkerFunc - выполняет функцию обработки пакета с перехватом паники,
+// чтобы паника при обработке одного пакета не завершала воркер.
+func (p *MessageCollector[T]) execWorkerFunc(ctx context.Context, fn func(ctx context.Context)) {
+	defer func() {
+		if rvr := recover(); rvr != nil {
+			p.errorHandler.Handle(
+				ctx,
+				mrprocess.NewCaughtPanicError("message collector: "+p.caption, rvr),
+			)
+		}
+	}()
+
+	fn(ctx)
+}
+
 func (p *MessageCollector[T]) workerFunc(messages []T) func(ctx context.Context) {
 	return func(ctx context.Context) {
-		handlerCtx, cancel := context.WithTimeout(p.traceManager.WithGeneratedProcessID(ctx, keyTaskID), p.handlerTimeout)
-		defer cancel()
-
-		p.logger.Debug(ctx, "workerFunc", "message_batch", len(messages), "message[0]", messages[0])
-
-		if err := p.handler.Execute(handlerCtx, messages); err != nil {
-			p.errorHandler.Handle(ctx, err)
-
-			return
-		}
-
-		p.logger.Debug(ctx, "The handler has been successfully executed")
+		p.flushBatch(ctx, messages)
 	}
+}
+
+// flushBatch - синхронно передаёт пакет сообщений обработчику с таймаутом handlerTimeout.
+func (p *MessageCollector[T]) flushBatch(ctx context.Context, messages []T) {
+	handlerCtx, cancel := context.WithTimeout(p.traceManager.WithGeneratedProcessID(ctx, keyTaskID), p.handlerTimeout)
+	defer cancel()
+
+	p.logger.Debug(ctx, "Flushing message batch...", "message_batch", len(messages))
+
+	if err := p.handler.Execute(handlerCtx, messages); err != nil {
+		p.errorHandler.Handle(ctx, err)
+
+		return
+	}
+
+	p.logger.Debug(ctx, "The handler has been successfully executed")
 }

@@ -23,6 +23,7 @@ type (
 // calcPeriod - вычисляет период со случайным отклонением.
 // Генерируется случайное значение в диапазоне
 // [value-value*ratio, value+value*ratio] с равномерным распределением.
+// Значение value может быть отрицательным (используется в стратегии ускорения).
 func calcPeriod(value time.Duration, ratio float64) time.Duration {
 	delta := time.Duration(float64(value) * ratio)
 	minInterval := value - delta
@@ -32,12 +33,32 @@ func calcPeriod(value time.Duration, ratio float64) time.Duration {
 		minInterval, maxInterval = maxInterval, minInterval
 	}
 
-	// overflow guard
-	if maxInterval >= math.MaxInt64-minInterval {
-		minInterval, maxInterval = 0, time.Minute
+	// ширина диапазона вычисляется в беззнаковой арифметике,
+	// чтобы корректно обработать отрицательные границы без переполнения int64
+	widthInterval := uint64(maxInterval) - uint64(minInterval) //nolint:gosec
+
+	// если widthInterval не помещается в int64, то диапазон считается
+	// некорректным и подменяется безопасным значением [1ms..1min]
+	if widthInterval >= math.MaxInt64 {
+		minInterval, widthInterval = minTimePeriod, uint64(time.Minute)
 	}
 
-	return minInterval + time.Duration(rand.Int64N(int64(maxInterval-minInterval)+1)) //nolint:gosec
+	return minInterval + time.Duration(rand.Int64N(int64(widthInterval)+1)) //nolint:gosec
+}
+
+// addPeriod - складывает две длительности с защитой от переполнения int64
+// (saturating-сложение): при переполнении возвращается граничное значение.
+func addPeriod(a, b time.Duration) time.Duration {
+	sum := a + b
+
+	switch {
+	case a > 0 && b > 0 && sum <= 0:
+		return math.MaxInt64
+	case a < 0 && b < 0 && sum >= 0:
+		return math.MinInt64
+	default:
+		return sum
+	}
 }
 
 // fixedPeriod - предотвращает нулевые и отрицательные значения.

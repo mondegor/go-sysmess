@@ -5,17 +5,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 
 	"github.com/mondegor/go-sysmess/errors"
 	"github.com/mondegor/go-sysmess/mrlog"
-	schedule2 "github.com/mondegor/go-sysmess/mrprocess/schedule"
-	mock2 "github.com/mondegor/go-sysmess/mrprocess/schedule/mock"
+	"github.com/mondegor/go-sysmess/mrprocess/schedule"
+	"github.com/mondegor/go-sysmess/mrprocess/schedule/mock"
 	"github.com/mondegor/go-sysmess/mrtrace"
 )
 
-//go:generate mockgen -destination=./mock/mrworker.go -package=mock github.com/mondegor/go-sysmess/mrprocess Task
+//go:generate mockgen -destination=./mock/mrprocess.go -package=mock github.com/mondegor/go-sysmess/mrprocess Task
 //go:generate mockgen -destination=./mock/mrtrace.go -package=mock github.com/mondegor/go-sysmess/mrtrace ContextManager
 
 const deadlineTimeout = 3 * time.Second
@@ -26,8 +26,8 @@ type SchedulerTestSuite struct {
 	ctrl *gomock.Controller
 	ctx  context.Context
 
-	mockTask           *mock2.MockTask
-	mockContextManager *mock2.MockContextManager
+	mockTask           *mock.MockTask
+	mockContextManager *mock.MockContextManager
 }
 
 func TestSchedulerTestSuite(t *testing.T) {
@@ -45,51 +45,51 @@ func (ts *SchedulerTestSuite) TearDownSuite() {
 }
 
 func (ts *SchedulerTestSuite) SetupTest() {
-	ts.mockTask = mock2.NewMockTask(ts.ctrl)
+	ts.mockTask = mock.NewMockTask(ts.ctrl)
 	ts.mockTask.EXPECT().Caption().Return("mockTaskCaption").AnyTimes()
 
-	ts.mockContextManager = mock2.NewMockContextManager(ts.ctrl)
+	ts.mockContextManager = mock.NewMockContextManager(ts.ctrl)
 }
 
 func (ts *SchedulerTestSuite) Test_StartWithNoTasks() {
-	taskScheduler := schedule2.NewTaskScheduler(
+	taskScheduler := schedule.NewTaskScheduler(
 		errors.NopHandler(),
 		mrlog.NopLogger(),
 		ts.mockContextManager,
 	)
 
 	err := ts.taskSchedulerStart(taskScheduler)
-	ts.ErrorIs(err, schedule2.ErrInternalNoTasks)
+	ts.ErrorIs(err, schedule.ErrInternalNoTasks)
 }
 
 func (ts *SchedulerTestSuite) Test_StartWithTaskZeroPeriod() {
 	ts.mockTask.EXPECT().Period().Return(time.Duration(0))
 	// ts.mockTask.EXPECT().Timeout().Return(time.Minute)
 
-	taskScheduler := schedule2.NewTaskScheduler(
+	taskScheduler := schedule.NewTaskScheduler(
 		errors.NopHandler(),
 		mrlog.NopLogger(),
 		ts.mockContextManager,
-		schedule2.WithTasks(ts.mockTask),
+		schedule.WithTasks(ts.mockTask),
 	)
 
 	err := ts.taskSchedulerStart(taskScheduler)
-	ts.ErrorIs(err, schedule2.ErrInternalZeroParam)
+	ts.ErrorIs(err, schedule.ErrInternalZeroParam)
 }
 
 func (ts *SchedulerTestSuite) Test_StartWithTaskZeroTimeout() {
 	ts.mockTask.EXPECT().Period().Return(time.Minute)
 	ts.mockTask.EXPECT().Timeout().Return(time.Duration(0))
 
-	taskScheduler := schedule2.NewTaskScheduler(
+	taskScheduler := schedule.NewTaskScheduler(
 		errors.NopHandler(),
 		mrlog.NopLogger(),
 		ts.mockContextManager,
-		schedule2.WithTasks(ts.mockTask),
+		schedule.WithTasks(ts.mockTask),
 	)
 
 	err := ts.taskSchedulerStart(taskScheduler)
-	ts.ErrorIs(err, schedule2.ErrInternalZeroParam)
+	ts.ErrorIs(err, schedule.ErrInternalZeroParam)
 }
 
 func (ts *SchedulerTestSuite) Test_StartWithStartupTask() {
@@ -106,11 +106,11 @@ func (ts *SchedulerTestSuite) Test_StartWithStartupTask() {
 		Do(gomock.Any()).
 		Return(errTaskDoFinished)
 
-	taskScheduler := schedule2.NewTaskScheduler(
+	taskScheduler := schedule.NewTaskScheduler(
 		errors.NopHandler(),
 		mrlog.NopLogger(),
 		ts.mockContextManager,
-		schedule2.WithTasks(ts.mockTask),
+		schedule.WithTasks(ts.mockTask),
 	)
 
 	err := ts.taskSchedulerStart(taskScheduler)
@@ -142,11 +142,11 @@ func (ts *SchedulerTestSuite) Test_StartAndShutdown() {
 		Return(nil).
 		MinTimes(minTaskExecution)
 
-	taskScheduler := schedule2.NewTaskScheduler(
+	taskScheduler := schedule.NewTaskScheduler(
 		errors.NopHandler(),
 		mrlog.NopLogger(),
 		ts.mockContextManager,
-		schedule2.WithTasks(ts.mockTask, ts.mockTask), // 2 tasks
+		schedule.WithTasks(ts.mockTask, ts.mockTask), // 2 tasks
 	)
 
 	go func() {
@@ -177,7 +177,7 @@ func (ts *SchedulerTestSuite) Test_StartAndShutdown() {
 	}
 }
 
-func (ts *SchedulerTestSuite) taskSchedulerStart(taskScheduler *schedule2.TaskScheduler) (err error) {
+func (ts *SchedulerTestSuite) taskSchedulerStart(taskScheduler *schedule.TaskScheduler) (err error) {
 	notify := make(chan error)
 
 	go func() {

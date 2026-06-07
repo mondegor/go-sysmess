@@ -88,8 +88,7 @@ the final kind and decides handling.
 - **`mraccess/`** — access control (actions, rights, roles, role groups).
 - **`mrstorage/`**, **`mrpostgres/`** — storage abstractions and the PostgreSQL implementation
   (connection manager, query builders, monitoring, migrations).
-- **`mrprocess/`** — background processing: workers, jobs, schedulers, consumers, collectors
-  (formerly `mrworker/`).
+- **`mrprocess/`** — background processing: workers, jobs, schedulers, consumers, collectors.
 - **`mrrun/`** — application runner / health probes / graceful shutdown.
 - **`mrlock/`** — distributed locking (`locker.go`, `mutexlocker`, `noplocker`).
 - **`mridempotency/`** — idempotency providers/responsers.

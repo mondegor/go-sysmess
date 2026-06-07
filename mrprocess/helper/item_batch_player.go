@@ -47,6 +47,9 @@ var (
 
 	// ErrInternalBatchSizeIsGreaterThanTotalLimit - размер пакета (batchSize) превышает общий лимит (totalLimit).
 	ErrInternalBatchSizeIsGreaterThanTotalLimit = errors.New("batchSize is greater than totalLimit")
+
+	// ErrInternalNegativeProcessedCount - обработчик вернул отрицательное количество обработанных элементов.
+	ErrInternalNegativeProcessedCount = errors.New("handler returned a negative processed items count")
 )
 
 // NewItemBatchPlayer - создаёт ItemBatchPlayer с лимитами по умолчанию.
@@ -122,6 +125,12 @@ func (p *ItemBatchPlayer) Execute(ctx context.Context, batchSize int) error {
 		count, err := p.handler.Execute(ctx, batchSize)
 		if err != nil {
 			return p.wrapError(err)
+		}
+
+		// защита от некорректной реализации обработчика,
+		// иначе отрицательный count исказит total и условия выхода из цикла
+		if count < 0 {
+			return ErrInternalNegativeProcessedCount
 		}
 
 		// на случай, если обработчик не обработал контекст
