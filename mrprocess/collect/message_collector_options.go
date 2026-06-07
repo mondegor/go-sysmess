@@ -46,7 +46,8 @@ func WithFlushPeriod[T any](value time.Duration) Option[T] {
 	}
 }
 
-// WithFlushPeriodStrategy - устанавливает период принудительной отправки накопленных сообщений.
+// WithFlushPeriodStrategy - устанавливает период принудительной отправки
+// накопленных сообщений на основе переданной стратегии.
 func WithFlushPeriodStrategy[T any](value mrprocess.PeriodStrategy) Option[T] {
 	return func(o *options[T]) {
 		o.collector.flushPeriodStrategy = value

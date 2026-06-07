@@ -49,22 +49,30 @@ func NewDelayedPeriod(
 // При каждом последующем вызове задержка/ускорение уменьшается коэффициентом decay.
 // Когда задержка/ускорение затухает до нуля, возвращается только период определённый стратегией.
 func (p *delayedPeriod) Period() time.Duration {
-	delayed := p.delayed.Load()
+	for {
+		delayed := p.delayed.Load()
 
-	// если задержка/ускорение уже затухла, то сразу возвращается только период
-	if delayed == 0 {
-		return p.periodStrategy.Period()
+		// если задержка/ускорение уже затухла, то сразу возвращается только период
+		if delayed == 0 {
+			return p.periodStrategy.Period()
+		}
+
+		// вычисляется задержка/ускорение для следующего шага с точностью до миллисекунды
+		newDelayed := p.truncateMs(
+			calcPeriod(
+				time.Duration(float64(delayed)*p.decay), // если отрицательна - ускорение
+				p.ratio,
+			),
+		)
+
+		// защищает от потери шага затухания при конкурентных вызовах,
+		// когда один экземпляр стратегии используется несколькими задачами
+		if !p.delayed.CompareAndSwap(delayed, newDelayed) {
+			continue
+		}
+
+		return fixedPeriod(addPeriod(time.Duration(delayed), p.periodStrategy.Period()))
 	}
-
-	// вычисляется задержка/ускорение для следующего шага с точностью до секунды
-	newDelayed := calcPeriod(
-		time.Duration(float64(delayed)*p.decay), // если отрицательна - ускорение
-		p.ratio,
-	)
-
-	p.delayed.Store(p.truncateMs(newDelayed)) // best-effort
-
-	return fixedPeriod(addPeriod(time.Duration(delayed), p.periodStrategy.Period()))
 }
 
 func (p *delayedPeriod) truncateMs(value time.Duration) int64 {

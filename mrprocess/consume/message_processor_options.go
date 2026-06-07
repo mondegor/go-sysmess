@@ -48,7 +48,8 @@ func WithReadPeriod[T any](value time.Duration) Option[T] {
 	}
 }
 
-// WithReadPeriodStrategy - устанавливает период опроса очереди в состоянии простоя.
+// WithReadPeriodStrategy - устанавливает период опроса очереди
+// в состоянии простоя на основе переданной стратегии.
 func WithReadPeriodStrategy[T any](value mrprocess.PeriodStrategy) Option[T] {
 	return func(o *options[T]) {
 		o.processor.readPeriodStrategy = value

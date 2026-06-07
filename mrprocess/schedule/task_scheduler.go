@@ -42,6 +42,7 @@ type (
 		logger       logger
 		traceManager traceManager
 		wg           sync.WaitGroup
+		closeOnce    sync.Once
 		done         chan struct{}
 	}
 
@@ -83,8 +84,9 @@ func NewTaskScheduler(
 			logger:       logger,
 			traceManager: traceManager,
 
-			wg:   sync.WaitGroup{},
-			done: make(chan struct{}),
+			wg:        sync.WaitGroup{},
+			closeOnce: sync.Once{},
+			done:      make(chan struct{}),
 		},
 	}
 
@@ -182,11 +184,12 @@ func (p *TaskScheduler) Start(ctx context.Context, ready func()) error {
 
 // Shutdown - корректная остановка планировщика задач.
 // Останавливает все воркеры и ожидает их завершения.
-//
-// Важно: при повторном вызове произойдёт panic (закрытие закрытого канала done).
 func (p *TaskScheduler) Shutdown(ctx context.Context) error {
 	p.logger.Debug(ctx, "Shutting down the task scheduler...")
-	close(p.done)
+
+	p.closeOnce.Do(func() {
+		close(p.done)
+	})
 
 	p.wg.Wait()
 	p.logger.Debug(ctx, "The task scheduler has been shut down")

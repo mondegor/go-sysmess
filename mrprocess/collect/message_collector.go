@@ -62,6 +62,7 @@ type (
 
 		wg            sync.WaitGroup
 		isSendStopped atomic.Bool
+		closeOnce     sync.Once
 		messageQueue  chan T
 		workersQueue  chan func(ctx context.Context)
 		done          chan struct{}
@@ -110,6 +111,7 @@ func NewMessageCollector[T any](
 			traceManager: traceManager,
 
 			wg:           sync.WaitGroup{},
+			closeOnce:    sync.Once{},
 			messageQueue: make(chan T),
 			workersQueue: make(chan func(ctx context.Context)),
 			done:         make(chan struct{}),
@@ -291,12 +293,13 @@ func (p *MessageCollector[T]) PushMessage(ctx context.Context, message T) error 
 
 // Shutdown - корректная остановка сервиса обработки сообщений.
 // Останавливает приём новых сообщений и ожидает завершения всех операций.
-//
-// Важно: при повторном вызове произойдёт panic (закрытие закрытого канала done).
 func (p *MessageCollector[T]) Shutdown(ctx context.Context) error {
 	p.logger.Debug(ctx, "Shutting down the message collector...")
-	p.isSendStopped.Store(true) // завершается приём данных
-	close(p.done)
+
+	p.closeOnce.Do(func() {
+		p.isSendStopped.Store(true) // завершается приём данных
+		close(p.done)
+	})
 
 	p.wg.Wait()
 	p.logger.Debug(ctx, "The message collector has been shut down")

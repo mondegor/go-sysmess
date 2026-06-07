@@ -33,6 +33,7 @@ type (
 		logger       logger
 		traceManager traceManager
 		wg           sync.WaitGroup
+		closeOnce    sync.Once
 		done         chan struct{}
 	}
 
@@ -60,6 +61,7 @@ func NewProcess(
 			logger:       logger,
 			traceManager: traceManager,
 			wg:           sync.WaitGroup{},
+			closeOnce:    sync.Once{},
 			done:         make(chan struct{}),
 		},
 	}
@@ -120,11 +122,12 @@ func (p *Process) Start(ctx context.Context, ready func()) error {
 
 // Shutdown - корректная остановка сервиса выполнения работы.
 // Завершает ожидание и останавливает процесс.
-//
-// Важно: при повторном вызове произойдёт panic (закрытие закрытого канала done).
 func (p *Process) Shutdown(ctx context.Context) error {
 	p.logger.Debug(ctx, "Shutting down the startup process...")
-	close(p.done)
+
+	p.closeOnce.Do(func() {
+		close(p.done)
+	})
 
 	p.wg.Wait()
 	p.logger.Debug(ctx, "The startup process has been shut down")
@@ -132,11 +135,18 @@ func (p *Process) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func (p *Process) execJob(ctx context.Context) error {
+func (p *Process) execJob(ctx context.Context) (err error) {
 	ctx = p.traceManager.WithGeneratedProcessID(ctx, keyTaskID)
 	p.logger.Debug(ctx, "Execute the job", "job_name", p.Caption())
 
-	if err := p.job.Do(ctx); err != nil {
+	// паника job не должна ронять приложение - перехватывается и превращается в ошибку
+	defer func() {
+		if rvr := recover(); rvr != nil {
+			err = mrprocess.NewCaughtPanicError("startup process: "+p.Caption(), rvr)
+		}
+	}()
+
+	if err = p.job.Do(ctx); err != nil {
 		return err
 	}
 

@@ -69,8 +69,12 @@ type (
 		logger       logger
 		traceManager traceManager
 
-		wg            sync.WaitGroup
+		wg sync.WaitGroup
+		// signalExecute - канал внешнего сигнала для немедленного опроса очереди
+		// (вне очередного периода readPeriodStrategy).
+		// Если опция WithSignalExecuteHandler не задана, этот канал не используется.
 		signalExecute <-chan struct{}
+		closeOnce     sync.Once
 		workersQueue  chan func(ctx context.Context)
 		done          chan struct{}
 	}
@@ -112,6 +116,7 @@ func NewMessageProcessor[T any](
 			traceManager: traceManager,
 
 			wg:           sync.WaitGroup{},
+			closeOnce:    sync.Once{},
 			workersQueue: make(chan func(ctx context.Context)),
 			done:         make(chan struct{}),
 		},
@@ -249,11 +254,12 @@ func (p *MessageProcessor[T]) Start(ctx context.Context, ready func()) error {
 
 // Shutdown - корректная остановка сервиса обработки сообщений.
 // Останавливает основной цикл и ожидает завершения всех воркеров.
-//
-// Важно: при повторном вызове произойдёт panic (закрытие закрытого канала done).
 func (p *MessageProcessor[T]) Shutdown(ctx context.Context) error {
 	p.logger.Debug(ctx, "Shutting down the message processor...")
-	close(p.done)
+
+	p.closeOnce.Do(func() {
+		close(p.done)
+	})
 
 	p.wg.Wait()
 	p.logger.Debug(ctx, "The message processor has been shut down")
@@ -279,6 +285,8 @@ func (p *MessageProcessor[T]) startWorkers(ctx context.Context, wg *sync.WaitGro
 	}
 }
 
+// execWorkerFunc - выполняет функцию обработки сообщения с перехватом паники,
+// чтобы паника при обработке одного сообщения не завершала воркер.
 func (p *MessageProcessor[T]) execWorkerFunc(ctx context.Context, fn func(ctx context.Context)) {
 	defer func() {
 		if rvr := recover(); rvr != nil {

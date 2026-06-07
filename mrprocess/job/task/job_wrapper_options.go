@@ -46,7 +46,8 @@ func WithPeriod(value time.Duration) Option {
 	}
 }
 
-// WithPeriodStrategy - устанавливает периодичность запуска задачи.
+// WithPeriodStrategy - устанавливает периодичность запуска задачи
+// на основе переданной стратегии.
 func WithPeriodStrategy(value mrprocess.PeriodStrategy) Option {
 	return func(o *options) {
 		o.job.periodStrategy = value

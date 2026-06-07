@@ -30,9 +30,10 @@ type (
 	//
 	// Используется как первый процесс в цепочке процессов для управления жизненным циклом сервиса.
 	Interceptor struct {
-		logger logger
-		wg     sync.WaitGroup
-		done   chan struct{}
+		logger    logger
+		wg        sync.WaitGroup
+		closeOnce sync.Once
+		done      chan struct{}
 	}
 
 	logger interface {
@@ -43,9 +44,10 @@ type (
 // NewInterceptor - создаёт сервис перехвата системных сигналов.
 func NewInterceptor(logger logger) *Interceptor {
 	return &Interceptor{
-		logger: logger,
-		wg:     sync.WaitGroup{},
-		done:   make(chan struct{}),
+		logger:    logger,
+		wg:        sync.WaitGroup{},
+		closeOnce: sync.Once{},
+		done:      make(chan struct{}),
 	}
 }
 
@@ -110,11 +112,12 @@ func (p *Interceptor) Start(ctx context.Context, ready func()) error {
 
 // Shutdown - корректная остановка сервиса перехвата сигналов.
 // Отменяет подписку на сигналы и завершает работу.
-//
-// Важно: при повторном вызове произойдёт panic (закрытие закрытого канала done).
 func (p *Interceptor) Shutdown(ctx context.Context) error {
 	p.logger.Debug(ctx, "Shutting down the signal interceptor...")
-	close(p.done)
+
+	p.closeOnce.Do(func() {
+		close(p.done)
+	})
 
 	p.wg.Wait()
 	p.logger.Debug(ctx, "The signal interceptor has been shut down")

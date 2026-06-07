@@ -29,9 +29,9 @@ by `.golangci.yaml` (`golangci-lint` runs strict — `make lint` must pass befor
   This is pervasive (the norm here, unlike Uber which groups only related decls):
   ```go
   type (
-      // MessageFormatter - преобразует плейсхолдеры ...
-      MessageFormatter struct {
-          extractor *PlaceholderExtractor
+      // Formatter - описание типа ...
+      Formatter struct {
+          parser *Parser
       }
   )
   ```
@@ -50,10 +50,10 @@ by `.golangci.yaml` (`golangci-lint` runs strict — `make lint` must pass befor
   declarations only, so these aren't linter-enforced — follow the convention manually.)
 - Document constructor params with a bulleted list when non-trivial:
   ```go
-  // NewMessageFormatter - создаёт MessageFormatter ...
+  // NewFormatter - создаёт Formatter ...
   // Параметры:
-  //   - leftDelim, rightDelim - ограничители плейсхолдеров;
-  //   - formatter - функция преобразования плейсхолдера.
+  //   - parser - разбирает входные данные;
+  //   - handler - функция обработки результата.
   ```
 
 ## Naming
@@ -61,7 +61,7 @@ by `.golangci.yaml` (`golangci-lint` runs strict — `make lint` must pass befor
 - Constructors: `NewXxx`. Receivers: short (1 letter), consistent per type
   (`e *protoError`, `w *customErrorWrapper`). `revive receiver-naming` enforces consistency.
 - Sentinel errors prefixed `Err`, error *types* suffixed `Error` (`errname`).
-  Note: error *codes* are camelCase string literals (e.g. `"errInternalErrorDetected"`).
+  Note: error *codes* are camelCase string literals (e.g. `"errSomethingFailed"`).
 - Initialisms via `revive var-naming`: `HTTP`, `JSON` (not `Http`/`Json`).
 - Import aliases lowercase `^[a-z][a-z0-9]*$`; no redundant aliases.
 - `staticcheck -ST1003` is off, so some naming rules are relaxed — still follow Go idiom.
@@ -104,8 +104,7 @@ by `.golangci.yaml` (`golangci-lint` runs strict — `make lint` must pass befor
   symbols. Do **not** use the `*_internal_test.go` / `*_export_test.go` escape hatch that
   the `testpackage` linter's default `skip-regexp` would let through — the linter allows
   it, the project does not. To cover an unexported helper, drive it through the exported
-  type/constructor that uses it (e.g. test `calcPeriod`/`fixedPeriod` via the public
-  `NewDispersionPeriod`/`NewStaticPeriod`/`NewDelayedPeriod` strategies, not directly).
+  type/constructor that uses it, not directly.
 - **Always use `github.com/stretchr/testify` for assertions** (`testifylint`). Use
   `require.*` for **fatal** checks that must abort the test on failure (preconditions,
   setup, `err != nil`, non-nil results you'll dereference); use `assert.*` for
