@@ -11,5 +11,7 @@ import (
 
 // Make sure the helper.SQLSet conforms with the mrstorage.SQLSetHelper interface.
 func TestSQLSetImplementsSQLSetHelper(t *testing.T) {
+	t.Parallel()
+
 	assert.Implements(t, (*mrstorage.SQLSetHelper)(nil), &helper.SQLSet{})
 }

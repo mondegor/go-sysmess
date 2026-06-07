@@ -12,12 +12,14 @@ import (
 func TestRoundFloat(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name      string
 		x         float64
 		precision int
 		want      float64
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:      "test1",
 			x:         123.12345678,

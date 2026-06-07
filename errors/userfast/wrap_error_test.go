@@ -18,12 +18,14 @@ func TestWrapError_Is(t *testing.T) {
 	errUserTest1 := errUserTestWrapper.Wrap(errors.New("test-message2"))
 	errUserTest2 := userfast.New("test-code2", "test-message2")
 
-	tests := []struct {
+	type testCase struct {
 		name       string
 		err        error
 		want       bool
 		mirrorWant bool
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:       "test1",
 			err:        errors.New("my-message"),

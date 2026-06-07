@@ -12,11 +12,13 @@ import (
 func TestSQLPartFuncRemoveNil(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name       string
 		parts      []mrstorage.SQLPartFunc
 		wantLength int
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name: "test 1",
 			parts: []mrstorage.SQLPartFunc{

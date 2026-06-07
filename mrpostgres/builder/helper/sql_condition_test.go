@@ -11,5 +11,7 @@ import (
 
 // Make sure the helper.SQLCondition conforms with the mrstorage.SQLConditionHelper interface.
 func TestSQLConditionImplementsSQLConditionHelper(t *testing.T) {
+	t.Parallel()
+
 	assert.Implements(t, (*mrstorage.SQLConditionHelper)(nil), &helper.SQLCondition{})
 }

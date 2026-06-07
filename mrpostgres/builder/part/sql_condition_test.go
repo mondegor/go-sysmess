@@ -11,5 +11,7 @@ import (
 
 // Make sure the builder.SQLConditionBuilder conforms with the mrstorage.SQLConditionBuilder interface.
 func TestSQLConditionBuilderImplementsSQLConditionBuilder(t *testing.T) {
+	t.Parallel()
+
 	assert.Implements(t, (*mrstorage.SQLConditionBuilder)(nil), &part.SQLConditionBuilder{})
 }

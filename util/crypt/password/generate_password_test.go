@@ -40,10 +40,12 @@ func TestGenerate_MinLength(t *testing.T) {
 
 	gen := password.NewGenerator()
 
-	tests := []struct {
+	type testCase struct {
 		name   string
 		length int
-	}{
+	}
+
+	tests := []testCase{
 		{name: "zero", length: 0},
 		{name: "negative", length: -5},
 	}
@@ -68,48 +70,47 @@ func TestGenerate_Length1(t *testing.T) {
 	require.Len(t, pw, 1)
 }
 
-// TestGenerate_CharVowelsOnly проверяет, что пароль содержит только гласные.
-func TestGenerate_CharVowelsOnly(t *testing.T) {
+// TestGenerate_CharSet проверяет, что при заданном наборе видов символов пароль
+// состоит только из символов допустимого набора.
+func TestGenerate_CharSet(t *testing.T) {
 	t.Parallel()
 
-	gen := password.NewGenerator()
-	pw := gen.Generate(20, password.CharVowels)
+	const (
+		vowels     = "aeiuyAEIUY"
+		consonants = "bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ"
+		numerals   = "0123456789"
+		signs      = "!$%&.<=>?@_~"
+	)
 
-	require.Len(t, pw, 20)
-
-	for _, ch := range pw {
-		assert.True(t, strings.ContainsRune("aeiuyAEIUY", ch),
-			"Символ %q не является гласной", ch)
+	type testCase struct {
+		name       string
+		length     int
+		charsKinds password.CharKinds
+		allowed    string
 	}
-}
 
-// TestGenerate_CharConsonantsOnly проверяет, что пароль содержит только согласные.
-func TestGenerate_CharConsonantsOnly(t *testing.T) {
-	t.Parallel()
-
-	gen := password.NewGenerator()
-	pw := gen.Generate(20, password.CharConsonants)
-
-	require.Len(t, pw, 20)
-
-	for _, ch := range pw {
-		assert.True(t, strings.ContainsRune("bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ", ch),
-			"Символ %q не является согласной", ch)
+	tests := []testCase{
+		{name: "vowels only", length: 20, charsKinds: password.CharVowels, allowed: vowels},
+		{name: "consonants only", length: 20, charsKinds: password.CharConsonants, allowed: consonants},
+		{name: "numerals only", length: 20, charsKinds: password.CharNumerals, allowed: numerals},
+		{name: "signs only", length: 20, charsKinds: password.CharSigns, allowed: signs},
+		{name: "letters", length: 20, charsKinds: password.CharAbc, allowed: vowels + consonants},
+		{name: "letters and numerals", length: 50, charsKinds: password.CharAbcNumerals, allowed: vowels + consonants + numerals},
 	}
-}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-// TestGenerate_CharNumeralsOnly проверяет, что пароль содержит только цифры.
-func TestGenerate_CharNumeralsOnly(t *testing.T) {
-	t.Parallel()
+			gen := password.NewGenerator()
+			pw := gen.Generate(tt.length, tt.charsKinds)
 
-	gen := password.NewGenerator()
-	pw := gen.Generate(20, password.CharNumerals)
+			require.Len(t, pw, tt.length)
 
-	require.Len(t, pw, 20)
-
-	for _, ch := range pw {
-		assert.True(t, ch >= '0' && ch <= '9',
-			"Символ %q не является цифрой", ch)
+			for _, ch := range pw {
+				assert.True(t, strings.ContainsRune(tt.allowed, ch),
+					"Символ %q вне допустимого набора", ch)
+			}
+		})
 	}
 }
 
@@ -122,55 +123,6 @@ func TestGenerate_CharNumerals_NoZero(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		pw := gen.Generate(20, password.CharNumerals)
 		assert.NotContains(t, pw, "0", "Пароль не должен содержать цифру 0")
-	}
-}
-
-// TestGenerate_CharSignsOnly проверяет, что пароль содержит только знаки.
-func TestGenerate_CharSignsOnly(t *testing.T) {
-	t.Parallel()
-
-	gen := password.NewGenerator()
-	pw := gen.Generate(20, password.CharSigns)
-
-	require.Len(t, pw, 20)
-
-	for _, ch := range pw {
-		assert.True(t, strings.ContainsRune("!$%&.<=>?@_~", ch),
-			"Символ %q не является знаком", ch)
-	}
-}
-
-// TestGenerate_CharAbc проверяет, что пароль содержит только буквы (гласные + согласные).
-func TestGenerate_CharAbc(t *testing.T) {
-	t.Parallel()
-
-	gen := password.NewGenerator()
-	pw := gen.Generate(20, password.CharAbc)
-
-	require.Len(t, pw, 20)
-
-	validChars := "aeiuyAEIUYbcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ"
-
-	for _, ch := range pw {
-		assert.True(t, strings.ContainsRune(validChars, ch),
-			"Символ %q не является буквой", ch)
-	}
-}
-
-// TestGenerate_CharAbcNumerals проверяет, что пароль содержит буквы и цифры.
-func TestGenerate_CharAbcNumerals(t *testing.T) {
-	t.Parallel()
-
-	gen := password.NewGenerator()
-	pw := gen.Generate(50, password.CharAbcNumerals)
-
-	require.Len(t, pw, 50)
-
-	validChars := "aeiuyAEIUYbcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ123456789"
-
-	for _, ch := range pw {
-		assert.True(t, strings.ContainsRune(validChars, ch),
-			"Символ %q не входит в допустимый набор", ch)
 	}
 }
 
@@ -289,11 +241,13 @@ func TestGenerate_DoesNotHang(t *testing.T) {
 
 	gen := password.NewGenerator()
 
-	tests := []struct {
+	type testCase struct {
 		name       string
 		length     int
 		charsKinds password.CharKinds
-	}{
+	}
+
+	tests := []testCase{
 		{name: "charAll", length: 12, charsKinds: password.CharAll},
 		{name: "charVowels", length: 12, charsKinds: password.CharVowels},
 		{name: "charConsonants", length: 12, charsKinds: password.CharConsonants},

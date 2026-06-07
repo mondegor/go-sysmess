@@ -11,24 +11,168 @@ import (
 	"github.com/mondegor/go-sysmess/errors/runtime"
 )
 
-func TestProtoError_WithDetails_CreatesErrorWithDetails(t *testing.T) {
+func TestProtoError_WithDetails_ErrorString(t *testing.T) {
 	t.Parallel()
 
-	proto := runtime.New(kind.Internal, "base error")
-	err := proto.WithDetails("additional context")
+	type testCase struct {
+		name    string
+		kind    kind.Enum
+		message string
+		details string
+		attrs   []any
+		want    string
+	}
 
-	require.Error(t, err)
-	assert.Equal(t, "base error: additional context", err.Error())
+	tests := []testCase{
+		{
+			name:    "creates error with details",
+			kind:    kind.Internal,
+			message: "base error",
+			details: "additional context",
+			want:    "base error: additional context",
+		},
+		{
+			name:    "creates error with attributes",
+			kind:    kind.Internal,
+			message: "storage error",
+			details: "query failed",
+			attrs:   []any{"db", "postgres", "table", "users"},
+			want:    "storage error: query failed [db=postgres, table=users]",
+		},
+		{
+			name:    "empty details and no attributes",
+			kind:    kind.Internal,
+			message: "error message",
+			details: "",
+			want:    "error message",
+		},
+		{
+			name:    "only attributes no details",
+			kind:    kind.Internal,
+			message: "error",
+			details: "",
+			attrs:   []any{"key", "value"},
+			want:    "error [key=value]",
+		},
+		{
+			name:    "special characters in details",
+			kind:    kind.Internal,
+			message: "error",
+			details: "context: with special chars & <tags>",
+			want:    "error: context: with special chars & <tags>",
+		},
+		{
+			name:    "unicode in details",
+			kind:    kind.Internal,
+			message: "error",
+			details: "контекст",
+			attrs:   []any{"ключ", "значение"},
+			want:    "error: контекст [ключ=значение]",
+		},
+		{
+			name:    "appends details after base text",
+			kind:    kind.User,
+			message: "validation failed",
+			details: "field 'email' is invalid",
+			want:    "validation failed: field 'email' is invalid",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			proto := runtime.New(tt.kind, tt.message)
+			err := proto.WithDetails(tt.details, tt.attrs...)
+
+			require.Error(t, err)
+			assert.Equal(t, tt.want, err.Error())
+		})
+	}
 }
 
-func TestProtoError_WithDetails_CreatesErrorWithAttributes(t *testing.T) {
+func TestProtoError_WithDetails_ContainsAttributes(t *testing.T) {
 	t.Parallel()
 
-	proto := runtime.New(kind.Internal, "storage error")
-	err := proto.WithDetails("query failed", "db", "postgres", "table", "users")
+	type testCase struct {
+		name         string
+		message      string
+		details      string
+		attrs        []any
+		wantContains []string
+	}
 
-	require.Error(t, err)
-	assert.Equal(t, "storage error: query failed [db=postgres, table=users]", err.Error())
+	tests := []testCase{
+		{
+			name:         "multiple attributes",
+			message:      "complex error",
+			details:      "failed",
+			attrs:        []any{"user_id", 123, "action", "delete", "resource", "account", "attempt", 3},
+			wantContains: []string{"user_id=123", "action=delete", "resource=account", "attempt=3"},
+		},
+		{
+			name:         "nil-like attribute values",
+			message:      "error",
+			details:      "context",
+			attrs:        []any{"ptr", nil, "num", 0, "bool", false},
+			wantContains: []string{"ptr=<NIL>", "num=0", "bool=false"},
+		},
+		{
+			name:         "numeric attribute values",
+			message:      "error",
+			details:      "limit exceeded",
+			attrs:        []any{"current", 150, "max", 100, "ratio", 1.5},
+			wantContains: []string{"current=150", "max=100", "ratio=1.5"},
+		},
+		{
+			name:         "slice attribute values",
+			message:      "error",
+			details:      "batch failed",
+			attrs:        []any{"ids", []int{1, 2, 3}},
+			wantContains: []string{"ids=[1 2 3]"},
+		},
+		{
+			name:         "map attribute values",
+			message:      "error",
+			details:      "config error",
+			attrs:        []any{"settings", map[string]string{"key": "val"}},
+			wantContains: []string{"settings="},
+		},
+		{
+			name:         "odd number of attributes",
+			message:      "error",
+			details:      "context",
+			attrs:        []any{"key1", "val1", "orphan_key"},
+			wantContains: []string{"key1=val1", "!MISSINGATTRVALUE"},
+		},
+		{
+			name:         "empty string as attribute key",
+			message:      "error",
+			details:      "context",
+			attrs:        []any{"", "value"},
+			wantContains: []string{"!EMPTYATTRKEY=value"},
+		},
+		{
+			name:         "non-string as first attribute",
+			message:      "error",
+			details:      "context",
+			attrs:        []any{123, "value"},
+			wantContains: []string{"!BADATTRKEY=123", "value"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			proto := runtime.New(kind.Internal, tt.message)
+			err := proto.WithDetails(tt.details, tt.attrs...)
+
+			require.Error(t, err)
+
+			for _, want := range tt.wantContains {
+				assert.Contains(t, err.Error(), want)
+			}
+		})
+	}
 }
 
 func TestProtoError_WithDetails_PreservesErrorKind(t *testing.T) {
@@ -65,26 +209,6 @@ func TestProtoError_WithDetails_MultipleCallsCreateIndependentErrors(t *testing.
 	assert.Equal(t, "base: second", err2.Error())
 }
 
-func TestProtoError_WithDetails_WithEmptyDetailsAndNoAttributes(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error message")
-	err := proto.WithDetails("")
-
-	require.Error(t, err)
-	assert.Equal(t, "error message", err.Error())
-}
-
-func TestProtoError_WithDetails_WithOnlyAttributesNoDetails(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("", "key", "value")
-
-	require.Error(t, err)
-	assert.Equal(t, "error [key=value]", err.Error())
-}
-
 func TestProtoError_WithDetails_AttributesAreCopiedNotShared(t *testing.T) {
 	t.Parallel()
 
@@ -97,26 +221,6 @@ func TestProtoError_WithDetails_AttributesAreCopiedNotShared(t *testing.T) {
 
 	// Both errors should have the same content since they're from same proto
 	assert.Equal(t, err.Error(), err2.Error())
-}
-
-func TestProtoError_WithDetails_HandlesSpecialCharactersInDetails(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("context: with special chars & <tags>")
-
-	require.Error(t, err)
-	assert.Equal(t, "error: context: with special chars & <tags>", err.Error())
-}
-
-func TestProtoError_WithDetails_HandlesUnicodeInDetails(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("контекст", "ключ", "значение")
-
-	require.Error(t, err)
-	assert.Equal(t, "error: контекст [ключ=значение]", err.Error())
 }
 
 func TestProtoError_WithDetails_IsComparesWithSamePrototype(t *testing.T) {
@@ -138,35 +242,6 @@ func TestProtoError_WithDetails_UnwrapReturnsNil(t *testing.T) {
 	err := proto.WithDetails("details")
 
 	assert.NoError(t, errors.Unwrap(err))
-}
-
-func TestProtoError_WithDetails_WithMultipleAttributes(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "complex error")
-	err := proto.WithDetails("failed",
-		"user_id", 123,
-		"action", "delete",
-		"resource", "account",
-		"attempt", 3)
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "user_id=123")
-	assert.Contains(t, err.Error(), "action=delete")
-	assert.Contains(t, err.Error(), "resource=account")
-	assert.Contains(t, err.Error(), "attempt=3")
-}
-
-func TestProtoError_WithDetails_WithNilLikeAttributeValues(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("context", "ptr", nil, "num", 0, "bool", false)
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "ptr=<NIL>")
-	assert.Contains(t, err.Error(), "num=0")
-	assert.Contains(t, err.Error(), "bool=false")
 }
 
 func TestProtoError_WithDetails_InvokesOnCreateCallback(t *testing.T) {
@@ -222,81 +297,4 @@ func TestProtoError_WithDetails_CombinesWithWrapAndDetails(t *testing.T) {
 	assert.Contains(t, err.Error(), "wrapper error: additional context")
 	assert.Contains(t, err.Error(), "base error")
 	assert.Contains(t, err.Error(), "key=value")
-}
-
-func TestProtoError_WithDetails_AppendsDetailsAfterBaseText(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.User, "validation failed")
-	err := proto.WithDetails("field 'email' is invalid")
-
-	require.Error(t, err)
-	assert.Equal(t, "validation failed: field 'email' is invalid", err.Error())
-}
-
-func TestProtoError_WithDetails_WithNumericAttributeValues(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("limit exceeded",
-		"current", 150,
-		"max", 100,
-		"ratio", 1.5)
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "current=150")
-	assert.Contains(t, err.Error(), "max=100")
-	assert.Contains(t, err.Error(), "ratio=1.5")
-}
-
-func TestProtoError_WithDetails_WithSliceAttributeValues(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("batch failed", "ids", []int{1, 2, 3})
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "ids=[1 2 3]")
-}
-
-func TestProtoError_WithDetails_WithMapAttributeValues(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("config error", "settings", map[string]string{"key": "val"})
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "settings=")
-}
-
-func TestProtoError_WithDetails_WithOddNumberOfAttributes(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("context", "key1", "val1", "orphan_key")
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "key1=val1")
-	assert.Contains(t, err.Error(), "!MISSINGATTRVALUE")
-}
-
-func TestProtoError_WithDetails_WithEmptyStringAsAttributeKey(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("context", "", "value")
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "!EMPTYATTRKEY=value")
-}
-
-func TestProtoError_WithDetails_WithNonStringAsFirstAttribute(t *testing.T) {
-	t.Parallel()
-
-	proto := runtime.New(kind.Internal, "error")
-	err := proto.WithDetails("context", 123, "value")
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "!BADATTRKEY=123")
-	assert.Contains(t, err.Error(), "value")
 }

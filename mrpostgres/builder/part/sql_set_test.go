@@ -11,5 +11,7 @@ import (
 
 // Make sure the builder.SQLSetBuilder conforms with the mrstorage.SQLSetBuilder interface.
 func TestSQLSetBuilderImplementsSQLSetBuilder(t *testing.T) {
+	t.Parallel()
+
 	assert.Implements(t, (*mrstorage.SQLSetBuilder)(nil), &part.SQLSetBuilder{})
 }

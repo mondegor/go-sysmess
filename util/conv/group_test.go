@@ -11,11 +11,13 @@ import (
 func TestData_String(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name  string
 		group conv.Group
 		want  string
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:  "data with string value",
 			group: map[string]any{"key1": "stringValue"},

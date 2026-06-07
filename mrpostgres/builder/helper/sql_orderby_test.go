@@ -11,5 +11,7 @@ import (
 
 // Make sure the helper.SQLOrderBy conforms with the mrstorage.SQLOrderByHelper interface.
 func TestSQLOrderByImplementsSQLOrderByHelper(t *testing.T) {
+	t.Parallel()
+
 	assert.Implements(t, (*mrstorage.SQLOrderByHelper)(nil), &helper.SQLOrderBy{})
 }

@@ -28,13 +28,13 @@ func TestNew(t *testing.T) {
 func TestProto_Error(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name      string
-		message   string
-		argsNames []string
-		args      []any
-		want      string
-	}{
+	type testCase struct {
+		name    string
+		message string
+		want    string
+	}
+
+	tests := []testCase{
 		{
 			name:    "test1",
 			message: "my-message",
@@ -62,12 +62,14 @@ func TestProto_Is(t *testing.T) {
 	errUserTest1 := user.New("test-code1", "test-message1")
 	errUserTest2 := user.New("test-code2", "test-message2")
 
-	tests := []struct {
+	type testCase struct {
 		name       string
 		err        error
 		want       bool
 		mirrorWant bool
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:       "test1",
 			err:        errors.New("my-message"),

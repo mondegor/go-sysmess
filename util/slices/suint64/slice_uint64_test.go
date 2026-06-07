@@ -11,11 +11,13 @@ import (
 func TestSortedUint64_FilterFunc(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name string
 		s    []uint64
 		want []uint64
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name: "test1",
 			s:    nil,
@@ -64,11 +66,13 @@ func TestSortedUint64_FilterFunc(t *testing.T) {
 func TestSortedUint64_SortedUnique(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name string
 		s    []uint64
 		want []uint64
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name: "test1",
 			s:    nil,
@@ -112,12 +116,14 @@ func TestSortedUint64_SortedUnique(t *testing.T) {
 func TestSortedUint64_BinaryIndex(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name  string
 		s     []uint64
 		value uint64
 		want  int
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:  "test1",
 			s:     nil,
@@ -167,12 +173,14 @@ func TestSortedUint64_BinaryIndex(t *testing.T) {
 func TestSortedUint64_BinaryAppend(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name  string
 		s     []uint64
 		value uint64
 		want  []uint64
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:  "test1",
 			s:     nil,
@@ -230,12 +238,14 @@ func TestSortedUint64_BinaryAppend(t *testing.T) {
 func TestSortedUint64_UniqueBinaryAppend(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name  string
 		s     []uint64
 		value uint64
 		want  []uint64
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:  "test1",
 			s:     nil,

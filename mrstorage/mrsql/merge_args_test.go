@@ -11,11 +11,13 @@ import (
 func TestMergeArgs(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name string
 		args [][]any
 		want []any
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name: "test 1",
 			args: [][]any{

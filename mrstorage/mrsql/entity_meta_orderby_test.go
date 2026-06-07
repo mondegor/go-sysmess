@@ -11,5 +11,7 @@ import (
 
 // Make sure the mrsql.EntityMetaOrderBy conforms with the mrtype.ListSorter interface.
 func TestEntityMetaOrderByImplementsListSorter(t *testing.T) {
+	t.Parallel()
+
 	assert.Implements(t, (*mrtype.ListSorter)(nil), &mrsql.EntityMetaOrderBy{})
 }

@@ -30,55 +30,75 @@ func (e *testError) Error() string {
 	return e.kind.String() + ": " + e.code
 }
 
-func TestNewCustom_UserError(t *testing.T) {
+func TestNewCustom(t *testing.T) {
 	t.Parallel()
 
-	e := &testError{kind: kind.User, code: "MyCode"}
-	got := custom.New(e, "test-custom-code")
-	require.True(t, got.IsKindUser())
-	require.Equal(t, "MyCode/test-custom-code", got.CustomCode())
-	assert.ErrorIs(t, got.Unwrap(), e)
-}
+	type testCase struct {
+		name           string
+		inputErr       error
+		wantKindUser   bool
+		wantCustomCode string
+		// wantUnwrap - ожидаемая ошибка под Unwrap(); если nil, ожидается сам inputErr
+		wantUnwrap error
+		// wantContains - sentinel-ошибка, чьё сообщение должно входить в got.Error(); nil - проверка пропускается
+		wantContains error
+	}
 
-func TestNewCustom_InternalError(t *testing.T) {
-	t.Parallel()
+	tests := []testCase{
+		{
+			name:           "user error",
+			inputErr:       &testError{kind: kind.User, code: "MyCode"},
+			wantKindUser:   true,
+			wantCustomCode: "MyCode/test-custom-code",
+		},
+		{
+			name:           "internal error",
+			inputErr:       &testError{kind: kind.Internal},
+			wantKindUser:   false,
+			wantCustomCode: "test-custom-code",
+			wantContains:   custom.ErrHasInternalError,
+		},
+		{
+			name:           "system error",
+			inputErr:       &testError{kind: kind.System},
+			wantKindUser:   false,
+			wantCustomCode: "test-custom-code",
+			wantContains:   custom.ErrHasSystemError,
+		},
+		{
+			name:           "no wrapped error",
+			inputErr:       errors.New("no-wrapped-error"),
+			wantKindUser:   false,
+			wantCustomCode: "test-custom-code",
+			wantContains:   custom.ErrHasUnexpectedError,
+		},
+		{
+			name:           "nil error",
+			inputErr:       nil,
+			wantKindUser:   false,
+			wantCustomCode: "test-custom-code",
+			wantUnwrap:     custom.ErrHasNilError,
+			wantContains:   custom.ErrHasNilError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	e := &testError{kind: kind.Internal}
-	got := custom.New(e, "test-custom-code")
-	require.False(t, got.IsKindUser())
-	require.Equal(t, "test-custom-code", got.CustomCode())
-	require.ErrorIs(t, got.Unwrap(), e)
-	assert.Contains(t, got.Error(), custom.ErrHasInternalError.Error())
-}
+			got := custom.New(tt.inputErr, "test-custom-code")
+			require.Equal(t, tt.wantKindUser, got.IsKindUser())
+			require.Equal(t, tt.wantCustomCode, got.CustomCode())
 
-func TestNewCustom_SystemError(t *testing.T) {
-	t.Parallel()
+			wantUnwrap := tt.inputErr
+			if tt.wantUnwrap != nil {
+				wantUnwrap = tt.wantUnwrap
+			}
 
-	e := &testError{kind: kind.System}
-	got := custom.New(e, "test-custom-code")
-	require.False(t, got.IsKindUser())
-	require.Equal(t, "test-custom-code", got.CustomCode())
-	require.ErrorIs(t, got.Unwrap(), e)
-	assert.Contains(t, got.Error(), custom.ErrHasSystemError.Error())
-}
+			require.ErrorIs(t, got.Unwrap(), wantUnwrap)
 
-func TestNewCustom_NoWrappedError(t *testing.T) {
-	t.Parallel()
-
-	e := errors.New("no-wrapped-error")
-	got := custom.New(e, "test-custom-code")
-	require.False(t, got.IsKindUser())
-	require.Equal(t, "test-custom-code", got.CustomCode())
-	require.ErrorIs(t, got.Unwrap(), e)
-	assert.Contains(t, got.Error(), custom.ErrHasUnexpectedError.Error())
-}
-
-func TestNewCustom_NilError(t *testing.T) {
-	t.Parallel()
-
-	got := custom.New(nil, "test-custom-code")
-	require.False(t, got.IsKindUser())
-	require.Equal(t, "test-custom-code", got.CustomCode())
-	require.ErrorIs(t, got.Unwrap(), custom.ErrHasNilError)
-	assert.Contains(t, got.Error(), custom.ErrHasNilError.Error())
+			if tt.wantContains != nil {
+				assert.Contains(t, got.Error(), tt.wantContains.Error())
+			}
+		})
+	}
 }
