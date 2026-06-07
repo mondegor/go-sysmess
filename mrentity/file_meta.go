@@ -7,7 +7,6 @@ import (
 
 	"github.com/mondegor/go-sysmess/errors"
 	modelmedia "github.com/mondegor/go-sysmess/mrmodel/media"
-	"github.com/mondegor/go-sysmess/util/copyptr"
 )
 
 type (
@@ -74,8 +73,8 @@ func FileMetaToInfo(meta FileMeta) modelmedia.FileInfo {
 		// Name:         path.Base(meta.Path),
 		Path:      meta.Path,
 		Size:      meta.Size,
-		CreatedAt: copyptr.Time(meta.CreatedAt),
-		UpdatedAt: copyptr.Time(meta.UpdatedAt),
+		CreatedAt: copyTime(meta.CreatedAt),
+		UpdatedAt: copyTime(meta.UpdatedAt),
 	}
 }
 
@@ -86,6 +85,18 @@ func FileMetaToInfoPointer(meta *FileMeta) *modelmedia.FileInfo {
 	}
 
 	c := FileMetaToInfo(*meta)
+
+	return &c
+}
+
+// copyTime - возвращает копию указателя на time.Time.
+// Если value равен nil или нулевому времени, возвращает nil.
+func copyTime(value *time.Time) *time.Time {
+	if value == nil || value.IsZero() {
+		return nil
+	}
+
+	c := *value
 
 	return &c
 }

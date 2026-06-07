@@ -2,10 +2,8 @@ package mrrun
 
 import (
 	"context"
+	"errors"
 	"net/http"
-
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/mrlog"
 )
 
 type (
@@ -22,12 +20,15 @@ type (
 	}
 )
 
+// ErrAppIsNotReady - приложение/сервис ещё не готово принимать запросы.
+var ErrAppIsNotReady = errors.New("app is not ready")
+
 // PrepareProbesForCheck - создаёт функцию для проверки работоспособности всех проб.
 //
 // Возвращаемая функция выполняет последовательную проверку всех проб.
 // Возвращает true, если ВСЕ пробы завершились успешно.
 // Возвращает false, если хотя бы одна проба завершилась с ошибкой.
-func PrepareProbesForCheck(logger mrlog.Logger, probes ...ProbeChecker) func(ctx context.Context) bool {
+func PrepareProbesForCheck(logger logger, probes ...ProbeChecker) func(ctx context.Context) bool {
 	return func(ctx context.Context) bool {
 		for _, probe := range probes {
 			if err := probe.Check(ctx); err != nil {
@@ -49,7 +50,7 @@ func PrepareProbesForCheck(logger mrlog.Logger, probes ...ProbeChecker) func(ctx
 //  1. Выполняет последовательную проверку всех проб;
 //  2. Для каждой пробы записывает статус: 200 (OK) или 422 (UnprocessableEntity);
 //  3. Возвращает срез FinishedProbe с результатами всех проверок;
-func PrepareProbes(logger mrlog.Logger, probes ...ProbeChecker) func(ctx context.Context) []FinishedProbe {
+func PrepareProbes(logger logger, probes ...ProbeChecker) func(ctx context.Context) []FinishedProbe {
 	return func(ctx context.Context) []FinishedProbe {
 		info := make([]FinishedProbe, len(probes))
 
@@ -76,13 +77,13 @@ func PrepareProbes(logger mrlog.Logger, probes ...ProbeChecker) func(ctx context
 // Проверяет состояние AppHealth через метод IsReady().
 //
 // Возвращает nil, если приложение готово.
-// Возвращает ошибку ErrSystemServiceTemporarilyUnavailable, если приложение не готово.
+// Возвращает ошибку ErrAppIsNotReady, если приложение не готово.
 func WithAppReadyProbe(app *AppHealth) func(ctx context.Context) error {
 	return func(_ context.Context) error {
 		if app.IsReady() {
 			return nil
 		}
 
-		return errors.ErrSystemServiceTemporarilyUnavailable.WithDetails("app is not ready")
+		return ErrAppIsNotReady
 	}
 }

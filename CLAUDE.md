@@ -61,8 +61,9 @@ The package is built in layers, with a flat facade re-exporting the subpackages:
   intended usage: infra-layer code wraps unrecognized errors into storage errors, service-layer code
   into operation-failed errors.
 - **`errors/helper/`** — `ErrorStatusMapper` (map user error codes → HTTP statuses), property extraction.
-- **`errors/handler.go`** — `Handler` interface for centralized error routing (logging/tracing),
-  with `HandlerFunc` adapter and `NopHandler`.
+- **`errors/handler/`** — `Handler` interface for centralized error routing (logging/tracing),
+  with a `Func` adapter and `Nop()`. The root `errors/handler.go` re-exports these as `Handler`,
+  `HandlerFunc`, and `NopHandler`.
 
 The intended flow (see README): each architectural layer defines its own errors and wraps caught
 errors as it propagates them up; the UseCase layer is the primary interception point that classifies
@@ -70,20 +71,36 @@ the final kind and decides handling.
 
 ### Other packages
 
-- **`mrmsg/`** — placeholder-based message formatting. `MessageFormatter` replaces named
-  placeholders like `%{name}` from a `map[string]any`.
+- **`mrmsg/`** — placeholder-based message formatting with configurable delimiters (e.g. `{` `}`
+  or `{{` `}}`). `PlaceholderExtractor` finds placeholders; `PlaceholderReplacer.Replace(args []any)`
+  substitutes positional args; `MessageFormatter` rewrites placeholders via a callback. Subpackage
+  `templater`.
 - **`mrlocale/`** — localization (`golang.org/x/text` + gotext catalogs): bundles, pools, localizers.
-- **`mrlog/`** — `slog`-based logging; subpackages `slog`, `logger`, `level`, `color`, `mock`.
-- **`mrtrace/`** — request/worker/correlation/task context propagation and ID generation.
-- **`wire/`** — composition-root helpers that assemble errors + logging + tracing together.
-- **`mrtype/`**, **`mrmodel/`**, **`mrstatus/`**, **`mrpath/`**, **`mrevent/`**, **`mrinfra/`**,
-  **`mrapp/`** — supporting domain types (paging/sort/parse, file/image models, status flow maps, etc.).
-- **`util/`** — standalone helpers (`x*` packages: xtime, xmath, xstrings, slices, conv, crypt, mime, …).
+- **`mrlog/`** — `slog`-based logging (`logger.go`, `nop_logger.go`, `std.go`); subpackages
+  `slog`, `level`, `color`.
+- **`mrtrace/`** — request/worker/correlation/task context propagation and ID generation
+  (subpackages `context`, `process`).
+- **`wire/`** — composition-root helpers that assemble errors + logging + tracing together
+  (subpackages `errors`, `mraccess`, `mrlog`, `mrtrace`).
+- **`mrtype/`**, **`mrmodel/`**, **`mrpath/`**, **`mrevent/`**, **`mrinfra/`**, **`mrapp/`**,
+  **`mrentity/`** — supporting domain types (paging/sort/parse, file/image models, etc.).
+- **`mrworkflow/`** — status flow maps (`flow_map.go`, `itemstatus`).
+- **`mraccess/`** — access control (actions, rights, roles, role groups).
+- **`mrstorage/`**, **`mrpostgres/`** — storage abstractions and the PostgreSQL implementation
+  (connection manager, query builders, monitoring, migrations).
+- **`mrprocess/`** — background processing: workers, jobs, schedulers, consumers, collectors
+  (formerly `mrworker/`).
+- **`mrrun/`** — application runner / health probes / graceful shutdown.
+- **`mrlock/`** — distributed locking (`locker.go`, `mutexlocker`, `noplocker`).
+- **`mridempotency/`** — idempotency providers/responsers.
+- **`util/`** — standalone helpers (e.g. `xtime`, `xmath`, `xstrings`, `ximage`, `xio`, `slices`,
+  `conv`, `casttype`, `copyptr`, `crypt`, `mime`, `args`).
 
 ### Reference material
 
 - `examples/` contains runnable usage examples per subsystem (`examples/errors/*`, `examples/mrlocale`,
-  `examples/mrlog`) — the best starting point for understanding intended API usage.
+  `examples/mrlog`, `examples/mrstorage`, `examples/mrworkflow`, `examples/shutdown`, `examples/util`)
+  — the best starting point for understanding intended API usage.
 - `docs/` holds C4 architecture diagrams (PlantUML sources + rendered SVGs referenced from README.md).
 - `README.md` (Russian) has the authoritative explanation of the error-handling philosophy.
 

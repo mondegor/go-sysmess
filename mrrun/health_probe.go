@@ -2,12 +2,10 @@ package mrrun
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"time"
-
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/mrlog"
 )
 
 const (
@@ -24,13 +22,16 @@ type (
 		caption string
 		check   func(ctx context.Context) error // функция проверки работоспособности процесса
 		timeout time.Duration                   // таймаут, после которого функция check должна остановить своё выполнение
-		logger  mrlog.Logger
+		logger  logger
 	}
 )
 
+// ErrInternalProbeHasPanic - во время выполнения пробы произошла паника.
+var ErrInternalProbeHasPanic = errors.New("probe has panic")
+
 // NewHealthProbe - создаёт пробу для отслеживания работоспособности процесса.
 // Если timeout равен 0, используется defaultTimeout (5 секунд).
-func NewHealthProbe(logger mrlog.Logger, caption string, check func(ctx context.Context) error, timeout time.Duration) *HealthProbe {
+func NewHealthProbe(logger logger, caption string, check func(ctx context.Context) error, timeout time.Duration) *HealthProbe {
 	if timeout <= 0 {
 		timeout = defaultTimeout
 	}
@@ -66,16 +67,13 @@ func (p *HealthProbe) Check(ctx context.Context) (err error) {
 		if rvr := recover(); rvr != nil {
 			p.logger.Error(
 				ctx,
-				"HealthProbe",
-				"error",
-				errors.ErrInternalCaughtPanic.New(
-					"source", "probe: "+p.caption,
-					"recover", rvr,
-					"stack_trace", string(debug.Stack()),
-				),
+				"HealthProbe panic",
+				"probe", p.caption,
+				"recover", rvr,
+				"stack_trace", string(debug.Stack()),
 			)
 
-			err = fmt.Errorf("probe has panic (caption='%s')", p.caption)
+			err = fmt.Errorf("%w [caption=%s]", ErrInternalProbeHasPanic, p.caption)
 		}
 	}()
 

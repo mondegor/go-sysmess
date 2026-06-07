@@ -7,7 +7,6 @@ import (
 
 	"github.com/mondegor/go-sysmess/errors"
 	modelmedia "github.com/mondegor/go-sysmess/mrmodel/media"
-	"github.com/mondegor/go-sysmess/util/copyptr"
 )
 
 type (
@@ -78,8 +77,8 @@ func ImageMetaToInfo(meta ImageMeta) modelmedia.ImageInfo {
 		Width:     meta.Width,
 		Height:    meta.Height,
 		Size:      meta.Size,
-		CreatedAt: copyptr.Time(meta.CreatedAt),
-		UpdatedAt: copyptr.Time(meta.UpdatedAt),
+		CreatedAt: copyTime(meta.CreatedAt),
+		UpdatedAt: copyTime(meta.UpdatedAt),
 	}
 }
 

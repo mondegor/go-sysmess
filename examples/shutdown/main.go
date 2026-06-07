@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/mondegor/go-sysmess/mrlog/slog"
-	"github.com/mondegor/go-sysmess/mrworker/process/signal"
+	"github.com/mondegor/go-sysmess/mrprocess/signal"
 )
 
 var isTimeout atomic.Bool

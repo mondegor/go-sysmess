@@ -5,16 +5,18 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5"
-
-	"github.com/mondegor/go-sysmess/mrtrace"
 )
 
 type (
 	// QueryTracer - трассировщик SQL-запросов для библиотеки pgx.
 	// Отслеживает начало выполнения запросов Query, QueryRow и Exec.
 	QueryTracer struct {
-		tracer mrtrace.Tracer
+		tracer tracer
 		source string
+	}
+
+	tracer interface {
+		Trace(ctx context.Context, args ...any)
 	}
 )
 
@@ -24,7 +26,7 @@ type (
 //   - port - порт сервера PostgreSQL;
 //   - database - имя БД;
 //   - tracer - трассировщик для логирования запросов.
-func NewQueryTracer(host, port, database string, tracer mrtrace.Tracer) *QueryTracer {
+func NewQueryTracer(host, port, database string, tracer tracer) *QueryTracer {
 	return &QueryTracer{
 		tracer: tracer,
 		source: host + ":" + port + "/" + database,

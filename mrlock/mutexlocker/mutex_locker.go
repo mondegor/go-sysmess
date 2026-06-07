@@ -2,6 +2,7 @@ package mutexlocker
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -71,9 +72,9 @@ func (l *Locker) LockWithExpiry(ctx context.Context, key string, expiry time.Dur
 	l.keysAutoCleaner(ctx, removeExpiredKeysLimit)
 
 	if exp, ok := l.keys[key]; ok && exp > time.Now().UnixNano() {
-		return nil, mrlock.ErrSystemStorageLockKeyNotObtained.New(
-			"source", lockerName,
-			"lock_key", key,
+		return nil, fmt.Errorf(
+			"%w [source=%s, lock_key=%s]",
+			mrlock.ErrLockKeyNotObtained, lockerName, key,
 		)
 	}
 
@@ -89,10 +90,9 @@ func (l *Locker) LockWithExpiry(ctx context.Context, key string, expiry time.Dur
 			l.logger.Warn(
 				ctx,
 				"unlock",
-				"error", mrlock.ErrSystemStorageLockKeyNotHeld.New(
-					"source", lockerName,
-					"lock_key", key,
-				),
+				"error", mrlock.ErrLockKeyNotHeld,
+				"source", lockerName,
+				"lock_key", key,
 			)
 
 			return

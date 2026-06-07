@@ -2,9 +2,6 @@ package mrrun
 
 import (
 	"context"
-
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrtrace"
 )
 
 type (
@@ -12,18 +9,28 @@ type (
 	// Обеспечивает параллельный запуск процессов, их синхронизацию и корректное завершение.
 	//
 	// Поддерживает несколько режимов добавления процессов:
-	//   - Add - простой процесс без синхронизации;
+	//   - Add - простой процесс (функции запуска/остановки) без синхронизации;
+	//   - AddProcess - процесс через интерфейс Process, без синхронизации;
 	//   - AddFirstProcess - первый процесс, от которого зависят остальные;
 	//   - AddNextProcess - процесс, зависящий от запуска предыдущего процесса.
 	AppRunner struct {
 		runner       ProcessRunner
-		logger       mrlog.Logger
-		traceManager mrtrace.ContextManager
+		logger       logger
+		traceManager traceManager
+	}
+
+	logger interface {
+		Info(ctx context.Context, msg string, args ...any)
+		Error(ctx context.Context, msg string, args ...any)
+	}
+
+	traceManager interface {
+		WithGeneratedProcessID(ctx context.Context, key string) context.Context
 	}
 )
 
 // NewAppRunner - создаёт менеджер запуска процессов.
-func NewAppRunner(runner ProcessRunner, logger mrlog.Logger, traceManager mrtrace.ContextManager) *AppRunner {
+func NewAppRunner(runner ProcessRunner, logger logger, traceManager traceManager) *AppRunner {
 	return &AppRunner{
 		runner:       runner,
 		logger:       logger,
