@@ -4,11 +4,14 @@ const (
 	// PrivilegePublic - привилегия для всех.
 	PrivilegePublic = "public"
 
-	// PermissionAnyUser - разрешение для любого пользователя.
+	// PermissionAnyUser - разрешение для любого авторизованного пользователя.
 	PermissionAnyUser = "any-user"
 
 	// PermissionGuestOnly - разрешение только для гостя.
 	PermissionGuestOnly = "guest-only"
+
+	// PermissionEveryone - разрешение для всех.
+	PermissionEveryone = "everyone"
 )
 
 type (

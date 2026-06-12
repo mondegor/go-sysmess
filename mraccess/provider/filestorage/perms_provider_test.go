@@ -41,13 +41,18 @@ func TestNewPermsProvider(t *testing.T) {
 	writeRole(t, dir, "admin", []string{"users.manage"}, []string{"orders.edit"})
 	writeRole(t, dir, "manager", []string{"orders.manage"}, nil)
 
-	provider, err := filestorage.NewPermsProvider(dir, []string{"admin", "manager"})
+	provider, err := filestorage.NewPermsProvider(dir, []string{"admin", "manager"}, []string{"any-user", "everyone"})
 	require.NoError(t, err)
 
-	// права роли = объединение её привилегий и разрешений (B-single)
+	// права роли = объединение её привилегий, разрешений и системных разрешений,
+	// переданных в NewPermsProvider и выдаваемых каждой роли автоматически
 	rights, ok := provider.RoleRights("admin")
 	require.True(t, ok)
-	assert.ElementsMatch(t, []string{"users.manage", "orders.edit"}, rights)
+	assert.ElementsMatch(
+		t,
+		[]string{"users.manage", "orders.edit", "any-user", "everyone"},
+		rights,
+	)
 
 	_, ok = provider.RoleRights("unknown-role")
 	assert.False(t, ok)
@@ -60,7 +65,7 @@ func TestPermsProvider_IsRegistered(t *testing.T) {
 	writeRole(t, dir, "admin", []string{"users.manage"}, []string{"orders.edit"})
 	writeRole(t, dir, "manager", []string{"orders.manage"}, nil)
 
-	provider, err := filestorage.NewPermsProvider(dir, []string{"admin", "manager"})
+	provider, err := filestorage.NewPermsProvider(dir, []string{"admin", "manager"}, []string{"any-user", "everyone"})
 	require.NoError(t, err)
 
 	type testCase struct {
@@ -73,6 +78,8 @@ func TestPermsProvider_IsRegistered(t *testing.T) {
 		{"privilege of admin", "users.manage", true},
 		{"permission of admin", "orders.edit", true},
 		{"privilege of manager", "orders.manage", true},
+		{"system permission any-user", "any-user", true},
+		{"system permission everyone", "everyone", true},
 		{"unregistered right (fail-closed)", "billing.manage", false},
 		{"empty name", "", false},
 	}
@@ -92,7 +99,7 @@ func TestNewPermsProvider_Errors(t *testing.T) {
 	t.Run("empty roles", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := filestorage.NewPermsProvider(t.TempDir(), nil)
+		_, err := filestorage.NewPermsProvider(t.TempDir(), nil, nil)
 		require.ErrorContains(t, err, "roles is required")
 	})
 
@@ -102,14 +109,14 @@ func TestNewPermsProvider_Errors(t *testing.T) {
 		dir := t.TempDir()
 		writeRole(t, dir, "admin", []string{"x"}, nil)
 
-		_, err := filestorage.NewPermsProvider(dir, []string{"admin", "admin"})
+		_, err := filestorage.NewPermsProvider(dir, []string{"admin", "admin"}, nil)
 		require.ErrorContains(t, err, "duplicate role")
 	})
 
 	t.Run("missing role file", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := filestorage.NewPermsProvider(t.TempDir(), []string{"ghost"})
+		_, err := filestorage.NewPermsProvider(t.TempDir(), []string{"ghost"}, nil)
 		require.Error(t, err)
 	})
 }

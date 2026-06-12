@@ -21,7 +21,8 @@ type (
 // Параметры:
 //   - dirPath - путь к каталогу с файлами ролей;
 //   - roles - список имён ролей.
-func NewPermsProvider(dirPath string, roles []string) (*PermsProvider, error) {
+//   - systemPermissions - список разрешений, которые будут добавлены каждой роли.
+func NewPermsProvider(dirPath string, roles, systemPermissions []string) (*PermsProvider, error) {
 	if len(roles) == 0 {
 		return nil, errors.New("roles is required")
 	}
@@ -41,11 +42,12 @@ func NewPermsProvider(dirPath string, roles []string) (*PermsProvider, error) {
 			return nil, err
 		}
 
-		rights := make([]string, 0, len(fileCfg.Privileges)+len(fileCfg.Permissions))
+		rights := make([]string, 0, len(fileCfg.Privileges)+len(fileCfg.Permissions)+len(systemPermissions))
 		rights = append(rights, fileCfg.Privileges...)
 		rights = append(rights, fileCfg.Permissions...)
+		rights = append(rights, systemPermissions...)
 
-		p.roleRights[roleName] = rights
+		p.roleRights[roleName] = rights // TODO: нужно избавиться от дублей
 
 		for _, right := range rights {
 			p.registered[right] = struct{}{}

@@ -3,6 +3,7 @@ package mraccess
 import (
 	"strings"
 
+	"github.com/mondegor/go-sysmess/mraccess"
 	"github.com/mondegor/go-sysmess/mraccess/provider/filestorage"
 	"github.com/mondegor/go-sysmess/mrlog"
 )
@@ -18,7 +19,10 @@ func InitPermsProvider(
 ) (*filestorage.PermsProvider, error) {
 	mrlog.Info(logger, "Create and init roles and permissions for app")
 
-	provider, err := filestorage.NewPermsProvider(rolesDirPath, roles)
+	// системные разрешения, выдаваемые каждой роли автоматически
+	systemPermissions := []string{mraccess.PermissionAnyUser, mraccess.PermissionEveryone}
+
+	provider, err := filestorage.NewPermsProvider(rolesDirPath, roles, systemPermissions)
 	if err != nil {
 		return nil, err
 	}
