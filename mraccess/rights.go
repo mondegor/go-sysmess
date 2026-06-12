@@ -12,31 +12,22 @@ const (
 )
 
 type (
-	// RightsChecker - проверяет наличие указанных привилегий и разрешений
-	// у сущности (пользователя, роли и т.д.).
+	// RightsChecker - проверяет, обладает ли сущность (пользователь, группа ролей и т.д.)
+	// указанным правом. Используется в момент запроса (request-время).
 	RightsChecker interface {
-		HasPrivilege(name string) bool
-		HasPermission(name string) bool
+		Has(name string) bool
 	}
 
-	// RightsSource - предоставляет методы для получения ролей,
-	// разрешений и привилегий, а также их проверки.
-	// Используется как центральный источник информации о правах доступа.
-	RightsSource interface {
-		RightsChecker
-
-		// RoleIDsByNames - возвращает ID ролей по их именам.
-		RoleIDsByNames(roles []string) []uint16
-
-		// RoleIDsByPrivilege - возвращает ID всех ролей, обладающих указанной привилегией.
-		RoleIDsByPrivilege(name string) []uint16
-
-		// RoleIDsByPermission - возвращает ID всех ролей, обладающих указанным разрешением.
-		RoleIDsByPermission(name string) []uint16
+	// RightsRegistry - проверяет, зарегистрировано ли указанное право (привилегия
+	// или разрешение) в системе. Используется при инициализации (init-время).
+	// Сигнатура намеренно отличается от RightsChecker: это разные вопросы
+	// («обладает ли» vs «зарегистрировано ли»), и разные имена методов не дают
+	// случайно подменить один контракт другим.
+	RightsRegistry interface {
+		IsRegistered(name string) bool
 	}
 
-	// RightsGetter - возвращает объект для проверки привилегий
-	// и разрешений для указанной группы.
+	// RightsGetter - возвращает объект проверки прав для указанной группы ролей.
 	RightsGetter interface {
 		// Rights - возвращает RightsChecker для указанной группы.
 		Rights(group string) RightsChecker

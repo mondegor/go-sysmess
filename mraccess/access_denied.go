@@ -6,12 +6,7 @@ type (
 	accessDenied struct{}
 )
 
-// HasPrivilege - всегда сообщает что привилегия отсутствует.
-func (accessDenied) HasPrivilege(_ string) bool {
-	return false
-}
-
-// HasPermission - всегда сообщает что разрешение отсутствует.
-func (accessDenied) HasPermission(_ string) bool {
+// Has - всегда сообщает, что право отсутствует.
+func (accessDenied) Has(_ string) bool {
 	return false
 }

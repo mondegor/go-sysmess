@@ -1,44 +1,30 @@
 package filestorage
 
+import (
+	"maps"
+	"slices"
+)
+
 type (
-	// PermsProviderInfo - информация о зарегистрированных ролях, привилегиях и разрешениях.
+	// PermsProviderInfo - информация о зарегистрированных ролях и правах.
 	// Используется для отладки и отображения в консоли.
+	// Привилегии и разрешения объединены в единый отсортированный список Rights
+	// (см. PermsProvider - они являются одним концептом права).
 	PermsProviderInfo struct {
-		Roles       []string
-		Privileges  []string
-		Permissions []string
+		Roles  []string
+		Rights []string
 	}
 )
 
 // ExtractProviderInfo - извлекает данные PermsProviderInfo из PermsProvider.
+// Списки отсортированы для детерминированного вывода.
 func ExtractProviderInfo(provider *PermsProvider) PermsProviderInfo {
 	if provider == nil {
 		return PermsProviderInfo{}
 	}
 
 	return PermsProviderInfo{
-		Roles:       registeredRoles(provider.roles),
-		Privileges:  registeredPermissions(provider.privileges),
-		Permissions: registeredPermissions(provider.permissions),
+		Roles:  slices.Sorted(maps.Keys(provider.roleRights)),
+		Rights: slices.Sorted(maps.Keys(provider.registered)),
 	}
-}
-
-func registeredRoles(roles map[string]uint16) []string {
-	list := make([]string, 0, len(roles))
-
-	for name := range roles {
-		list = append(list, name)
-	}
-
-	return list
-}
-
-func registeredPermissions(permissions map[string][]uint16) []string {
-	list := make([]string, 0, len(permissions))
-
-	for name := range permissions {
-		list = append(list, name)
-	}
-
-	return list
 }

@@ -39,13 +39,13 @@ func NewUserProviderGroup(providers []TypedUserProvider, typeByTokenFunc func(va
 // UserByToken - возвращает пользователя по указанному токену авторизации
 // с привязанными к нему привилегиями и разрешениями.
 // Определяет тип провайдера через typeByTokenFunc и делегирует запрос соответствующему провайдеру.
-func (co *userProviderGroup) UserByToken(ctx context.Context, value string) (User, error) {
+func (g *userProviderGroup) UserByToken(ctx context.Context, value string) (User, error) {
 	if value == "" {
 		return nil, errors.New("userProviderGroup: token value is empty")
 	}
 
-	if tp := co.typeByTokenFunc(value); tp != "" {
-		if provider, ok := co.type2provider[tp]; ok {
+	if tp := g.typeByTokenFunc(value); tp != "" {
+		if provider, ok := g.type2provider[tp]; ok {
 			return provider.UserByToken(ctx, value)
 		}
 	}

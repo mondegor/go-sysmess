@@ -52,12 +52,7 @@ func (u *entryUser) LangCode() string {
 	return u.langCode
 }
 
-// HasPrivilege - сообщает о наличии указанной привилегии у пользователя.
-func (u *entryUser) HasPrivilege(name string) bool {
-	return u.rights.HasPrivilege(name)
-}
-
-// HasPermission - сообщает о наличии указанного разрешения у пользователя.
-func (u *entryUser) HasPermission(name string) bool {
-	return u.rights.HasPermission(name)
+// Has - сообщает о наличии указанного права у пользователя.
+func (u *entryUser) Has(name string) bool {
+	return u.rights.Has(name)
 }
