@@ -1,11 +1,21 @@
-package suint64
+package ordered
 
-import "slices"
+import (
+	"slices"
+)
 
-// FilterFunc - фильтрует слайс uint64 на месте (без выделения нового слайса).
+type (
+	ordered interface {
+		~int | ~int8 | ~int16 | ~int32 | ~int64 |
+			~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 |
+			~string
+	}
+)
+
+// FilterFunc - фильтрует слайс целых/строк на месте (без выделения нового слайса).
 // Удаляет элементы, для которых check возвращает false.
 // Возвращает усечённый слайс.
-func FilterFunc(s []uint64, check func(el uint64) bool) []uint64 {
+func FilterFunc[T ordered](s []T, check func(el T) bool) []T {
 	for i := 0; i < len(s); i++ {
 		if check(s[i]) {
 			continue
@@ -27,16 +37,23 @@ func FilterFunc(s []uint64, check func(el uint64) bool) []uint64 {
 	return s
 }
 
-// SortedUnique - возвращает уникальный отсортированный массив элементов (не копию).
-func SortedUnique(s []uint64) []uint64 {
+// SortedUnique - сортирует переданный слайс на месте и возвращает его срез
+// без дубликатов (без выделения нового массива).
+func SortedUnique[T ordered](s []T) []T {
 	slices.Sort(s)
 
 	return slices.Compact(s)
 }
 
+// SortedUniqueClone - возвращает новый отсортированный слайс без дубликатов;
+// исходный слайс не изменяется.
+func SortedUniqueClone[T ordered](s []T) []T {
+	return SortedUnique(slices.Clone(s))
+}
+
 // BinaryIndex - возвращает индекс массива, где содержится указанный элемент массива.
 // Указанный массив обязан быть предварительно отсортирован.
-func BinaryIndex(s []uint64, value uint64) int {
+func BinaryIndex[T ordered](s []T, value T) int {
 	i := binaryIndex(s, value)
 
 	if i == -1 || s[i] != value {
@@ -48,24 +65,24 @@ func BinaryIndex(s []uint64, value uint64) int {
 
 // BinaryContains - сообщает, содержится ли указанный элемент в массиве.
 // Указанный массив обязан быть предварительно отсортирован.
-func BinaryContains(s []uint64, value uint64) bool {
+func BinaryContains[T ordered](s []T, value T) bool {
 	return BinaryIndex(s, value) >= 0
 }
 
 // BinaryAppend - добавляет элемент в массив оставляя последний отсортированным.
 // Указанный массив обязан быть предварительно отсортирован.
-func BinaryAppend(s []uint64, value uint64) []uint64 {
+func BinaryAppend[T ordered](s []T, value T) []T {
 	return binaryAppend(s, value, false)
 }
 
 // UniqueBinaryAppend - добавляет элемент в массив, если такого ещё не было,
 // оставляя массив отсортированным.
 // Указанный массив обязан быть предварительно отсортирован.
-func UniqueBinaryAppend(s []uint64, value uint64) []uint64 {
+func UniqueBinaryAppend[T ordered](s []T, value T) []T {
 	return binaryAppend(s, value, true)
 }
 
-func binaryAppend(s []uint64, value uint64, unique bool) []uint64 {
+func binaryAppend[T ordered](s []T, value T, unique bool) []T {
 	i := binaryIndex(s, value)
 
 	if unique && i != -1 && value == s[i] {
@@ -76,14 +93,16 @@ func binaryAppend(s []uint64, value uint64, unique bool) []uint64 {
 		return append(s, value)
 	}
 
-	c := append(s, 0) //nolint:gocritic
+	var zero T
+
+	c := append(s, zero) //nolint:gocritic
 	copy(c[i+1:], s[i:])
 	c[i] = value
 
 	return c
 }
 
-func binaryIndex(s []uint64, value uint64) int {
+func binaryIndex[T ordered](s []T, value T) int {
 	i, j := 0, len(s)
 
 	for i < j {

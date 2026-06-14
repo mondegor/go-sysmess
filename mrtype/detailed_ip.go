@@ -16,6 +16,19 @@ type (
 	}
 )
 
+// NewIP - создаёт DetailedIP из числового представления IPv4.
+// Параметры:
+//   - realIP - числовое представление реального IP клиента;
+//
+// Если аргумент равен 0, поле Real остаётся nil.
+func NewIP(realIP uint32) (ip DetailedIP) {
+	if realIP > 0 {
+		ip.Real = castUint2ip(realIP)
+	}
+
+	return ip
+}
+
 // NewDetailedIP - создаёт DetailedIP из числовых представлений IPv4.
 // Параметры:
 //   - realIP - числовое представление реального IP клиента;
@@ -35,18 +48,25 @@ func NewDetailedIP(realIP, proxyIP uint32) (ip DetailedIP) {
 }
 
 // String - возвращает IP-адреса в виде строки.
-// Формат: "real" или "real, proxy" (если proxy задан).
-func (ip *DetailedIP) String() string {
+// Формат: "real" или "real, proxy" (если proxy задан). Пустой IP даёт пустую строку.
+// Если задан только proxy, real подставляется как "0" ("0, proxy").
+func (ip DetailedIP) String() string {
+	realStr := ipToString(ip.Real)
+
 	if len(ip.Proxy) == 0 || ip.Proxy.IsUnspecified() {
-		return ip.Real.String()
+		return realStr
 	}
 
-	return ip.Real.String() + ", " + ip.Proxy.String()
+	if realStr == "" {
+		realStr = "0"
+	}
+
+	return realStr + ", " + ipToString(ip.Proxy)
 }
 
 // ToUint - преобразует IP-адреса в числовое представление (uint32).
 // Возвращает ошибку, если IP не является IPv4 или имеет неверную длину.
-func (ip *DetailedIP) ToUint() (realIP, proxyIP uint32, err error) {
+func (ip DetailedIP) ToUint() (realIP, proxyIP uint32, err error) {
 	realIP, err = castIP2uint(ip.Real)
 	if err != nil {
 		return 0, 0, fmt.Errorf("mrtype.ToUint: %w", err)
@@ -87,4 +107,13 @@ func castUint2ip(number uint32) net.IP {
 	binary.BigEndian.PutUint32(ip, number)
 
 	return ip
+}
+
+// ipToString - возвращает строковое представление IP или "" для пустого адреса.
+func ipToString(ip net.IP) string {
+	if len(ip) == 0 {
+		return ""
+	}
+
+	return ip.String()
 }
