@@ -37,7 +37,7 @@ func TestUserProviderGroup_UserByToken(t *testing.T) {
 	getter, err := mraccess.NewRolesGroupSet(testGroups(), testSource())
 	require.NoError(t, err)
 
-	dbUser := mraccess.NewUser([16]byte{1}, "administrators", "en", getter)
+	dbUser := mraccess.NewUser([16]byte{1}, "administrators", "", "en", getter)
 	providerErr := errors.New("jwt provider failed")
 
 	providers := []mraccess.TypedUserProvider{

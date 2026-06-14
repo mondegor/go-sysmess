@@ -81,6 +81,12 @@ by `.golangci.yaml` (`golangci-lint` runs strict — `make lint` must pass befor
 - Sentinel errors prefixed `Err`, error *types* suffixed `Error` (`errname`).
   Note: error *codes* are camelCase string literals (e.g. `"errSomethingFailed"`).
 - Initialisms via `revive var-naming`: `HTTP`, `JSON` (not `Http`/`Json`).
+- **Layer-based entity & method naming.** In the `usecase`/`service` layers, name domain
+  entity values `item` / `items` and give methods **business-intent** names that describe
+  the operation in domain terms. In the `repository` layer, name DB-row values
+  `row` / `rows` and give methods **technical CRUD** names (`Insert`, `Update`, `Delete`,
+  `Fetch`, …). The split keeps domain vocabulary in the upper layers and data-access
+  vocabulary at the storage boundary.
 - Import aliases lowercase `^[a-z][a-z0-9]*$`; no redundant aliases.
 - `staticcheck -ST1003` is off, so some naming rules are relaxed — still follow Go idiom.
 
@@ -160,6 +166,13 @@ by `.golangci.yaml` (`golangci-lint` runs strict — `make lint` must pass befor
 - For mocks use **only** `go.uber.org/mock/gomock`. Generate mocks with `mockgen`
   (`//go:generate mockgen ...`), drive expectations via `gomock.NewController(t)` and
   `EXPECT()`. Do **not** hand-write mocks or use any other mocking library.
+- **Put the `//go:generate mockgen ...` directives in the `_test.go` file that consumes
+  the mocks, not in the production source.** Mocks are test-only tooling, so the
+  directives belong with the tests; place them right after the import block of the
+  package's test file. `go generate` runs per-directory, so `-source=foo.go` (and the
+  `-destination=mock/...` paths) still resolve correctly from the test file. When one
+  directory has several source files generating mocks, group all their directives in the
+  single package test file (e.g. `session_test.go`).
 - **Always generate mocks into a nested `mock/` directory next to the consuming package**
   (`package mock`, e.g. `service/session/mock/`), one `mock/` per package that owns/consumes
   the interfaces — never into `*_mock_test.go` in the test package. The external `_test`
