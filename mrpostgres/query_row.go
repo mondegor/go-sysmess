@@ -13,6 +13,8 @@ type (
 )
 
 // Scan - извлекает значения из одной записи результата запроса.
+// Возвращает ErrEventStorageNoRecordFound - если запись не найдена,
+// и ErrInternalStorageFetchDataFailed - если записей более одной.
 func (qr *queryRow) Scan(dest ...any) error {
 	if err := qr.row.Scan(dest...); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

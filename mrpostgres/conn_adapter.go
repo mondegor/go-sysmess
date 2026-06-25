@@ -66,6 +66,11 @@ func New() *ConnAdapter {
 }
 
 // Connect - создаёт пул соединений PostgreSQL по указанным опциям.
+// Может возвращать следующие ошибки:
+//   - ErrInternalStorageConnectionIsAlreadyCreated - если пул уже создан;
+//   - ошибку pgxpool.ParseConfig - если DSN некорректен;
+//   - ошибку "max pool size is incorrect" - если размер пула вне допустимого диапазона;
+//   - ErrSystemStorageConnectionFailed - если не удалось создать пул соединений.
 func (c *ConnAdapter) Connect(ctx context.Context, opts Options) error {
 	if c.pool != nil {
 		return errors.ErrInternalStorageConnectionIsAlreadyCreated.New("source", connectionName)
@@ -130,6 +135,8 @@ func (c *ConnAdapter) Connect(ctx context.Context, opts Options) error {
 }
 
 // Ping - проверяет работоспособность пула соединений PostgreSQL.
+// Возвращает ErrInternalStorageConnectionIsNotOpened - если пул не открыт,
+// или ErrSystemStorageConnectionFailed - если ping не прошёл.
 func (c *ConnAdapter) Ping(ctx context.Context) error {
 	if c.pool == nil {
 		return errors.ErrInternalStorageConnectionIsNotOpened.New("source", connectionName)
@@ -152,6 +159,7 @@ func (c *ConnAdapter) Ping(ctx context.Context) error {
 // HijackConn - извлекает соединение из пула для независимого использования.
 // Возвращённое соединение не управляется пулом и должно быть закрыто вызывающей стороной.
 // Полезно для длительного использования соединения (например: LISTEN/NOTIFY).
+// Возвращает ErrSystemStorageConnectionFailed - если не удалось получить соединение из пула.
 func (c *ConnAdapter) HijackConn(ctx context.Context) (*pgx.Conn, error) {
 	conn, err := c.pool.Acquire(ctx)
 	if err != nil {
@@ -162,6 +170,7 @@ func (c *ConnAdapter) HijackConn(ctx context.Context) (*pgx.Conn, error) {
 }
 
 // Cli - возвращает нативный пул соединений pgx для прямого доступа к API.
+// Возвращает ErrInternalStorageConnectionIsNotOpened, если пул не открыт.
 func (c *ConnAdapter) Cli() (*pgxpool.Pool, error) {
 	if c.pool == nil {
 		return nil, errors.ErrInternalStorageConnectionIsNotOpened.New("source", connectionName)
@@ -171,6 +180,7 @@ func (c *ConnAdapter) Cli() (*pgxpool.Pool, error) {
 }
 
 // Close - закрывает пул соединений.
+// Возвращает ErrInternalStorageConnectionIsNotOpened, если пул не открыт.
 func (c *ConnAdapter) Close() error {
 	if c.pool == nil {
 		return errors.ErrInternalStorageConnectionIsNotOpened.New("source", connectionName)
@@ -202,6 +212,20 @@ func (c *ConnAdapter) QueryRow(ctx context.Context, sql string, args ...any) mrs
 }
 
 // Exec - отправляет SQL запрос к БД и исполняет его.
+// Возвращает ErrEventStorageRecordsNotAffected,
+// если команда Insert/Update/Delete не затронула ни одной строки.
 func (c *ConnAdapter) Exec(ctx context.Context, sql string, args ...any) error {
 	return wrapErrorCommandTag(c.pool.Exec(ctx, sql, args...))
+}
+
+// ExecRow - отправляет SQL запрос к БД и исполняет его, ожидая ровно одну затронутую запись.
+// Возвращает ErrEventStorageNoRecordFound, если не затронуто ни одной записи,
+// или ErrInternalStorageQueryFailed, если затронуто более одной.
+func (c *ConnAdapter) ExecRow(ctx context.Context, sql string, args ...any) error {
+	return wrapErrorExecRow(c.pool.Exec(ctx, sql, args...))
+}
+
+// ExecAffected - отправляет SQL-запрос к БД, исполняет его и возвращает число затронутых строк.
+func (c *ConnAdapter) ExecAffected(ctx context.Context, sql string, args ...any) (count int, err error) {
+	return wrapErrorExecAffected(c.pool.Exec(ctx, sql, args...))
 }

@@ -24,6 +24,8 @@ type (
 		Query(ctx context.Context, sql string, args ...any) (DBQueryRows, error)
 		QueryRow(ctx context.Context, sql string, args ...any) DBQueryRow
 		Exec(ctx context.Context, sql string, args ...any) error
+		ExecRow(ctx context.Context, sql string, args ...any) error
+		ExecAffected(ctx context.Context, sql string, args ...any) (count int, err error)
 	}
 
 	// DBQueryRows - результат SQL-запроса в виде списка записей.

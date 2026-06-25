@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 
-	"github.com/mondegor/go-sysmess/errors"
 	"github.com/mondegor/go-sysmess/mrstorage"
 )
 
@@ -35,16 +34,11 @@ func NewRowSoftDeleter[RowID any](
 
 // Delete - помечает указанную запись как удалённую, если она существует и не была удалена ранее.
 func (re RowSoftDeleter[RowID]) Delete(ctx context.Context, id RowID) error {
-	err := re.client.Conn(ctx).Exec(
+	return re.client.Conn(ctx).ExecRow(
 		ctx,
 		re.sqlSoftDeleteRow,
 		id,
 	)
-	if err != nil && errors.Is(err, errors.ErrEventStorageRecordsNotAffected) {
-		return errors.ErrEventStorageNoRecordFound
-	}
-
-	return err
 }
 
 func prepareSQLSoftDeleteRow(tableName, fieldKeyName, fieldVersionName, fieldDeletedName string) string {

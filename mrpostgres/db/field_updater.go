@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 
-	"github.com/mondegor/go-sysmess/errors"
 	"github.com/mondegor/go-sysmess/mrstorage"
 )
 
@@ -42,17 +41,12 @@ func (re FieldUpdater[RowID, FieldValue]) Fetch(ctx context.Context, id RowID) (
 // Update - обновляет значение поля указанной записи в таблице.
 // Автоматически устанавливает updated_at = NOW().
 func (re FieldUpdater[RowID, FieldValue]) Update(ctx context.Context, id RowID, value FieldValue) error {
-	err := re.fetcher.client.Conn(ctx).Exec(
+	return re.fetcher.client.Conn(ctx).ExecRow(
 		ctx,
 		re.sqlUpdateValue,
 		id,
 		value,
 	)
-	if err != nil && errors.Is(err, errors.ErrEventStorageRecordsNotAffected) {
-		return errors.ErrEventStorageNoRecordFound
-	}
-
-	return err
 }
 
 func prepareSQLUpdateFieldValue(tableName, fieldKeyName, fieldName, fieldDeletedName string) string {
