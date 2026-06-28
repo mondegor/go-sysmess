@@ -8,4 +8,7 @@ var (
 	// ErrEventStorageRecordsNotAffected - записи не затронуты.
 	// В хранилище данных указанная запись не была обновлена, в зависимости от логики это может быть не ошибкой.
 	ErrEventStorageRecordsNotAffected = New("records not affected")
+
+	// ErrEventRecordAlreadyExists - такая запись уже существует.
+	ErrEventRecordAlreadyExists = New("record already exists")
 )
