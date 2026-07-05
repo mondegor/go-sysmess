@@ -2,81 +2,83 @@ package gotext
 
 import (
 	"errors"
+	"maps"
+	"slices"
 
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
-	"golang.org/x/text/message/catalog"
 )
 
 type (
-	// Provider - локализатор сообщений построенный на библиотеке gotext.
+	// Provider - провайдер локализации, построенный на golang.org/x/text/message.
+	// Поддерживает несколько доменов и языков, используя каталоги переводов.
 	Provider struct {
-		domain2langCatalog map[string]map[language.Tag]*message.Printer
 		defaultPrinter     *message.Printer
 		domains            []string
 		languages          []language.Tag
-	}
-
-	options struct {
-		domains   []string
-		catalogs  []catalog.Catalog
-		languages []language.Tag
+		domain2langCatalog map[string]map[language.Tag]*message.Printer
 	}
 )
 
-// NewProvider - создаёт объект Provider.
-func NewProvider(opts ...Option) (*Provider, error) {
+// NewProvider - создаёт Provider локализации сообщений.
+// Параметры:
+//   - languages - список языков для которых будет настроена локализация;
+//   - opts - опции для добавления каталогов переводов через WithDomainCatalog;
+//
+// Первый язык в списке становится языком по умолчанию.
+func NewProvider(
+	languages []language.Tag,
+	opts ...Option,
+) (*Provider, error) {
 	o := options{}
 
 	for _, opt := range opts {
 		opt(&o)
 	}
 
-	if len(o.languages) == 0 {
-		return nil, errors.New("gotext provider:opts.Languages is required")
-	}
-
-	if len(o.catalogs) == 0 {
-		return nil, errors.New("gotext provider:opts.Catalogs is required")
+	if len(languages) == 0 {
+		return nil, errors.New("gotext provider:languages is required")
 	}
 
 	p := &Provider{
-		domain2langCatalog: make(map[string]map[language.Tag]*message.Printer, len(o.domains)),
-		defaultPrinter:     message.NewPrinter(o.languages[0]),
+		defaultPrinter: message.NewPrinter(languages[0]),
 	}
 
-	for i, domain := range o.domains {
-		p.domain2langCatalog[domain] = make(map[language.Tag]*message.Printer, len(o.languages))
+	if len(o.domains) == 0 {
+		return p, nil
+	}
 
-		for _, lang := range o.languages {
+	p.domain2langCatalog = make(map[string]map[language.Tag]*message.Printer, len(o.domains))
+
+	for i, domain := range o.domains {
+		p.domain2langCatalog[domain] = make(map[language.Tag]*message.Printer, len(languages))
+
+		for _, lang := range languages {
 			p.domain2langCatalog[domain][lang] = message.NewPrinter(lang, message.Catalog(o.catalogs[i]))
 		}
 	}
 
 	// uniq domains
-	for domain := range p.domain2langCatalog {
-		p.domains = append(p.domains, domain)
-	}
+	p.domains = slices.Collect(maps.Keys(p.domain2langCatalog))
 
 	// uniq languages
-	for lang := range p.domain2langCatalog[o.domains[0]] {
-		p.languages = append(p.languages, lang)
-	}
+	p.languages = slices.Collect(maps.Keys(p.domain2langCatalog[o.domains[0]]))
 
 	return p, nil
 }
 
-// Domains - возвращает список используемых доменов.
+// Domains - возвращает список доступных доменов для локализации.
 func (p *Provider) Domains() []string {
 	return p.domains
 }
 
-// Languages - возвращает список используемых языков.
+// Languages - возвращает список поддерживаемых языков.
 func (p *Provider) Languages() []language.Tag {
 	return p.languages
 }
 
 // Localize - возвращает локализованное сообщение с подставленными аргументами.
+// Если для указанной пары domain/lang не найден каталог, используется язык по умолчанию.
 func (p *Provider) Localize(domain string, lang language.Tag, msg string, args []any) string {
 	printer := p.defaultPrinter
 

@@ -1,28 +1,28 @@
 package slog
 
 import (
-	"log/slog"
+	stdlog "log/slog"
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrlog"
+	"github.com/mondegor/go-sysmess/mrlog/level"
 )
 
-func handlerOptions(opts options) *slog.HandlerOptions {
-	return &slog.HandlerOptions{
-		Level: slog.Level(opts.level),
-		ReplaceAttr: func(_ []string, attr slog.Attr) slog.Attr {
+func handlerOptions(opts options) *stdlog.HandlerOptions {
+	return &stdlog.HandlerOptions{
+		Level: stdlog.Level(opts.level),
+		ReplaceAttr: func(_ []string, attr stdlog.Attr) stdlog.Attr {
 			attr = opts.replaceAttr(attr)
 
-			switch {
-			case attr.Key == slog.TimeKey:
+			switch attr.Key {
+			case stdlog.TimeKey:
 				if tm, ok := attr.Value.Any().(time.Time); ok {
-					attr.Value = slog.StringValue(tm.Format(opts.timeFormat))
+					attr.Value = stdlog.StringValue(tm.Format(opts.timeFormat))
 				}
 
-			case attr.Key == slog.LevelKey:
-				if lv, ok := attr.Value.Any().(slog.Level); ok {
-					if lv < slog.LevelInfo || lv > slog.LevelError {
-						attr.Value = slog.StringValue(mrlog.Level(lv).String())
+			case stdlog.LevelKey:
+				if lv, ok := attr.Value.Any().(stdlog.Level); ok {
+					if lv < stdlog.LevelInfo || lv > stdlog.LevelError {
+						attr.Value = stdlog.StringValue(level.Enum(lv).String())
 					}
 				}
 			}

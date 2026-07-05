@@ -13,14 +13,16 @@ const (
 )
 
 type (
-	// Templater - шаблонизатор на основе html/template для рендеринга сообщений с параметрами.
+	// Templater - шаблонизатор сообщений на основе html/template.
+	// Позволяет использовать синтаксис Go-шаблонов для подстановки параметров.
 	Templater struct {
 		leftDelim  string
 		rightDelim string
 	}
 )
 
-// NewTemplater - создаёт объект Templater.
+// NewTemplater - создаёт Templater с указанными ограничителями.
+// Если leftDelim или rightDelim пусты, используются значения по умолчанию: "{{" и "}}".
 func NewTemplater(leftDelim, rightDelim string) *Templater {
 	if leftDelim == "" {
 		leftDelim = leftDelimDefault
@@ -36,7 +38,10 @@ func NewTemplater(leftDelim, rightDelim string) *Templater {
 	}
 }
 
-// Render - возвращает сформированное сообщение с заменёнными его аргументами на указанные значения.
+// Render - формирует сообщение из шаблона, подставляя параметры из data.
+// Параметры:
+//   - message - шаблон с синтаксисом html/template;
+//   - data - карта имён параметров и их строковых значений;
 func (p *Templater) Render(message string, data map[string]string) (string, error) {
 	var buf strings.Builder
 
@@ -47,8 +52,12 @@ func (p *Templater) Render(message string, data map[string]string) (string, erro
 	return buf.String(), nil
 }
 
-// RenderTo - записывает в указанный Writer сформированное сообщение
-// с заменёнными его аргументами на указанные значения.
+// RenderTo - записывает сформированное сообщение из шаблона в io.Writer.
+// Параметры:
+//   - message - шаблон с синтаксисом html/template;
+//   - data - карта имён параметров и их строковых значений;
+//
+// Если сообщение не содержит ограничителей, записывается как есть без парсинга.
 func (p *Templater) RenderTo(wr io.Writer, message string, data map[string]string) error {
 	if message == "" {
 		return nil
@@ -62,11 +71,11 @@ func (p *Templater) RenderTo(wr io.Writer, message string, data map[string]strin
 
 	t, err := template.New("").Delims(p.leftDelim, p.rightDelim).Parse(message)
 	if err != nil {
-		return fmt.Errorf("parse message '%s' error: %w", message, err)
+		return fmt.Errorf("parse message '%s': %w", message, err)
 	}
 
 	if err = t.Execute(wr, data); err != nil {
-		return fmt.Errorf("render message '%s' error: %w", message, err)
+		return fmt.Errorf("render message '%s': %w", message, err)
 	}
 
 	return nil

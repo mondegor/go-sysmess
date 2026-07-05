@@ -5,22 +5,28 @@ import (
 	"time"
 
 	"github.com/mondegor/go-sysmess/mrlock"
-	"github.com/mondegor/go-sysmess/mrtrace"
 )
 
 const (
-	nopLockerName = "NopLocker"
+	// lockerName - имя блокировщика для логирования и трассировки.
+	lockerName = "NopLocker"
 )
 
 type (
-	// Locker - заглушка реализующая интерфейс блокировщика указанного ключа.
+	// Locker - заглушка, реализующая интерфейс блокировщика ключа.
+	// Не выполняет реальной блокировки, только логирует операции через tracer.
+	// Полезен для тестирования и в средах, где блокировка не требуется.
 	Locker struct {
-		tracer mrtrace.Tracer
+		tracer tracer
+	}
+
+	tracer interface {
+		Trace(ctx context.Context, args ...any)
 	}
 )
 
-// New - создаёт объект Locker.
-func New(tracer mrtrace.Tracer) *Locker {
+// New - создаёт объект Locker-заглушку, не выполняющую реальной блокировки.
+func New(tracer tracer) *Locker {
 	return &Locker{
 		tracer: tracer,
 	}
@@ -46,10 +52,11 @@ func (l *Locker) LockWithExpiry(ctx context.Context, key string, expiry time.Dur
 	}, nil
 }
 
+// traceCmd - логирует выполняемую операцию блокировки для трассировки.
 func (l *Locker) traceCmd(ctx context.Context, command, key string) {
 	l.tracer.Trace(
 		ctx,
-		"source", nopLockerName,
+		"source", lockerName,
 		"cmd", command,
 		"key", key,
 	)

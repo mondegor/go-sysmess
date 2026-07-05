@@ -21,12 +21,14 @@ func Test_NewMessageFormatter(t *testing.T) {
 		},
 	)
 
-	tests := []struct {
+	type testCase struct {
 		name             string
 		message          string
 		wantMessage      string
 		wantPlaceholders []string
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:             "1",
 			message:          "",

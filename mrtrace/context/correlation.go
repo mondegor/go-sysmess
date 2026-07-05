@@ -8,12 +8,14 @@ type (
 	ctxCorrelationKey struct{}
 )
 
-// WithCorrelationID - возвращает контекст с установленным в него указанным идентификатором корреляции запроса.
+// WithCorrelationID - возвращает новый контекст с установленным ID корреляции запроса.
+// ID корреляции используется для связывания цепочки запросов между сервисами.
 func WithCorrelationID(ctx context.Context, correlationID string) context.Context {
 	return context.WithValue(ctx, ctxCorrelationKey{}, correlationID)
 }
 
-// CorrelationID - возвращает из контекста указанный идентификатор корреляции текущего запроса.
+// CorrelationID - извлекает ID корреляции из контекста.
+// Возвращает пустую строку, если ID не установлен.
 func CorrelationID(ctx context.Context) string {
 	if value, ok := ctx.Value(ctxCorrelationKey{}).(string); ok {
 		return value

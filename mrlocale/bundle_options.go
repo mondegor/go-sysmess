@@ -5,61 +5,62 @@ import (
 )
 
 type (
-	// BundleOption - настройка объекта Bundle.
-	BundleOption func(e *bundleOptions)
+	// BundleOption - функция-опция для настройки Bundle.
+	BundleOption func(o *bundleOptions)
+
+	bundleOptions struct {
+		createProvider  func(languages []language.Tag) (MessageProvider, error)
+		formatMessage   func(msg string, args []any) (newMsg string, newArgs []any)
+		formatError     func(err error) (msg string, args []any)
+		messagesDomain  string
+		errorsDomain    string
+		defaultLanguage string
+	}
 )
 
-// WithMessageProvider - устанавливает провайдер для локализации сообщений.
-func WithMessageProvider(createFunc func(langs []language.Tag) (MessageProvider, error)) BundleOption {
+// WithMessageProvider - задаёт фабрику для создания провайдера локализации сообщений.
+// Функция createFunc получает список языков и должна вернуть реализацию MessageProvider.
+func WithMessageProvider(createFunc func(languages []language.Tag) (MessageProvider, error)) BundleOption {
 	return func(o *bundleOptions) {
 		o.createProvider = createFunc
 	}
 }
 
-// WithFormatMessage - устанавливает функцию для подстановки значений аргументов в сообщения.
+// WithFormatMessage - задаёт функцию для предварительной обработки сообщения и аргументов
+// перед локализацией. Позволяет трансформировать сообщение и аргументы до передачи провайдеру.
 func WithFormatMessage(fn func(msg string, args []any) (newMsg string, newArgs []any)) BundleOption {
 	return func(o *bundleOptions) {
 		o.formatMessage = fn
 	}
 }
 
-// WithFormatError - устанавливает функцию для подстановки значений аргументов в сообщения об ошибках.
+// WithFormatError - задаёт функцию для извлечения сообщения и аргументов из ошибки.
+// Используется при локализации ошибок через TranslateError.
 func WithFormatError(fn func(err error) (msg string, args []any)) BundleOption {
 	return func(o *bundleOptions) {
 		o.formatError = fn
 	}
 }
 
-// WithMessagesDomain - устанавливает домен, который будет использоваться при локализации сообщений.
+// WithMessagesDomain - задаёт домен для локализации обычных сообщений (по умолчанию "messages").
 func WithMessagesDomain(value string) BundleOption {
 	return func(o *bundleOptions) {
-		if value != "" {
-			o.messagesDomain = value
-		}
+		o.messagesDomain = value
 	}
 }
 
-// WithErrorsDomain - устанавливает домен, который будет использоваться при локализации сообщений об ошибках.
+// WithErrorsDomain - задаёт домен для локализации сообщений об ошибках (по умолчанию "errors").
 func WithErrorsDomain(value string) BundleOption {
 	return func(o *bundleOptions) {
-		if value != "" {
-			o.errorsDomain = value
-		}
+		o.errorsDomain = value
 	}
 }
 
-// WithLanguages - добавляет языки для локализации сообщений.
-func WithLanguages(values ...string) BundleOption {
-	return func(o *bundleOptions) {
-		o.languages = append(o.languages, values...)
-	}
-}
-
-// WithDefaultLanguage - устанавливает язык по умолчанию.
+// WithDefaultLanguage - задаёт язык по умолчанию.
+// Если указанный язык не найден в списке поддерживаемых,
+// будет возвращена ошибка при создании Bundle.
 func WithDefaultLanguage(value string) BundleOption {
 	return func(o *bundleOptions) {
-		if value != "" {
-			o.defaultLanguage = value
-		}
+		o.defaultLanguage = value
 	}
 }

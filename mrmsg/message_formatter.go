@@ -5,14 +5,19 @@ import (
 )
 
 type (
-	// MessageFormatter - предназначен для форматирования аргументов сообщения.
+	// MessageFormatter - преобразует плейсхолдеры в сообщении в формат,
+	// подходящий для конкретного реплейсера (fmt.Sprintf, strings.Replacer и т.д.).
+	// Извлекает плейсхолдеры и преобразует каждый через пользовательскую функцию formatter.
 	MessageFormatter struct {
 		extractor *PlaceholderExtractor
 		formatter func(placeholder string, index int) (newPlaceholder string)
 	}
 )
 
-// NewMessageFormatter - создаёт объект MessageFormatter.
+// NewMessageFormatter - создаёт MessageFormatter для преобразования плейсхолдеров.
+// Параметры:
+//   - leftDelim, rightDelim - ограничители плейсхолдеров (например: "{{" и "}}");
+//   - formatter - функция преобразования плейсхолдера в новый формат, принимает исходный плейсхолдер и его индекс.
 func NewMessageFormatter(leftDelim, rightDelim string, formatter func(placeholder string, index int) (newPlaceholder string)) *MessageFormatter {
 	return &MessageFormatter{
 		extractor: NewPlaceholderExtractor(leftDelim, rightDelim),
@@ -20,8 +25,9 @@ func NewMessageFormatter(leftDelim, rightDelim string, formatter func(placeholde
 	}
 }
 
-// Format - возвращает шаблон сообщения с отформатированными аргументами подходящие
-// для конкретных реплейсеров аргументов сообщений.
+// Format - преобразует плейсхолдеры в сообщении в формат для целевого реплейсера.
+// Возвращает преобразованное сообщение и список новых плейсхолдеров.
+// Например: "{name}" → "%[1]s" для fmt.Sprintf.
 func (p *MessageFormatter) Format(message string) (formattedMessage string, newPlaceholders []string) {
 	placeholders := p.extractor.Extract(message)
 

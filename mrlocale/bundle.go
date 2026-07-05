@@ -14,8 +14,9 @@ const (
 )
 
 type (
-	// Bundle - загружает и транслирует сообщения, ошибки,
-	// справочники объектов на различные языки.
+	// Bundle - управляет локализацией сообщений, ошибок и справочников.
+	// Загружает переводы из провайдера, выбирает подходящий язык
+	// и форматирует сообщения с учётом переданных аргументов.
 	Bundle struct {
 		provider        MessageProvider
 		messagesDomain  string
@@ -25,20 +26,15 @@ type (
 		languageMatcher language.Matcher
 		defaultLanguage language.Tag
 	}
-
-	bundleOptions struct {
-		createProvider  func(langs []language.Tag) (MessageProvider, error)
-		formatMessage   func(msg string, args []any) (newMsg string, newArgs []any)
-		formatError     func(err error) (msg string, args []any)
-		messagesDomain  string
-		errorsDomain    string
-		languages       []string
-		defaultLanguage string
-	}
 )
 
-// NewBundle - создаёт объект Bundle.
-func NewBundle(opts ...BundleOption) (*Bundle, error) {
+// NewBundle - создаёт Bundle для локализации сообщений.
+// Параметры:
+//   - languages - список поддерживаемых языков в формате BCP 47 (например: "en", "ru", "en-US");
+//   - opts - дополнительные опции настройки (WithMessageProvider, WithDefaultLanguage и др.);
+//
+// Первый язык в списке становится языком по умолчанию, если не задан явно через WithDefaultLanguage.
+func NewBundle(languages []string, opts ...BundleOption) (*Bundle, error) {
 	o := bundleOptions{
 		messagesDomain: DefaultMessagesDomain,
 		errorsDomain:   DefaultErrorsDomain,
@@ -48,20 +44,20 @@ func NewBundle(opts ...BundleOption) (*Bundle, error) {
 		opt(&o)
 	}
 
-	if len(o.languages) == 0 {
+	if len(languages) == 0 {
 		return nil, errors.New("bundle create: no matching language found")
 	}
 
-	languages := make([]language.Tag, len(o.languages))
+	languageTags := make([]language.Tag, len(languages))
 	defaultLanguage := language.Und
 
-	for i, lang := range o.languages {
+	for i, lang := range languages {
 		tag, err := language.Parse(lang)
 		if err != nil {
 			return nil, fmt.Errorf("bundle create: parsing language '%s': %w", lang, err)
 		}
 
-		languages[i] = tag
+		languageTags[i] = tag
 
 		if o.defaultLanguage == lang {
 			defaultLanguage = tag
@@ -70,15 +66,15 @@ func NewBundle(opts ...BundleOption) (*Bundle, error) {
 
 	if defaultLanguage == language.Und {
 		if o.defaultLanguage != "" {
-			return nil, fmt.Errorf("bundle create: default language '%s' is not supported", o.defaultLanguage)
+			return nil, fmt.Errorf("bundle create: default language is not supported (lang='%s')", o.defaultLanguage)
 		}
 
 		// если в опции явно не указан язык по умолчанию,
 		// то по умолчанию используется первый язык в списке
-		defaultLanguage = languages[0]
+		defaultLanguage = languageTags[0]
 	}
 
-	pr, err := o.createProvider(languages)
+	pr, err := o.createProvider(languageTags)
 	if err != nil {
 		return nil, fmt.Errorf("bundle create: %w", err)
 	}
@@ -109,17 +105,20 @@ func NewBundle(opts ...BundleOption) (*Bundle, error) {
 		errorsDomain:    o.errorsDomain,
 		formatMessage:   o.formatMessage,
 		formatError:     o.formatError,
-		languageMatcher: language.NewMatcher(languages),
+		languageMatcher: language.NewMatcher(languageTags),
 		defaultLanguage: defaultLanguage,
 	}, nil
 }
 
+// localize - выполняет локализацию сообщения в указанном домене.
+// Предварительно обрабатывает сообщение и аргументы через formatMessage.
 func (b *Bundle) localize(domain string, lang language.Tag, msg string, args []any) string {
 	msg, args = b.formatMessage(msg, args)
 
 	return b.provider.Localize(domain, lang, msg, args)
 }
 
+// isDomainInArray - проверяет наличие домена в массиве доменов.
 func isDomainInArray(domain string, domains []string) bool {
 	for _, val := range domains {
 		if val == domain {

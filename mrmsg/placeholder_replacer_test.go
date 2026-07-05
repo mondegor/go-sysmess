@@ -12,12 +12,14 @@ import (
 func Test_NewMessageReplacer(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
+	type testCase struct {
 		name    string
 		message string
 		args    []any
 		want    string
-	}{
+	}
+
+	tests := []testCase{
 		{
 			name:    "empty message",
 			message: "",

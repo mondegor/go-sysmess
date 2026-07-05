@@ -1,31 +1,43 @@
 package mrtype
 
 import (
-	"github.com/mondegor/go-sysmess/mrtype/enums"
+	"github.com/mondegor/go-sysmess/mrtype/sortdirection"
 )
 
 type (
-	// PageParams - параметры для выборки части списка элементов.
+	// CursorParams - параметры курсорной пагинации.
+	// Используется для выборки части списка элементов с помощью курсора.
+	CursorParams struct {
+		// Value - значение курсора (последовательность и указатель на элемент начала выборки).
+		Value string
+
+		// Limit - максимальное количество элементов в выборке.
+		Limit int
+	}
+
+	// PageParams - параметры страничной пагинации.
+	// Используется для выборки части списка элементов с помощью смещения.
 	PageParams struct {
-		Index uint64 // pageIndex
-		Size  uint64 // pageSize
+		// Index - индекс страницы (нумерация с 0 или 1 в зависимости от контекста).
+		Index int
+
+		// Size - количество элементов на странице.
+		Size int
 	}
 
-	// PageCursor - параметры для выборки части списка элементов.
-	PageCursor struct {
-		LastID uint64 // lastItemID
-		Size   uint64 // pageSize
-	}
-
-	// SortParams - параметры для сортировки списка элементов по указанному полю.
+	// SortParams - параметры сортировки списка элементов.
 	SortParams struct {
-		FieldName string              // sortField
-		Direction enums.SortDirection // sortDirection
+		// Column - имя колонки для сортировки.
+		Column string
+
+		// Direction - направление сортировки (ASC/DESC).
+		Direction sortdirection.Enum
 	}
 
-	// ListSorter - интерфейс для проверки полей, которые могут участвовать в сортировке.
+	// ListSorter - интерфейс проверки допустимых полей сортировки.
+	// Позволяет валидировать имя поля сортировки и получить параметры сортировки по умолчанию.
 	ListSorter interface {
-		CheckField(name string) bool
+		HasColumn(name string) bool
 		DefaultSort() SortParams
 	}
 )

@@ -11,5 +11,7 @@ import (
 
 // Make sure the Locker conforms with the mrlock.Locker interface.
 func TestLockerImplementsLocker(t *testing.T) {
+	t.Parallel()
+
 	assert.Implements(t, (*mrlock.Locker)(nil), &noplocker.Locker{})
 }

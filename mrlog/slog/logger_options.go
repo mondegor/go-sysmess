@@ -2,7 +2,9 @@ package slog
 
 import (
 	"io"
-	"log/slog"
+	stdlog "log/slog"
+
+	"github.com/mondegor/go-sysmess/mrlog/level"
 )
 
 const (
@@ -12,83 +14,99 @@ const (
 )
 
 type (
-	// Option - настройка объекта LoggerAdapter.
+	// Option - функция-опция для настройки LoggerAdapter.
 	Option func(o *options)
+
+	options struct {
+		stdout             io.Writer
+		levelString        string
+		level              level.Enum
+		jsonFormat         bool
+		timeFormat         string
+		middlewareHandlers []func(next stdlog.Handler) stdlog.Handler
+		replaceAttr        func(attr stdlog.Attr) (newAttr stdlog.Attr)
+		colorMode          bool
+		attrKey2color      map[string]attrColor
+		attrColorByDefault attrColor
+	}
 )
 
-// WithWriter - устанавливает опцию stdout для LoggerAdapter.
+// WithWriter - задаёт поток вывода для логирования (по умолчанию os.Stdout).
 func WithWriter(value io.Writer) Option {
 	return func(o *options) {
-		if o.stdout != nil {
-			o.stdout = value
-		}
+		o.stdout = value
 	}
 }
 
-// WithLevel - устанавливает уровень логирования для LoggerAdapter.
+// WithLevel - задаёт минимальный уровень логирования (DEBUG, INFO, WARN, ERROR).
+// Сообщения с более низким уровнем будут отфильтрованы.
 func WithLevel(value string) Option {
 	return func(o *options) {
-		if value != "" {
-			o.levelString = value
-		}
+		o.levelString = value
 	}
 }
 
-// WithJsonFormat - устанавливает признак логирования в json формате для LoggerAdapter.
+// WithJsonFormat - включает вывод логов в формате JSON.
+// При включении отключает цветной режим (colorMode).
 func WithJsonFormat(value bool) Option {
 	return func(o *options) {
 		o.jsonFormat = value
 	}
 }
 
-// WithTimeFormat - устанавливает формат времени при логировании для LoggerAdapter.
+// WithTimeFormat - задаёт формат вывода времени в логах.
+// Поддерживаемые именованные форматы: "RFC3339", "RFC3339Nano", "DateTime", "TimeOnly", "Kitchen".
 func WithTimeFormat(value string) Option {
 	return func(o *options) {
-		if value != "" {
-			o.timeFormat = value
-		}
+		o.timeFormat = value
 	}
 }
 
-// WithMiddlewareHandler - устанавливает middleware для LoggerAdapter.
-func WithMiddlewareHandler(value ...func(next slog.Handler) slog.Handler) Option {
+// WithMiddlewareHandler - добавляет один или несколько middleware-обработчиков.
+// Middleware применяются в порядке добавления и позволяют модифицировать slog.Handler.
+func WithMiddlewareHandler(value ...func(next stdlog.Handler) stdlog.Handler) Option {
 	return func(o *options) {
 		o.middlewareHandlers = append(o.middlewareHandlers, value...)
 	}
 }
 
-// WithReplaceAttrs - устанавливает функцию замены атрибутов для LoggerAdapter.
-func WithReplaceAttrs(value func(attr slog.Attr) (newAttr slog.Attr)) Option {
+// WithReplaceAttrs - задаёт функцию для кастомной обработки атрибутов перед выводом.
+// Позволяет изменять ключи, значения и форматирование атрибутов.
+func WithReplaceAttrs(value func(attr stdlog.Attr) (newAttr stdlog.Attr)) Option {
 	return func(o *options) {
-		if value != nil {
-			o.replaceAttr = value
-		}
+		o.replaceAttr = value
 	}
 }
 
-// WithColorMode - устанавливает режим логирования в цветном формате
-// (только при выключенном JsonFormat) для LoggerAdapter.
+// WithColorMode - включает/отключает цветной вывод в консоль.
+// Игнорируется, если включен JsonFormat.
 func WithColorMode(value bool) Option {
 	return func(o *options) {
 		o.colorMode = value
 	}
 }
 
-// WithColorizeAttr - добавляет определение цветов для указанного ключа и его значения
-// (только при включенном ColorMode) для LoggerAdapter.
-func WithColorizeAttr(key, keyColor, valueColor string) Option {
+// WithColorizeAttr - задаёт цвета для ключа/значения указанного атрибута.
+// Параметры:
+//   - attrKey - имя атрибута, которому назначаются цвета;
+//   - colorKey, colorValue - ANSI-коды цветов из пакета color.
+//
+// При attrKey=AttrColorByDefaultKey цвета назначаются всем атрибутам,
+// для которых явно не были определены цвета.
+// Работает только при включенном ColorMode и отключенном JsonFormat.
+func WithColorizeAttr(attrKey, colorKey, colorValue string) Option {
 	return func(o *options) {
 		color := attrColor{
-			keyColor:   keyColor,
-			valueColor: valueColor,
+			key:   colorKey,
+			value: colorValue,
 		}
 
-		if key == AttrColorByDefaultKey {
+		if attrKey == AttrColorByDefaultKey {
 			o.attrColorByDefault = color
 
 			return
 		}
 
-		o.attrKey2color[key] = color
+		o.attrKey2color[attrKey] = color
 	}
 }

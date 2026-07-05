@@ -5,11 +5,11 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/mondegor/go-sysmess/errors"
+	"github.com/mondegor/go-sysmess/errors/helper"
 	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/errcat"
 	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/fruitcat"
 	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/msgcat"
-	"github.com/mondegor/go-sysmess/mrerr/mr"
-	"github.com/mondegor/go-sysmess/mrerrors"
 	"github.com/mondegor/go-sysmess/mrlocale"
 	"github.com/mondegor/go-sysmess/mrlocale/provider/gotext"
 )
@@ -22,41 +22,17 @@ func main() {
 	)
 
 	bundle, err := mrlocale.NewBundle(
-		mrlocale.WithLanguages("ru-RU", "en-US"),
+		[]string{"ru-RU", "en-US"},
 		mrlocale.WithDefaultLanguage("ru-RU"),
-		mrlocale.WithFormatError(
-			func() func(err error) (message string, args []any) {
-				code2ok := map[string]bool{
-					mr.ErrorCodeUnexpectedInternal:     true,
-					mr.ErrorCodeTemporarilyUnavailable: true,
-				}
-
-				return func(err error) (message string, args []any) {
-					if e, ok := err.(localizedError); ok {
-						// если детали ошибки можно отобразить пользователю
-						if e.Type() == uint8(mrerrors.ErrorKindUser) || code2ok[e.Code()] {
-							return e.FormattedMessage(), e.Args()
-						}
-
-						if e.Type() == uint8(mrerrors.ErrorKindSystem) {
-							return mr.DefaultErrorCodeSystem, nil
-						}
-					}
-
-					return mr.DefaultErrorCodeInternal, nil
-				}
-			}(),
-		),
+		mrlocale.WithFormatError(helper.ExtractMessageForLocalization),
 		mrlocale.WithMessageProvider(
 			func(languages []language.Tag) (mrlocale.MessageProvider, error) {
-				localeProvider, err = gotext.NewProvider(
-					gotext.WithLanguages(languages...),
-					gotext.WithCatalog(mrlocale.DefaultMessagesDomain, msgcat.NewCatalog()),
-					gotext.WithCatalog(mrlocale.DefaultErrorsDomain, errcat.NewCatalog()),
-					gotext.WithCatalog("fruitcat", fruitcat.NewCatalog()),
+				return gotext.NewProvider(
+					languages,
+					gotext.WithDomainCatalog(mrlocale.DefaultMessagesDomain, msgcat.NewCatalog()),
+					gotext.WithDomainCatalog(mrlocale.DefaultErrorsDomain, errcat.NewCatalog()),
+					gotext.WithDomainCatalog("fruitcat", fruitcat.NewCatalog()),
 				)
-
-				return localeProvider, err
 			},
 		),
 	)
@@ -72,7 +48,7 @@ func main() {
 
 	fmt.Println("--------------------------------------------------")
 
-	errorMessage := errcat.ParseErrorMessage(lz.TranslateError(mr.ErrInternal.New()))
+	errorMessage := errcat.ParseErrorMessage(lz.TranslateError(errors.NewInternalError("my-error")))
 	fmt.Printf("error: %s\n", errorMessage.Reason)
 	fmt.Printf("error-details: %s\n", errorMessage.Details)
 
@@ -94,13 +70,13 @@ func main() {
 
 		fmt.Println("..................................................")
 
-		errMess := errcat.ParseErrorMessage(lz.TranslateError(mr.ErrInternalNilPointer.New()))
+		errMess := errcat.ParseErrorMessage(lz.TranslateError(errors.ErrInternalNilPointer.New()))
 		fmt.Println("reason: '" + errMess.Reason + "'; details: '" + errMess.Details + "'")
 
-		errMess = errcat.ParseErrorMessage(lz.TranslateError(mr.ErrStorageConnectionFailed.New("connName")))
+		errMess = errcat.ParseErrorMessage(lz.TranslateError(errors.ErrSystemStorageConnectionFailed.New()))
 		fmt.Println("reason: '" + errMess.Reason + "'; details: '" + errMess.Details + "'")
 
-		fmt.Println(lz.TranslateError(mr.ErrUseCaseEntityNotFound.New()))
+		fmt.Println(lz.TranslateError(errors.ErrRecordNotFound))
 
 		fmt.Println("..................................................")
 
@@ -122,11 +98,4 @@ func main() {
 	// fr - not found
 	lz = pool.Localizer(language.MustParse("fr"))
 	fmt.Println(lz.Language()) // print default lang
-}
-
-type localizedError interface {
-	Type() uint8
-	Code() string
-	FormattedMessage() string
-	Args() []any
 }

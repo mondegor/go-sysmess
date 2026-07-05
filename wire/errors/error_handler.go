@@ -1,0 +1,33 @@
+package errors
+
+import (
+	"context"
+
+	"github.com/mondegor/go-sysmess/errors"
+	"github.com/mondegor/go-sysmess/errors/kind"
+	"github.com/mondegor/go-sysmess/mrlog"
+)
+
+// InitErrorHandler - создаёт обработчик ошибок для пакета errors.
+// Маршрутизирует логирование в зависимости от типа ошибки:
+//   - User - логируется на уровне Debug (пользовательские ошибки);
+//   - System, Internal - логируется на уровне Error (системные и внутренние ошибки);
+//   - Неизвестные - логируется на уровне Error с пометкой "unexpected".
+func InitErrorHandler(logger mrlog.Logger) errors.Handler {
+	return errors.HandlerFunc(
+		func(ctx context.Context, err error) {
+			switch kind.Analyze(err) {
+			case kind.User:
+				// 1. пользовательские ошибки логируются только в отладочном режиме;
+				logger.Debug(ctx, "ErrorHandler: user error", "error", err)
+			case kind.System, kind.Internal:
+				// 2. пользовательские ошибки с вложенной runtime ошибкой;
+				// 3. runtime ошибки;
+				logger.Error(ctx, "ErrorHandler", "error", err)
+			default:
+				// 4. остальные ошибки у которых нет метода Kind() (требуется найти место их возникновения и правильно обработать);
+				logger.Error(ctx, "ErrorHandler: unexpected error", "error", err)
+			}
+		},
+	)
+}

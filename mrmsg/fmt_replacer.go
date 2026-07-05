@@ -6,14 +6,18 @@ import (
 )
 
 type (
-	// FmtReplacer - реплейсер параметров сообщения на основе fmt.
+	// FmtReplacer - замена плейсхолдеров в сообщении через fmt.Sprintf.
+	// Использует формат fmt, где плейсхолдеры заменяются позиционными аргументами.
 	FmtReplacer struct {
 		message      string
 		placeholders []string
 	}
 )
 
-// NewFmtReplacer - создаёт объект FmtReplacer.
+// NewFmtReplacer - создаёт FmtReplacer для замены плейсхолдеров в сообщении.
+// Параметры:
+//   - message - строка формата для fmt.Sprintf (например: "Hello %[1]s, you are %[2]d");
+//   - placeholders - список плейсхолдеров, которые будут заменены аргументами.
 func NewFmtReplacer(message string, placeholders []string) *FmtReplacer {
 	return &FmtReplacer{
 		message:      message,
@@ -21,7 +25,9 @@ func NewFmtReplacer(message string, placeholders []string) *FmtReplacer {
 	}
 }
 
-// Replace - возвращает заранее подготовленное сообщение с заменёнными его аргументами на указанные значения.
+// Replace - подставляет аргументы в подготовленное сообщение через fmt.Sprintf.
+// Если аргументов меньше, чем плейсхолдеров, недостающие заменяются на "!MISSINGARG".
+// Если аргументов больше, лишние игнорируются.
 func (p *FmtReplacer) Replace(args []any) (replacedMessage string, err error) {
 	if p.message == "" {
 		return "", nil
@@ -34,8 +40,8 @@ func (p *FmtReplacer) Replace(args []any) (replacedMessage string, err error) {
 	return fmt.Sprintf(p.message, p.correctArgs(args)...), nil
 }
 
-// ReplaceTo - записывает в указанный Writer заранее подготовленное сообщение
-// с заменёнными его аргументами на указанные значения.
+// ReplaceTo - записывает сообщение с подставленными аргументами в io.Writer.
+// Поведение обработки недостающих/лишних аргументов аналогично Replace.
 func (p *FmtReplacer) ReplaceTo(wr io.Writer, args []any) error {
 	if p.message == "" {
 		return nil
@@ -52,7 +58,7 @@ func (p *FmtReplacer) ReplaceTo(wr io.Writer, args []any) error {
 	return err //nolint:wrapcheck
 }
 
-// CountArgs - возвращает кол-во аргументов в подготовленном сообщении.
+// CountArgs - возвращает количество плейсхолдеров, ожидаемых сообщением.
 func (p *FmtReplacer) CountArgs() int {
 	return len(p.placeholders)
 }

@@ -12,7 +12,9 @@ const (
 )
 
 type (
-	// PlaceholderExtractor - предназначен для извлечения аргументов из сообщения.
+	// PlaceholderExtractor - извлекает именованные плейсхолдеры из текста сообщения.
+	// Плейсхолдер должен соответствовать формату: {Name}, где Name начинается с буквы
+	// и содержит только буквы и цифры.
 	PlaceholderExtractor struct {
 		leftDelim  string
 		rightDelim string
@@ -21,7 +23,8 @@ type (
 
 var regexpPlaceholderBody = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9]*$`)
 
-// NewPlaceholderExtractor - создаёт объект PlaceholderExtractor.
+// NewPlaceholderExtractor - создаёт PlaceholderExtractor с указанными ограничителями.
+// Если leftDelim или rightDelim пусты, используются значения по умолчанию: "{" и "}".
 func NewPlaceholderExtractor(leftDelim, rightDelim string) *PlaceholderExtractor {
 	if leftDelim == "" {
 		leftDelim = leftDelimDefault
@@ -37,7 +40,10 @@ func NewPlaceholderExtractor(leftDelim, rightDelim string) *PlaceholderExtractor
 	}
 }
 
-// Extract - извлекает аргументы из указанного сообщения и возвращает их.
+// Extract - извлекает все уникальные плейсхолдеры из сообщения.
+// Плейсхолдер валидируется: тело должно соответствовать ^[A-Za-z][A-Za-z0-9]*$.
+// Возвращает nil, если плейсхолдеры не найдены или невалидны.
+// Плейсхолдеры возвращаются в порядке первого появления, дубликаты пропускаются.
 func (p *PlaceholderExtractor) Extract(message string) (placeholders []string) {
 	n := strings.Count(message, p.leftDelim)
 

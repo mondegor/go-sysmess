@@ -17,7 +17,8 @@ const (
 	End         = "\033[0m"  // завершающий символ цвета
 )
 
-// ColorizeText - возвращает указанный текст в указанном цвете для отображения в консоли.
+// ColorizeText - оборачивает текст в ANSI-коды цвета для вывода в консоль.
+// Автоматически добавляет код сброса цвета (End) в конец.
 func ColorizeText(colorCode, value string) string {
 	return colorCode + value + End
 }

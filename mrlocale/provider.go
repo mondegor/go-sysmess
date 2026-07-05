@@ -5,7 +5,8 @@ import (
 )
 
 type (
-	// MessageProvider - интерфейс для создания провайдеров локализующих сообщения.
+	// MessageProvider - интерфейс провайдера локализации сообщений.
+	// Реализация должна хранить переводы для набора языков и доменов.
 	MessageProvider interface {
 		Domains() []string
 		Languages() []language.Tag
