@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/mrtrace"
+	"github.com/mondegor/go-core/mrtrace"
 )
 
 type (

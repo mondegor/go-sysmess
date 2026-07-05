@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrprocess"
+	"github.com/mondegor/go-core/mrprocess"
 )
 
 const (

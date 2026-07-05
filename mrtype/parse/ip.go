@@ -4,7 +4,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/mrtype/errors"
+	"github.com/mondegor/go-core/mrtype/errors"
 )
 
 const (

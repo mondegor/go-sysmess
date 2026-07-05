@@ -1,7 +1,7 @@
 package mrstorage
 
 import (
-	"github.com/mondegor/go-sysmess/mrstorage/txisolevel"
+	"github.com/mondegor/go-core/mrstorage/txisolevel"
 )
 
 type (

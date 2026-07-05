@@ -7,8 +7,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrlog/slog"
-	"github.com/mondegor/go-sysmess/mrprocess/signal"
+	"github.com/mondegor/go-core/mrlog/slog"
+	"github.com/mondegor/go-core/mrprocess/signal"
 )
 
 var isTimeout atomic.Bool

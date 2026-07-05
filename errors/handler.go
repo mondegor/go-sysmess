@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"github.com/mondegor/go-sysmess/errors/handler"
+	"github.com/mondegor/go-core/errors/handler"
 )
 
 type (

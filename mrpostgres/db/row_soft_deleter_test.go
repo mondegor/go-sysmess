@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/mrpostgres/db"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/mrpostgres/db"
 )
 
 func TestRowSoftDeleter_Delete(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrstorage/mrsql"
+	"github.com/mondegor/go-core/mrstorage/mrsql"
 )
 
 func TestMergeArgs(t *testing.T) {

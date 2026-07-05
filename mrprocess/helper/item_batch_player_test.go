@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 
-	"github.com/mondegor/go-sysmess/mrprocess"
-	"github.com/mondegor/go-sysmess/mrprocess/helper"
-	"github.com/mondegor/go-sysmess/mrprocess/helper/mock"
+	"github.com/mondegor/go-core/mrprocess"
+	"github.com/mondegor/go-core/mrprocess/helper"
+	"github.com/mondegor/go-core/mrprocess/helper/mock"
 )
 
 //go:generate mockgen -source=item_batch_player.go -destination=./mock/helper.go -package=mock

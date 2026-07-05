@@ -12,7 +12,7 @@
 - предоставляет систему логирования сообщений и ошибок на основе `slog`;
 
 ## Подключение библиотеки
-`go get -u github.com/mondegor/go-sysmess@v0.15.3`
+`go get -u github.com/mondegor/go-core@v0.15.3`
 
 ## Установка библиотеки для её локальной разработки
 - Выбрать рабочую директорию, где должна быть расположена библиотека
@@ -108,27 +108,27 @@
 ## Пример архитектуры обработки ошибок
 
 ### Подсистема формирования ошибок
-- [ProtoError](https://github.com/mondegor/go-sysmess/blob/master/mrerrors/proto_error.go);
-- [InstantError](https://github.com/mondegor/go-sysmess/blob/master/mrerrors/instant_error.go);
-- [CustomError](https://github.com/mondegor/go-sysmess/blob/master/mrerr/custom_error.go);
-- [GenerateErrorID](https://github.com/mondegor/go-sysmess/blob/master/mrerr/generate/instance_id.go);
-- [ErrorStackTrace](https://github.com/mondegor/go-sysmess/blob/master/mrerr/stacktrace/caller.go);
-- [Примеры базового пакета](https://github.com/mondegor/go-sysmess/tree/master/examples/mrerrors);
-- [Примеры расширенного пакета](https://github.com/mondegor/go-sysmess/tree/master/examples/mrerr);
+- [ProtoError](https://github.com/mondegor/go-core/blob/master/mrerrors/proto_error.go);
+- [InstantError](https://github.com/mondegor/go-core/blob/master/mrerrors/instant_error.go);
+- [CustomError](https://github.com/mondegor/go-core/blob/master/mrerr/custom_error.go);
+- [GenerateErrorID](https://github.com/mondegor/go-core/blob/master/mrerr/generate/instance_id.go);
+- [ErrorStackTrace](https://github.com/mondegor/go-core/blob/master/mrerr/stacktrace/caller.go);
+- [Примеры базового пакета](https://github.com/mondegor/go-core/tree/master/examples/mrerrors);
+- [Примеры расширенного пакета](https://github.com/mondegor/go-core/tree/master/examples/mrerr);
 
 ![image](docs/resources/packages/c4/mrerr.svg)
 
 ### Подсистема обработки ошибок
-- [Создание и инициализация ошибок опциями по умолчанию](https://github.com/mondegor/go-sysmess/blob/master/mrerr/error.go); 
-- [ErrorHandler](https://github.com/mondegor/go-sysmess/blob/master/mrerr/error_handler.go);
+- [Создание и инициализация ошибок опциями по умолчанию](https://github.com/mondegor/go-core/blob/master/mrerr/error.go); 
+- [ErrorHandler](https://github.com/mondegor/go-core/blob/master/mrerr/error_handler.go);
 - Библиотека готовых типов ошибок:
-  - [Внутренние ошибки](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_internal.go);
-  - [Инфраструктурные ошибки](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_storage.go);
-  - [Ошибки бизнес логики](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_usecase.go);
-  - [Http ошибки](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/errors_http.go);
+  - [Внутренние ошибки](https://github.com/mondegor/go-core/blob/master/mrerr/mr/errors_internal.go);
+  - [Инфраструктурные ошибки](https://github.com/mondegor/go-core/blob/master/mrerr/mr/errors_storage.go);
+  - [Ошибки бизнес логики](https://github.com/mondegor/go-core/blob/master/mrerr/mr/errors_usecase.go);
+  - [Http ошибки](https://github.com/mondegor/go-core/blob/master/mrerr/mr/errors_http.go);
 - Врапперы ошибок:
-  - [Для инфраструктурного слоя](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/wrapper_storage.go);
-  - [Для слоя бизнес логики](https://github.com/mondegor/go-sysmess/blob/master/mrerr/mr/wrapper_usecase.go);
+  - [Для инфраструктурного слоя](https://github.com/mondegor/go-core/blob/master/mrerr/mr/wrapper_storage.go);
+  - [Для слоя бизнес логики](https://github.com/mondegor/go-core/blob/master/mrerr/mr/wrapper_usecase.go);
 
 ![image](docs/resources/packages/c4/errcore.svg)
 

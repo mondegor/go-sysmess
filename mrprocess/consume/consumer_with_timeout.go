@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrprocess"
+	"github.com/mondegor/go-core/mrprocess"
 )
 
 type (

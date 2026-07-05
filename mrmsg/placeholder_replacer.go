@@ -4,7 +4,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/util/conv"
+	"github.com/mondegor/go-core/util/conv"
 )
 
 const (

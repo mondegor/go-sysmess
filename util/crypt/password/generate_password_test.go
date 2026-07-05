@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/util/crypt/password"
+	"github.com/mondegor/go-core/util/crypt/password"
 )
 
 // TestGenerate_DefaultCharsKinds проверяет, что при нулевом charsKinds

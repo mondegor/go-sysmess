@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-`go-sysmess` is a Go library (module `github.com/mondegor/go-sysmess`, Go 1.25) providing
+`go-sysmess` is a Go library (module `github.com/mondegor/go-core`, Go 1.25) providing
 infrastructure for building user/system/internal error handling, multi-language message
 formatting and localization, and `slog`-based logging. It is a library, not an application —
 there is no main binary (the only `cmd` is the `gotext-catalog-fix` codegen helper). Most

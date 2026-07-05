@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrlock"
-	"github.com/mondegor/go-sysmess/mrlock/noplocker"
+	"github.com/mondegor/go-core/mrlock"
+	"github.com/mondegor/go-core/mrlock/noplocker"
 )
 
 // Make sure the Locker conforms with the mrlock.Locker interface.

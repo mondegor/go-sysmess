@@ -364,18 +364,18 @@ formatters:
 
   settings:
     gofumpt:
-      module-path: github.com/mondegor/go-sysmess
+      module-path: github.com/mondegor/go-core
       extra-rules: true
 
     goimports:
       local-prefixes:
-        - github.com/mondegor/go-sysmess
+        - github.com/mondegor/go-core
 
     gci:
       sections:
         - standard
         - default
-        - prefix(github.com/mondegor/go-sysmess)
+        - prefix(github.com/mondegor/go-core)
 
 run:
   concurrency: 4

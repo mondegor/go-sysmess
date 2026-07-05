@@ -6,9 +6,9 @@ import (
 	stdlog "log/slog"
 	"os"
 
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrlog/color"
-	"github.com/mondegor/go-sysmess/mrlog/level"
+	"github.com/mondegor/go-core/mrlog"
+	"github.com/mondegor/go-core/mrlog/color"
+	"github.com/mondegor/go-core/mrlog/level"
 )
 
 type (

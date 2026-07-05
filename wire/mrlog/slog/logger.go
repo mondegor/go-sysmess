@@ -7,16 +7,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/errors/helper"
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
-	"github.com/mondegor/go-sysmess/mrapp"
-	"github.com/mondegor/go-sysmess/mrlog/color"
-	"github.com/mondegor/go-sysmess/mrlog/slog"
-	"github.com/mondegor/go-sysmess/mrlog/slog/middleware"
-	"github.com/mondegor/go-sysmess/mrtrace"
-	"github.com/mondegor/go-sysmess/mrtrace/process"
-	"github.com/mondegor/go-sysmess/wire/mrlog"
+	"github.com/mondegor/go-core/errors/helper"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/errors/runtime/stacktrace"
+	"github.com/mondegor/go-core/mrapp"
+	"github.com/mondegor/go-core/mrlog/color"
+	"github.com/mondegor/go-core/mrlog/slog"
+	"github.com/mondegor/go-core/mrlog/slog/middleware"
+	"github.com/mondegor/go-core/mrtrace"
+	"github.com/mondegor/go-core/mrtrace/process"
+	"github.com/mondegor/go-core/wire/mrlog"
 )
 
 type (

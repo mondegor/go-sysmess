@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrprocess/schedule"
+	"github.com/mondegor/go-core/mrprocess/schedule"
 )
 
 type process interface {

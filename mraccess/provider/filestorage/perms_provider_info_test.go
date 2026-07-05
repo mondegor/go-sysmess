@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/mraccess/provider/filestorage"
+	"github.com/mondegor/go-core/mraccess/provider/filestorage"
 )
 
 func TestExtractProviderInfo_Nil(t *testing.T) {

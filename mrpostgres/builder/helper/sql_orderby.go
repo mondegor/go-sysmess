@@ -3,9 +3,9 @@ package helper
 import (
 	"strings"
 
-	"github.com/mondegor/go-sysmess/mrstorage"
-	"github.com/mondegor/go-sysmess/mrstorage/mrsql"
-	"github.com/mondegor/go-sysmess/mrtype/sortdirection"
+	"github.com/mondegor/go-core/mrstorage"
+	"github.com/mondegor/go-core/mrstorage/mrsql"
+	"github.com/mondegor/go-core/mrtype/sortdirection"
 )
 
 type (

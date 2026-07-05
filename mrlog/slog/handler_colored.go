@@ -7,7 +7,7 @@ import (
 
 	"github.com/lmittmann/tint"
 
-	"github.com/mondegor/go-sysmess/mrlog/color"
+	"github.com/mondegor/go-core/mrlog/color"
 )
 
 func newColoredHandler(w io.Writer, opts options) stdlog.Handler {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/mondegor/go-sysmess/errors/user"
+	"github.com/mondegor/go-core/errors/user"
 )
 
 // ============================================================================

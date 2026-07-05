@@ -1,8 +1,8 @@
 package errors
 
 import (
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/errors/runtime"
 )
 
 type (

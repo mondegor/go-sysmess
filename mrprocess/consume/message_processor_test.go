@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrprocess/consume"
+	"github.com/mondegor/go-core/mrprocess/consume"
 )
 
 type process interface {

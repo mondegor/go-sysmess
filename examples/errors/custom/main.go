@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/errors/helper"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/errors/helper"
 )
 
 // main - пример использования errors.CustomError и errors.CustomListError.

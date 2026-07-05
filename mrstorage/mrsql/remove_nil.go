@@ -1,7 +1,7 @@
 package mrsql
 
 import (
-	"github.com/mondegor/go-sysmess/mrstorage"
+	"github.com/mondegor/go-core/mrstorage"
 )
 
 // SQLPartFuncRemoveNil - удаляет все nil элементы из переданного списка функций SQLPartFunc.

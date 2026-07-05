@@ -7,11 +7,11 @@ import (
 	stdlog "log/slog"
 	"os"
 
-	"github.com/mondegor/go-sysmess/errors/runtime/instance"
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrlog/color"
-	"github.com/mondegor/go-sysmess/mrlog/slog"
-	"github.com/mondegor/go-sysmess/mrlog/slog/middleware"
+	"github.com/mondegor/go-core/errors/runtime/instance"
+	"github.com/mondegor/go-core/mrlog"
+	"github.com/mondegor/go-core/mrlog/color"
+	"github.com/mondegor/go-core/mrlog/slog"
+	"github.com/mondegor/go-core/mrlog/slog/middleware"
 )
 
 type (

@@ -1,6 +1,6 @@
 package mrsql
 
-import "github.com/mondegor/go-sysmess/mrlog"
+import "github.com/mondegor/go-core/mrlog"
 
 type (
 	// EntityMeta - метаинформация о структуре для динамического управления записями в БД.

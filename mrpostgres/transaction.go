@@ -5,8 +5,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/mondegor/go-sysmess/mrstorage"
-	"github.com/mondegor/go-sysmess/mrstorage/txisolevel"
+	"github.com/mondegor/go-core/mrstorage"
+	"github.com/mondegor/go-core/mrstorage/txisolevel"
 )
 
 type (

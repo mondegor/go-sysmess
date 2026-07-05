@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrlock"
+	"github.com/mondegor/go-core/mrlock"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrprocess/period/strategy"
+	"github.com/mondegor/go-core/mrprocess/period/strategy"
 )
 
 const minTimePeriod = time.Millisecond

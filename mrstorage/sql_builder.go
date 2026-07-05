@@ -1,8 +1,8 @@
 package mrstorage
 
 import (
-	"github.com/mondegor/go-sysmess/mrtype"
-	"github.com/mondegor/go-sysmess/mrtype/sortdirection"
+	"github.com/mondegor/go-core/mrtype"
+	"github.com/mondegor/go-core/mrtype/sortdirection"
 )
 
 type (

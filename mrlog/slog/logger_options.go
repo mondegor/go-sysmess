@@ -4,7 +4,7 @@ import (
 	"io"
 	stdlog "log/slog"
 
-	"github.com/mondegor/go-sysmess/mrlog/level"
+	"github.com/mondegor/go-core/mrlog/level"
 )
 
 const (

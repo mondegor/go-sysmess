@@ -3,7 +3,7 @@ package gotext
 import (
 	"strconv"
 
-	"github.com/mondegor/go-sysmess/mrmsg"
+	"github.com/mondegor/go-core/mrmsg"
 )
 
 // NewMessageFormatter - создаёт MessageFormatter для преобразования

@@ -1,9 +1,9 @@
 package mrlog
 
 import (
-	"github.com/mondegor/go-sysmess/mrtrace"
-	"github.com/mondegor/go-sysmess/mrtrace/context"
-	"github.com/mondegor/go-sysmess/mrtrace/process"
+	"github.com/mondegor/go-core/mrtrace"
+	"github.com/mondegor/go-core/mrtrace/context"
+	"github.com/mondegor/go-core/mrtrace/process"
 )
 
 type (

@@ -4,7 +4,7 @@ import (
 	stdlog "log/slog"
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrlog/level"
+	"github.com/mondegor/go-core/mrlog/level"
 )
 
 func handlerOptions(opts options) *stdlog.HandlerOptions {

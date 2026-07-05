@@ -9,8 +9,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrpostgres"
+	"github.com/mondegor/go-core/mrlog"
+	"github.com/mondegor/go-core/mrpostgres"
 )
 
 const (

@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/mrtrace/process"
+	"github.com/mondegor/go-core/mrtrace/process"
 )
 
 // TestGenerateID_Format проверяет базовый формат генерируемого ID.

@@ -1,8 +1,8 @@
 package errors
 
 import (
-	"github.com/mondegor/go-sysmess/errors/custom"
-	"github.com/mondegor/go-sysmess/errors/wrap"
+	"github.com/mondegor/go-core/errors/custom"
+	"github.com/mondegor/go-core/errors/wrap"
 )
 
 type (

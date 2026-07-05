@@ -3,9 +3,9 @@ package mraccess
 import (
 	"strings"
 
-	"github.com/mondegor/go-sysmess/mraccess"
-	"github.com/mondegor/go-sysmess/mraccess/provider/filestorage"
-	"github.com/mondegor/go-sysmess/mrlog"
+	"github.com/mondegor/go-core/mraccess"
+	"github.com/mondegor/go-core/mraccess/provider/filestorage"
+	"github.com/mondegor/go-core/mrlog"
 )
 
 // InitPermsProvider - создаёт и инициализирует провайдер ролей и прав из файлового хранилища.
