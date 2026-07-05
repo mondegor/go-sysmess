@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/mrstorage"
-	"github.com/mondegor/go-sysmess/mrstorage/mrsql"
-	"github.com/mondegor/go-sysmess/mrtype"
-	"github.com/mondegor/go-sysmess/util/xmath"
+	"github.com/mondegor/go-core/mrstorage"
+	"github.com/mondegor/go-core/mrstorage/mrsql"
+	"github.com/mondegor/go-core/mrtype"
+	"github.com/mondegor/go-core/util/xmath"
 )
 
 type (

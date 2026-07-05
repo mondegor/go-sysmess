@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/mrworkflow/itemstatus"
+	"github.com/mondegor/go-core/mrworkflow/itemstatus"
 )
 
 func main() {

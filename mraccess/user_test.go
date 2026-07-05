@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/mraccess"
+	"github.com/mondegor/go-core/mraccess"
 )
 
 func TestNewUser(t *testing.T) {

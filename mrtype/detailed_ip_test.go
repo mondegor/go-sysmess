@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/mrtype"
+	"github.com/mondegor/go-core/mrtype"
 )
 
 func TestNewIP(t *testing.T) {

@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/errors/helper"
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/mrmsg"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/errors/helper"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/mrmsg"
 )
 
 type (

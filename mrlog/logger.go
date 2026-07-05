@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/mondegor/go-sysmess/mrlog/level"
+	"github.com/mondegor/go-core/mrlog/level"
 )
 
 type (

@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/mraccess"
-	"github.com/mondegor/go-sysmess/mraccess/config"
+	"github.com/mondegor/go-core/mraccess"
+	"github.com/mondegor/go-core/mraccess/config"
 )
 
 type (

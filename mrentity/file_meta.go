@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/mondegor/go-sysmess/errors"
-	modelmedia "github.com/mondegor/go-sysmess/mrmodel/media"
+	"github.com/mondegor/go-core/errors"
+	modelmedia "github.com/mondegor/go-core/mrmodel/media"
 )
 
 type (

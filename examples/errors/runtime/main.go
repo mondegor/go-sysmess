@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
-	"github.com/mondegor/go-sysmess/util/conv"
-	wireerrors "github.com/mondegor/go-sysmess/wire/errors"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/errors/runtime/stacktrace"
+	"github.com/mondegor/go-core/util/conv"
+	wireerrors "github.com/mondegor/go-core/wire/errors"
 )
 
 type (
@@ -33,7 +33,7 @@ func main() {
 			CallerDepth:    3,
 			CallerShowFunc: true,
 			CallerUpperBounds: []string{
-				"github.com/mondegor/go-sysmess/errors/runtime.(*proto).New",
+				"github.com/mondegor/go-core/errors/runtime.(*proto).New",
 			},
 		},
 	)

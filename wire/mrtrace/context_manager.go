@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mondegor/go-sysmess/mrtrace"
-	"github.com/mondegor/go-sysmess/mrtrace/process"
-	"github.com/mondegor/go-sysmess/util/crypt"
+	"github.com/mondegor/go-core/mrtrace"
+	"github.com/mondegor/go-core/mrtrace/process"
+	"github.com/mondegor/go-core/util/crypt"
 )
 
 type (

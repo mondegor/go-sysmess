@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/mraccess"
+	"github.com/mondegor/go-core/mraccess"
 )
 
 // stubUserProvider - тестовый провайдер, возвращающий заданного пользователя или ошибку.

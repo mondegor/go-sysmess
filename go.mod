@@ -1,4 +1,4 @@
-module github.com/mondegor/go-sysmess
+module github.com/mondegor/go-core
 
 go 1.25.0
 

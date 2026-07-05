@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
+	"github.com/mondegor/go-core/errors/runtime/stacktrace"
 )
 
 // main - пример формирования стека вызовов с использованием опций.

@@ -1,9 +1,9 @@
 package part
 
 import (
-	"github.com/mondegor/go-sysmess/mrpostgres/builder/helper"
-	"github.com/mondegor/go-sysmess/mrstorage"
-	"github.com/mondegor/go-sysmess/mrstorage/mrsql"
+	"github.com/mondegor/go-core/mrpostgres/builder/helper"
+	"github.com/mondegor/go-core/mrstorage"
+	"github.com/mondegor/go-core/mrstorage/mrsql"
 )
 
 type (

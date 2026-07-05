@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/mondegor/go-sysmess/mrstorage"
+	"github.com/mondegor/go-core/mrstorage"
 )
 
 type (

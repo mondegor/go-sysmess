@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/util/conv"
+	"github.com/mondegor/go-core/util/conv"
 )
 
 func TestData_String(t *testing.T) {

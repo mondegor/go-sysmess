@@ -3,9 +3,9 @@ package errors
 import (
 	"context"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/mrlog"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/mrlog"
 )
 
 // InitErrorHandler - создаёт обработчик ошибок для пакета errors.

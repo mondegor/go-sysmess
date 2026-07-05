@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	modelmedia "github.com/mondegor/go-sysmess/mrmodel/media"
+	modelmedia "github.com/mondegor/go-core/mrmodel/media"
 )
 
 type (

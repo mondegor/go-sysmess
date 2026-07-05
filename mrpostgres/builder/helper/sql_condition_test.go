@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrpostgres/builder/helper"
-	"github.com/mondegor/go-sysmess/mrstorage"
+	"github.com/mondegor/go-core/mrpostgres/builder/helper"
+	"github.com/mondegor/go-core/mrstorage"
 )
 
 // Make sure the helper.SQLCondition conforms with the mrstorage.SQLConditionHelper interface.

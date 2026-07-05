@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/errors/kind"
+	"github.com/mondegor/go-core/errors/kind"
 )
 
 func TestEnum_String(t *testing.T) {

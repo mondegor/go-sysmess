@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/util/xmath"
+	"github.com/mondegor/go-core/util/xmath"
 )
 
 func TestRoundFloat(t *testing.T) {

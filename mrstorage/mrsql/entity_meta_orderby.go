@@ -6,10 +6,10 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrtype"
-	"github.com/mondegor/go-sysmess/mrtype/sortdirection"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/mrlog"
+	"github.com/mondegor/go-core/mrtype"
+	"github.com/mondegor/go-core/mrtype/sortdirection"
 )
 
 const (

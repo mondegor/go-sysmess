@@ -3,7 +3,7 @@ package mrpostgres
 import (
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/mondegor/go-sysmess/errors"
+	"github.com/mondegor/go-core/errors"
 )
 
 // wrapError - обёртывает ошибки PostgreSQL в стандартные ошибки приложения:

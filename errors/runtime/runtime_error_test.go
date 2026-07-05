@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/errors/runtime"
 )
 
 func TestProtoError_WithDetails_ErrorString(t *testing.T) {

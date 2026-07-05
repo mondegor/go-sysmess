@@ -1,9 +1,9 @@
 package slog
 
 import (
-	"github.com/mondegor/go-sysmess/mrlog/level"
-	"github.com/mondegor/go-sysmess/mrlog/slog"
-	"github.com/mondegor/go-sysmess/mrtrace"
+	"github.com/mondegor/go-core/mrlog/level"
+	"github.com/mondegor/go-core/mrlog/slog"
+	"github.com/mondegor/go-core/mrtrace"
 )
 
 // InitTracer - создаёт mrtrace.Tracer на основе slog.LoggerAdapter.

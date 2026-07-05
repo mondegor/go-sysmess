@@ -5,13 +5,13 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/errors/helper"
-	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/errcat"
-	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/fruitcat"
-	"github.com/mondegor/go-sysmess/examples/mrlocale/internal/dict/msgcat"
-	"github.com/mondegor/go-sysmess/mrlocale"
-	"github.com/mondegor/go-sysmess/mrlocale/provider/gotext"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/errors/helper"
+	"github.com/mondegor/go-core/examples/mrlocale/internal/dict/errcat"
+	"github.com/mondegor/go-core/examples/mrlocale/internal/dict/fruitcat"
+	"github.com/mondegor/go-core/examples/mrlocale/internal/dict/msgcat"
+	"github.com/mondegor/go-core/mrlocale"
+	"github.com/mondegor/go-core/mrlocale/provider/gotext"
 )
 
 // main - пример формирование сообщений, ошибок и свойств объектов на указанном языке.

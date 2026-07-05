@@ -1,7 +1,7 @@
 package mrtype
 
 import (
-	"github.com/mondegor/go-sysmess/mrtype/sortdirection"
+	"github.com/mondegor/go-core/mrtype/sortdirection"
 )
 
 type (

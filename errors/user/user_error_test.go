@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/user"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/errors/user"
 )
 
 func TestNew(t *testing.T) {

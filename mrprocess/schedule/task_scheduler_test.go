@@ -8,15 +8,15 @@ import (
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrprocess/schedule"
-	"github.com/mondegor/go-sysmess/mrprocess/schedule/mock"
-	"github.com/mondegor/go-sysmess/mrtrace"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/mrlog"
+	"github.com/mondegor/go-core/mrprocess/schedule"
+	"github.com/mondegor/go-core/mrprocess/schedule/mock"
+	"github.com/mondegor/go-core/mrtrace"
 )
 
-//go:generate mockgen -destination=./mock/mrprocess.go -package=mock github.com/mondegor/go-sysmess/mrprocess Task
-//go:generate mockgen -destination=./mock/mrtrace.go -package=mock github.com/mondegor/go-sysmess/mrtrace ContextManager
+//go:generate mockgen -destination=./mock/mrprocess.go -package=mock github.com/mondegor/go-core/mrprocess Task
+//go:generate mockgen -destination=./mock/mrtrace.go -package=mock github.com/mondegor/go-core/mrtrace ContextManager
 
 const deadlineTimeout = 3 * time.Second
 

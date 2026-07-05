@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrprocess/onstartup"
+	"github.com/mondegor/go-core/mrprocess/onstartup"
 )
 
 type process interface {

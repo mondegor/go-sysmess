@@ -1,11 +1,11 @@
 package errors
 
 import (
-	"github.com/mondegor/go-sysmess/errors/kind"
-	"github.com/mondegor/go-sysmess/errors/runtime"
-	"github.com/mondegor/go-sysmess/errors/runtime/hint"
-	"github.com/mondegor/go-sysmess/errors/runtime/instance"
-	"github.com/mondegor/go-sysmess/errors/runtime/stacktrace"
+	"github.com/mondegor/go-core/errors/kind"
+	"github.com/mondegor/go-core/errors/runtime"
+	"github.com/mondegor/go-core/errors/runtime/hint"
+	"github.com/mondegor/go-core/errors/runtime/instance"
+	"github.com/mondegor/go-core/errors/runtime/stacktrace"
 )
 
 // InitErrors - инициализирует опции для разного типа runtime-ошибок.

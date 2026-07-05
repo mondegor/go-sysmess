@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrlog/slog"
-	"github.com/mondegor/go-sysmess/mrpostgres/builder/helper"
-	"github.com/mondegor/go-sysmess/mrpostgres/builder/part"
+	"github.com/mondegor/go-core/mrlog"
+	"github.com/mondegor/go-core/mrlog/slog"
+	"github.com/mondegor/go-core/mrpostgres/builder/helper"
+	"github.com/mondegor/go-core/mrpostgres/builder/part"
 )
 
 func main() {

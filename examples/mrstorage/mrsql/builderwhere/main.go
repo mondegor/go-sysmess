@@ -5,12 +5,12 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mondegor/go-sysmess/mrlog"
-	"github.com/mondegor/go-sysmess/mrlog/slog"
-	"github.com/mondegor/go-sysmess/mrpostgres/builder/part"
-	"github.com/mondegor/go-sysmess/mrstorage"
-	"github.com/mondegor/go-sysmess/mrtype"
-	"github.com/mondegor/go-sysmess/util/casttype"
+	"github.com/mondegor/go-core/mrlog"
+	"github.com/mondegor/go-core/mrlog/slog"
+	"github.com/mondegor/go-core/mrpostgres/builder/part"
+	"github.com/mondegor/go-core/mrstorage"
+	"github.com/mondegor/go-core/mrtype"
+	"github.com/mondegor/go-core/util/casttype"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"golang.org/x/text/message"
 )
 
-//go:generate gotext -srclang=en-US update -out=../../internal/dict/msgcat/catalog.go -lang=en-US,ru-RU github.com/mondegor/go-sysmess/examples/mrlocale/dict/msgcat
+//go:generate gotext -srclang=en-US update -out=../../internal/dict/msgcat/catalog.go -lang=en-US,ru-RU github.com/mondegor/go-core/examples/mrlocale/dict/msgcat
 //go:generate gotext-catalog-fix -src=../../internal/dict/msgcat/catalog.go -out=../../internal/dict/msgcat/catalog.go
 
 func list() { //nolint:unused

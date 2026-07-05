@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrprocess/signal"
+	"github.com/mondegor/go-core/mrprocess/signal"
 )
 
 type process interface {

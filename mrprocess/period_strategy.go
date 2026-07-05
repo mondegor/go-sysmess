@@ -3,7 +3,7 @@ package mrprocess
 import (
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrprocess/period/strategy"
+	"github.com/mondegor/go-core/mrprocess/period/strategy"
 )
 
 type (

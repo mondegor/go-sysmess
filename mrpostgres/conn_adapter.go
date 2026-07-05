@@ -9,8 +9,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/mondegor/go-sysmess/errors"
-	"github.com/mondegor/go-sysmess/mrstorage"
+	"github.com/mondegor/go-core/errors"
+	"github.com/mondegor/go-core/mrstorage"
 )
 
 // go get -u github.com/jackc/pgx/v5

@@ -3,7 +3,7 @@ package db_test
 import (
 	"context"
 
-	"github.com/mondegor/go-sysmess/mrstorage"
+	"github.com/mondegor/go-core/mrstorage"
 )
 
 // fakeConnManager - тестовый двойник mrstorage.DBConnManager.

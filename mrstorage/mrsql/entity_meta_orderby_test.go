@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/mrstorage/mrsql"
-	"github.com/mondegor/go-sysmess/mrtype"
+	"github.com/mondegor/go-core/mrstorage/mrsql"
+	"github.com/mondegor/go-core/mrtype"
 )
 
 // Make sure the mrsql.EntityMetaOrderBy conforms with the mrtype.ListSorter interface.

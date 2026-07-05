@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mondegor/go-sysmess/mrtype"
-	"github.com/mondegor/go-sysmess/mrtype/errors"
+	"github.com/mondegor/go-core/mrtype"
+	"github.com/mondegor/go-core/mrtype/errors"
 )
 
 const (

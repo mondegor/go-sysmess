@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mondegor/go-sysmess/util/slices/ordered"
+	"github.com/mondegor/go-core/util/slices/ordered"
 )
 
 func TestOrdered_FilterFunc(t *testing.T) {

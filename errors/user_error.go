@@ -1,8 +1,8 @@
 package errors
 
 import (
-	"github.com/mondegor/go-sysmess/errors/user"
-	"github.com/mondegor/go-sysmess/errors/userfast"
+	"github.com/mondegor/go-core/errors/user"
+	"github.com/mondegor/go-core/errors/userfast"
 )
 
 type (
