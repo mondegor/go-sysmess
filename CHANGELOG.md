@@ -1,5 +1,12 @@
-# GoSysMess Changelog
-Все изменения библиотеки GoSysMess будут документироваться на этой странице.
+# GoCore Changelog
+Все изменения библиотеки GoCore будут документироваться на этой странице.
+
+## 2026-07-14
+### Changed
+- `mrtype`: типы IP переведены на `net/netip`; `DetailedIP.Real/Proxy` теперь `netip.Addr`;
+- `mrtype/parse.IP` возвращает `netip.Addr` (поддержка адреса с портом, IPv4-mapped → IPv4);
+### Removed
+- `mrtype.IPToUint64Pair`/`IPFromUint64Pair` — числовая пара `uint64`.
 
 ## 2025-09-29 (v0.15.3)
 ### Changed

@@ -1,59 +1,51 @@
 package mrtype
 
 import (
-	"encoding/binary"
-	"errors"
-	"fmt"
-	"net"
+	"net/netip"
 )
 
 type (
 	// DetailedIP - содержит информацию о настоящем IP и
 	// об IP переданного прокси сервером через заголовки.
+	// Поддерживаются адреса IPv4 и IPv6 в едином представлении netip.Addr,
+	// не заданный адрес - это нулевое (невалидное) значение netip.Addr.
 	DetailedIP struct {
-		Real  net.IP `json:"real"`
-		Proxy net.IP `json:"proxy"`
+		Real  netip.Addr `json:"real"`
+		Proxy netip.Addr `json:"proxy"`
 	}
 )
 
-// NewIP - создаёт DetailedIP из числового представления IPv4.
+// NewIP - создаёт DetailedIP с указанным реальным IP клиента (IPv4 или IPv6).
 // Параметры:
-//   - realIP - числовое представление реального IP клиента;
+//   - realIP - реальный IP клиента;
 //
-// Если аргумент равен 0, поле Real остаётся nil.
-func NewIP(realIP uint32) (ip DetailedIP) {
-	if realIP > 0 {
-		ip.Real = castUint2ip(realIP)
+// Если адрес не задан, поле Real остаётся не заданным.
+func NewIP(realIP netip.Addr) DetailedIP {
+	return DetailedIP{
+		Real: realIP.Unmap(),
 	}
-
-	return ip
 }
 
-// NewDetailedIP - создаёт DetailedIP из числовых представлений IPv4.
+// NewDetailedIP - создаёт DetailedIP с указанными IP клиента и прокси-сервера (IPv4 или IPv6).
 // Параметры:
-//   - realIP - числовое представление реального IP клиента;
-//   - proxyIP - числовое представление IP прокси-сервера;
+//   - realIP - реальный IP клиента;
+//   - proxyIP - IP прокси-сервера;
 //
-// Если аргументы равны 0, соответствующие поля остаются nil.
-func NewDetailedIP(realIP, proxyIP uint32) (ip DetailedIP) {
-	if realIP > 0 {
-		ip.Real = castUint2ip(realIP)
+// Если адрес не задан, соответствующее поле остаётся не заданным.
+func NewDetailedIP(realIP, proxyIP netip.Addr) DetailedIP {
+	return DetailedIP{
+		Real:  realIP.Unmap(),
+		Proxy: proxyIP.Unmap(),
 	}
-
-	if proxyIP > 0 {
-		ip.Proxy = castUint2ip(proxyIP)
-	}
-
-	return ip
 }
 
 // String - возвращает IP-адреса в виде строки.
-// Формат: "real" или "real, proxy" (если proxy задан). Пустой IP даёт пустую строку.
+// Формат: "real" или "real, proxy" (если proxy задан). Не заданный IP даёт пустую строку.
 // Если задан только proxy, real подставляется как "0" ("0, proxy").
 func (ip DetailedIP) String() string {
 	realStr := ipToString(ip.Real)
 
-	if len(ip.Proxy) == 0 || ip.Proxy.IsUnspecified() {
+	if !ip.Proxy.IsValid() || ip.Proxy.IsUnspecified() {
 		return realStr
 	}
 
@@ -61,57 +53,12 @@ func (ip DetailedIP) String() string {
 		realStr = "0"
 	}
 
-	return realStr + ", " + ipToString(ip.Proxy)
+	return realStr + ", " + ip.Proxy.String()
 }
 
-// ToUint - преобразует IP-адреса в числовое представление (uint32).
-// Возвращает ошибку, если IP не является IPv4 или имеет неверную длину.
-func (ip DetailedIP) ToUint() (realIP, proxyIP uint32, err error) {
-	realIP, err = castIP2uint(ip.Real)
-	if err != nil {
-		return 0, 0, fmt.Errorf("mrtype.ToUint: %w", err)
-	}
-
-	proxyIP, err = castIP2uint(ip.Proxy)
-	if err != nil {
-		return 0, 0, fmt.Errorf("mrtype.ToUint: %w", err)
-	}
-
-	return realIP, proxyIP, nil
-}
-
-// castIP2uint - преобразует IPv4-адрес в числовое представление (uint32).
-// Возвращает 0 без ошибки для пустого IP.
-// Возвращает ошибку для IPv6 и некорректных адресов.
-func castIP2uint(ip net.IP) (uint32, error) {
-	if len(ip) == 0 {
-		return 0, nil
-	}
-
-	if ip4 := ip.To4(); ip4 != nil {
-		return binary.BigEndian.Uint32(ip4), nil
-	}
-
-	if len(ip) == 16 {
-		return 0, errors.New("no sane way to convert ipv6 into uint32")
-	}
-
-	return 0, errors.New("ip is incorrect")
-}
-
-// castUint2ip - преобразует числовое представление (uint32) в IPv4-адрес net.IP.
-// Использует big-endian порядок байтов.
-func castUint2ip(number uint32) net.IP {
-	ip := make(net.IP, 4)
-
-	binary.BigEndian.PutUint32(ip, number)
-
-	return ip
-}
-
-// ipToString - возвращает строковое представление IP или "" для пустого адреса.
-func ipToString(ip net.IP) string {
-	if len(ip) == 0 {
+// ipToString - возвращает строковое представление IP или "" для не заданного адреса.
+func ipToString(ip netip.Addr) string {
+	if !ip.IsValid() {
 		return ""
 	}
 
