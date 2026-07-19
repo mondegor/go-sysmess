@@ -16,12 +16,13 @@ func TestNewUser(t *testing.T) {
 	require.NoError(t, err)
 
 	id := [16]byte{1, 2, 3, 4}
-	user := mraccess.NewUser(id, "administrators", "session-123", "ru", getter)
+	user := mraccess.NewUser(id, "administrators", "session-123", "ru", "Europe/Moscow", getter)
 
 	assert.Equal(t, id, user.ID())
 	assert.Equal(t, "administrators", user.Group())
 	assert.Equal(t, "session-123", user.SessionID())
 	assert.Equal(t, "ru", user.LangCode())
+	assert.Equal(t, "Europe/Moscow", user.TimeZone())
 	assert.True(t, user.Has("users.manage"))
 	assert.True(t, user.Has("public"))
 	assert.False(t, user.Has("billing.manage"))
@@ -52,7 +53,7 @@ func TestNewUser_GroupRightsBinding(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			user := mraccess.NewUser([16]byte{}, tc.group, "", "en", getter)
+			user := mraccess.NewUser([16]byte{}, tc.group, "", "en", "UTC", getter)
 
 			assert.Equal(t, tc.wantGroup, user.Group())
 			assert.Equal(t, tc.wantHas, user.Has(tc.right))
@@ -66,7 +67,7 @@ func TestOneUserProvider(t *testing.T) {
 	getter, err := mraccess.NewRolesGroupSet(testGroups(), testSource())
 	require.NoError(t, err)
 
-	want := mraccess.NewUser([16]byte{9}, "guests", "", "en", getter)
+	want := mraccess.NewUser([16]byte{9}, "guests", "", "en", "UTC", getter)
 	provider := mraccess.NewOneUserProvider(want)
 
 	got, err := provider.UserByToken(t.Context(), "any-token")

@@ -16,13 +16,11 @@ import (
 
 // main - пример формирование сообщений, ошибок и свойств объектов на указанном языке.
 func main() {
-	var (
-		localeProvider mrlocale.MessageProvider
-		err            error
-	)
+	// языки бандла: тот же список ниже используется для обхода локализаторов
+	languages := []string{"ru-RU", "en-US"}
 
 	bundle, err := mrlocale.NewBundle(
-		[]string{"ru-RU", "en-US"},
+		languages,
 		mrlocale.WithDefaultLanguage("ru-RU"),
 		mrlocale.WithFormatError(helper.ExtractMessageForLocalization),
 		mrlocale.WithMessageProvider(
@@ -54,8 +52,8 @@ func main() {
 
 	fmt.Println("--------------------------------------------------")
 
-	for _, lang := range localeProvider.Languages() {
-		lz = pool.Localizer(lang)
+	for _, lang := range languages {
+		lz = pool.Localizer(language.MustParse(lang))
 
 		fmt.Printf("language: %s\n", lang)
 		fmt.Println("..................................................")
@@ -88,12 +86,6 @@ func main() {
 
 		fmt.Println("--------------------------------------------------")
 	}
-
-	for _, domain := range localeProvider.Domains() {
-		fmt.Printf("domain=%s\n", domain)
-	}
-
-	fmt.Println("--------------------------------------------------")
 
 	// fr - not found
 	lz = pool.Localizer(language.MustParse("fr"))

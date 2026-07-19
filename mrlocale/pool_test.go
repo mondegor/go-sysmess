@@ -1,0 +1,252 @@
+package mrlocale_test
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+
+	"github.com/mondegor/go-core/mrlocale"
+)
+
+type (
+	// stubProvider - провайдер, отдающий сообщение без перевода:
+	// проверяется подбор локализатора, а не сама локализация.
+	stubProvider struct{}
+)
+
+func (p stubProvider) Domains() []string {
+	return []string{mrlocale.DefaultMessagesDomain, mrlocale.DefaultErrorsDomain}
+}
+
+func (p stubProvider) Localize(_ string, _ language.Tag, msg string, _ []any) string {
+	return msg
+}
+
+// TestPool_Localizer - проверяет подбор локализатора по списку языков.
+// Язык по умолчанию задан явно и не является первым в списке, поэтому промах
+// матчера отличим от подбора первого языка.
+func TestPool_Localizer(t *testing.T) {
+	t.Parallel()
+
+	pool := testPool(t)
+
+	tests := []struct {
+		name  string
+		langs []language.Tag
+		want  string
+	}{
+		{
+			// матчер возвращает тег с расширением "en-u-rg-uszzzz",
+			// поэтому подбор по тегу дал бы язык по умолчанию
+			name:  "regional tag resolves to its base language",
+			langs: []language.Tag{language.MustParse("en-US")},
+			want:  "en",
+		},
+		{
+			name:  "regional tag of another language",
+			langs: []language.Tag{language.MustParse("fr-CA")},
+			want:  "fr",
+		},
+		{
+			name:  "exact tag",
+			langs: []language.Tag{language.MustParse("en")},
+			want:  "en",
+		},
+		{
+			name:  "first supported language of the list wins",
+			langs: []language.Tag{language.MustParse("es"), language.MustParse("en-GB")},
+			want:  "en",
+		},
+		{
+			// промах должен давать язык по умолчанию, а не первый язык списка (fr)
+			name:  "unsupported language falls back to the default",
+			langs: []language.Tag{language.MustParse("es")},
+			want:  "de",
+		},
+		{
+			name:  "empty list falls back to the default",
+			langs: nil,
+			want:  "de",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := pool.Localizer(tc.langs...)
+
+			require.NotNil(t, got)
+			assert.Equal(t, tc.want, got.Language())
+		})
+	}
+}
+
+// TestPool_LocalizerRegionalBundle - проверяет подбор локализатора, когда языки бандла
+// заданы с регионом, как это сделано в приложениях ("ru-RU", "en-US").
+//
+// Фиксирует главное свойство: наружу отдаётся язык бандла, а не язык запроса, поэтому
+// любая запись одной и той же локали ("ru", "ru_RU", "ru-UA") сводится к "ru-RU".
+// Язык по умолчанию задан вторым, чтобы промах матчера был отличим от подбора первого языка.
+func TestPool_LocalizerRegionalBundle(t *testing.T) {
+	t.Parallel()
+
+	bundle, err := mrlocale.NewBundle(
+		[]string{"ru-RU", "en-US"},
+		mrlocale.WithDefaultLanguage("en-US"),
+		mrlocale.WithMessageProvider(
+			func(_ []language.Tag) (mrlocale.MessageProvider, error) {
+				return stubProvider{}, nil
+			},
+		),
+	)
+	require.NoError(t, err)
+
+	pool := mrlocale.NewPool(bundle)
+
+	tests := []struct {
+		name  string
+		langs []language.Tag
+		want  string
+	}{
+		{
+			name:  "language without region resolves to the regional language of the bundle",
+			langs: []language.Tag{language.MustParse("ru")},
+			want:  "ru-RU",
+		},
+		{
+			name:  "exact regional tag",
+			langs: []language.Tag{language.MustParse("ru-RU")},
+			want:  "ru-RU",
+		},
+		{
+			name:  "underscore separated tag is the same language",
+			langs: []language.Tag{language.MustParse("ru_RU")},
+			want:  "ru-RU",
+		},
+		{
+			// матчер отдаёт "ru-RU-u-rg-uazzzz", поэтому подбор по тегу дал бы промах
+			name:  "another region of the supported language",
+			langs: []language.Tag{language.MustParse("ru-UA")},
+			want:  "ru-RU",
+		},
+		{
+			name:  "another supported language without region",
+			langs: []language.Tag{language.MustParse("en")},
+			want:  "en-US",
+		},
+		{
+			name:  "another region of another supported language",
+			langs: []language.Tag{language.MustParse("en-GB")},
+			want:  "en-US",
+		},
+		{
+			name:  "unsupported language falls back to the default",
+			langs: []language.Tag{language.MustParse("fr")},
+			want:  "en-US",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := pool.Localizer(tc.langs...)
+
+			require.NotNil(t, got)
+			assert.Equal(t, tc.want, got.Language())
+		})
+	}
+}
+
+// TestPool_LocalizerAcceptLanguage - проверяет подбор локализатора по списку языков,
+// разобранному из заголовка Accept-Language: именно в таком виде языки приходят от клиента.
+// Сам заголовок mrlocale не разбирает, это делает вызывающая сторона.
+func TestPool_LocalizerAcceptLanguage(t *testing.T) {
+	t.Parallel()
+
+	bundle, err := mrlocale.NewBundle(
+		[]string{"ru-RU", "en-US"},
+		mrlocale.WithDefaultLanguage("en-US"),
+		mrlocale.WithMessageProvider(
+			func(_ []language.Tag) (mrlocale.MessageProvider, error) {
+				return stubProvider{}, nil
+			},
+		),
+	)
+	require.NoError(t, err)
+
+	pool := mrlocale.NewPool(bundle)
+
+	tests := []struct {
+		name   string
+		header string
+		want   string
+	}{
+		{
+			name:   "the most weighted language wins",
+			header: "ru-RU,ru;q=0.9,en;q=0.8",
+			want:   "ru-RU",
+		},
+		{
+			name:   "language without region wins",
+			header: "ru,en;q=0.8",
+			want:   "ru-RU",
+		},
+		{
+			// вес q=0 означает, что язык клиенту не подходит
+			name:   "language rejected by zero weight is skipped",
+			header: "ru;q=0,en;q=0.9",
+			want:   "en-US",
+		},
+		{
+			name:   "unsupported languages fall back to the default",
+			header: "de-DE,fr;q=0.7",
+			want:   "en-US",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			langs, _, err := language.ParseAcceptLanguage(tc.header)
+			require.NoError(t, err)
+
+			got := pool.Localizer(langs...)
+
+			require.NotNil(t, got)
+			assert.Equal(t, tc.want, got.Language())
+		})
+	}
+}
+
+// TestPool_LocalizerDefaultIsNotFirst - фиксирует, что язык по умолчанию берётся
+// из настройки бандла, а не из позиции в списке языков.
+func TestPool_LocalizerDefaultIsNotFirst(t *testing.T) {
+	t.Parallel()
+
+	pool := testPool(t)
+
+	assert.Equal(t, "de", pool.Localizer().Language())
+}
+
+// testPool - создаёт Pool на языках [fr, en, de] с языком по умолчанию "de".
+func testPool(t *testing.T) *mrlocale.Pool {
+	t.Helper()
+
+	bundle, err := mrlocale.NewBundle(
+		[]string{"fr", "en", "de"},
+		mrlocale.WithDefaultLanguage("de"),
+		mrlocale.WithMessageProvider(
+			func(_ []language.Tag) (mrlocale.MessageProvider, error) {
+				return stubProvider{}, nil
+			},
+		),
+	)
+	require.NoError(t, err)
+
+	return mrlocale.NewPool(bundle)
+}

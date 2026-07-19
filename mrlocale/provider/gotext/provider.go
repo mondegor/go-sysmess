@@ -15,7 +15,6 @@ type (
 	Provider struct {
 		defaultPrinter     *message.Printer
 		domains            []string
-		languages          []language.Tag
 		domain2langCatalog map[string]map[language.Tag]*message.Printer
 	}
 )
@@ -61,20 +60,12 @@ func NewProvider(
 	// uniq domains
 	p.domains = slices.Collect(maps.Keys(p.domain2langCatalog))
 
-	// uniq languages
-	p.languages = slices.Collect(maps.Keys(p.domain2langCatalog[o.domains[0]]))
-
 	return p, nil
 }
 
 // Domains - возвращает список доступных доменов для локализации.
 func (p *Provider) Domains() []string {
 	return p.domains
-}
-
-// Languages - возвращает список поддерживаемых языков.
-func (p *Provider) Languages() []language.Tag {
-	return p.languages
 }
 
 // Localize - возвращает локализованное сообщение с подставленными аргументами.

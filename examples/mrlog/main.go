@@ -25,6 +25,7 @@ func main() {
 		slog.WithLevel("INFO"),
 		slog.WithJsonFormat(true),
 		slog.WithTimeFormat("RFC3339Nano"),
+		// slog.WithTimeZone("UTC")
 	)
 	if err != nil {
 		mrlog.Fatal(err.Error())
@@ -39,6 +40,7 @@ func main() {
 		slog.WithLevel("DEBUG"),
 		slog.WithJsonFormat(false),
 		slog.WithTimeFormat("Kitchen"),
+		slog.WithTimeZone("Local"), // UTC, Europe/Moscow
 		slog.WithMiddlewareHandler(
 			middleware.BeforeHandle(
 				func(ctx context.Context, rec stdlog.Record) stdlog.Record {

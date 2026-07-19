@@ -3,6 +3,7 @@ package mrlocale
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	"golang.org/x/text/language"
 )
@@ -18,11 +19,15 @@ type (
 	// Загружает переводы из провайдера, выбирает подходящий язык
 	// и форматирует сообщения с учётом переданных аргументов.
 	Bundle struct {
-		provider        MessageProvider
-		messagesDomain  string
-		errorsDomain    string
-		formatMessage   func(msg string, args []any) (newMsg string, newArgs []any)
-		formatError     func(err error) (msg string, args []any)
+		provider       MessageProvider
+		messagesDomain string
+		errorsDomain   string
+		formatMessage  func(msg string, args []any) (newMsg string, newArgs []any)
+		formatError    func(err error) (msg string, args []any)
+		// languages - языки в том же порядке, в котором они переданы
+		// в languageMatcher: индекс, возвращаемый Match, адресует именно этот срез,
+		// и по нему же адресуются локализаторы пула (см. NewPool)
+		languages       []language.Tag
 		languageMatcher language.Matcher
 		defaultLanguage language.Tag
 	}
@@ -30,7 +35,7 @@ type (
 
 // NewBundle - создаёт Bundle для локализации сообщений.
 // Параметры:
-//   - languages - список поддерживаемых языков в формате BCP 47 (например: "en", "ru", "en-US");
+//   - languages - список поддерживаемых языков в формате BCP 47 (например: "en", "ru", "en-US", "en_US");
 //   - opts - дополнительные опции настройки (WithMessageProvider, WithDefaultLanguage и др.);
 //
 // Первый язык в списке становится языком по умолчанию, если не задан явно через WithDefaultLanguage.
@@ -49,7 +54,6 @@ func NewBundle(languages []string, opts ...BundleOption) (*Bundle, error) {
 	}
 
 	languageTags := make([]language.Tag, len(languages))
-	defaultLanguage := language.Und
 
 	for i, lang := range languages {
 		tag, err := language.Parse(lang)
@@ -57,21 +61,36 @@ func NewBundle(languages []string, opts ...BundleOption) (*Bundle, error) {
 			return nil, fmt.Errorf("bundle create: parsing language '%s': %w", lang, err)
 		}
 
-		languageTags[i] = tag
-
-		if o.defaultLanguage == lang {
-			defaultLanguage = tag
+		// уникальность проверяется по разобранному тегу, а не по строке: одна и та же
+		// локаль записывается по-разному ("ru-RU", "ru_RU"), и дубликат в списке
+		// породил бы лишний локализатор и неоднозначность подбора языка.
+		// Сравнение тегов через == корректно: language.Parse приводит тег
+		// к канонической форме, поэтому разные записи одной локали равны побитово
+		if slices.Contains(languageTags[:i], tag) {
+			return nil, fmt.Errorf("bundle create: duplicate language '%s'", lang)
 		}
+
+		languageTags[i] = tag
 	}
 
-	if defaultLanguage == language.Und {
-		if o.defaultLanguage != "" {
+	// если в опции явно не указан язык по умолчанию,
+	// то по умолчанию используется первый язык в списке
+	defaultLanguage := languageTags[0]
+
+	if o.defaultLanguage != "" {
+		tag, err := language.Parse(o.defaultLanguage)
+		if err != nil {
+			return nil, fmt.Errorf("bundle create: parsing default language '%s': %w", o.defaultLanguage, err)
+		}
+
+		// языки сверяются разобранными тегами, а не исходными строками: одна и та же
+		// локаль записывается по-разному ("ru-RU", "ru_RU", "ru-ru"), и сравнение строк
+		// отвергало бы язык по умолчанию, записанный не так, как он записан в списке
+		if !slices.Contains(languageTags, tag) {
 			return nil, fmt.Errorf("bundle create: default language is not supported (lang='%s')", o.defaultLanguage)
 		}
 
-		// если в опции явно не указан язык по умолчанию,
-		// то по умолчанию используется первый язык в списке
-		defaultLanguage = languageTags[0]
+		defaultLanguage = tag
 	}
 
 	pr, err := o.createProvider(languageTags)
@@ -105,6 +124,7 @@ func NewBundle(languages []string, opts ...BundleOption) (*Bundle, error) {
 		errorsDomain:    o.errorsDomain,
 		formatMessage:   o.formatMessage,
 		formatError:     o.formatError,
+		languages:       languageTags,
 		languageMatcher: language.NewMatcher(languageTags),
 		defaultLanguage: defaultLanguage,
 	}, nil
