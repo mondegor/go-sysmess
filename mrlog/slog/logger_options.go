@@ -3,6 +3,7 @@ package slog
 import (
 	"io"
 	stdlog "log/slog"
+	"time"
 
 	"github.com/mondegor/go-core/mrlog/level"
 )
@@ -23,6 +24,8 @@ type (
 		level              level.Enum
 		jsonFormat         bool
 		timeFormat         string
+		timeZone           string
+		timeLocation       *time.Location
 		middlewareHandlers []func(next stdlog.Handler) stdlog.Handler
 		replaceAttr        func(attr stdlog.Attr) (newAttr stdlog.Attr)
 		colorMode          bool
@@ -62,6 +65,22 @@ func WithTimeFormat(value string) Option {
 	}
 }
 
+// WithTimeZone - задаёт часовой пояс вывода времени в логах.
+// Поддерживаются IANA-имена (например: "Europe/Moscow"), а также "UTC" и "Local".
+// Пустое значение считается ошибкой; если опция не указана, то используется UTC
+// независимо от режима вывода. Чтобы выводить время в часовом поясе процесса,
+// укажите "Local".
+//
+// ВНИМАНИЕ: для IANA-имён требуется база часовых поясов в системе;
+// в минимальных образах (scratch, distroless) её нужно встроить
+// в бинарник импортом `_ "time/tzdata"`.
+// Значения "UTC" и "Local" доступны всегда.
+func WithTimeZone(value string) Option {
+	return func(o *options) {
+		o.timeZone = value
+	}
+}
+
 // WithMiddlewareHandler - добавляет один или несколько middleware-обработчиков.
 // Middleware применяются в порядке добавления и позволяют модифицировать slog.Handler.
 func WithMiddlewareHandler(value ...func(next stdlog.Handler) stdlog.Handler) Option {
@@ -94,6 +113,11 @@ func WithColorMode(value bool) Option {
 // При attrKey=AttrColorByDefaultKey цвета назначаются всем атрибутам,
 // для которых явно не были определены цвета.
 // Работает только при включенном ColorMode и отключенном JsonFormat.
+//
+// Цвета назначаются по имени атрибута без учёта группы, поэтому заданные цвета
+// действуют и на вложенные атрибуты с тем же именем. Сообщение записи (msg)
+// в этом смысле рядовой ключ: у него есть цвет по умолчанию, он перекрывается
+// как любой другой, и его же получает одноимённый атрибут, включая вложенный.
 func WithColorizeAttr(attrKey, colorKey, colorValue string) Option {
 	return func(o *options) {
 		color := attrColor{

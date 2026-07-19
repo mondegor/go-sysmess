@@ -31,11 +31,18 @@ type (
 // При включенном colorMode и jsonFormat=true приоритет у JSON.
 func NewLoggerAdapter(opts ...Option) (logger *LoggerAdapter, err error) {
 	o := options{
-		levelString:   level.Debug.String(),
-		jsonFormat:    false,
-		timeFormat:    "RFC3339",
-		colorMode:     true,
-		attrKey2color: make(map[string]attrColor),
+		levelString: level.Debug.String(),
+		jsonFormat:  false,
+		timeFormat:  "RFC3339",
+		timeZone:    "UTC",
+		colorMode:   true,
+		attrKey2color: map[string]attrColor{
+			// сообщение записи заметнее значений атрибутов, но остаётся рядовым
+			// ключом: перекрывается через WithColorizeAttr как любой другой и,
+			// как любой другой, действует по имени без учёта группы - вложенный
+			// msg получает тот же цвет (см. colorizeBuiltinAttr)
+			stdlog.MessageKey: {key: color.Cyan, value: color.White},
+		},
 		attrColorByDefault: attrColor{
 			key:   color.Cyan,
 			value: color.LightGray,
@@ -58,6 +65,12 @@ func NewLoggerAdapter(opts ...Option) (logger *LoggerAdapter, err error) {
 	o.timeFormat, err = mrlog.ParseDateTimeFormat(o.timeFormat)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing time: %w", err)
+	}
+
+	// часовой пояс процесса задаётся явно через WithTimeZone("Local")
+	o.timeLocation, err = mrlog.ParseTimeZone(o.timeZone)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing timezone: %w", err)
 	}
 
 	if o.replaceAttr == nil {

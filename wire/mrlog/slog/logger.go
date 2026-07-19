@@ -64,17 +64,12 @@ func initLoggerOptions(cfg mrlog.LoggerConfig) []slog.Option {
 		cfg.Level = "info"
 	}
 
-	if cfg.TimeFormat == "" {
-		cfg.TimeFormat = "RFC3339"
-	}
-
 	contextProcessIDs := process.ToKeyGetID(cfg.ContextProcessIDs)
 
 	opts := []slog.Option{
 		slog.WithWriter(os.Stdout),
 		slog.WithLevel(strings.ToUpper(cfg.Level)),
 		slog.WithJsonFormat(cfg.JsonFormat),
-		slog.WithTimeFormat(cfg.TimeFormat),
 		slog.WithMiddlewareHandler(
 			middleware.BeforeHandle(
 				func(ctx context.Context, rec stdlog.Record) stdlog.Record {
@@ -138,6 +133,14 @@ func initLoggerOptions(cfg mrlog.LoggerConfig) []slog.Option {
 			return attr
 		}),
 		slog.WithColorMode(cfg.ColorMode),
+	}
+
+	if cfg.TimeFormat != "" {
+		opts = append(opts, slog.WithTimeFormat(cfg.TimeFormat))
+	}
+
+	if cfg.TimeZone != "" {
+		opts = append(opts, slog.WithTimeZone(cfg.TimeZone))
 	}
 
 	if cfg.ColorMode {

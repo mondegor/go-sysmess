@@ -59,6 +59,10 @@ func WithErrorsDomain(value string) BundleOption {
 // WithDefaultLanguage - задаёт язык по умолчанию.
 // Если указанный язык не найден в списке поддерживаемых,
 // будет возвращена ошибка при создании Bundle.
+//
+// Язык сверяется со списком поддерживаемых по разобранному тегу, поэтому его запись
+// не обязана совпадать с записью в списке ("en-US", "en_US" и "en-us" - один язык).
+// При этом язык без региона не равен языку с регионом: "en" не подойдёт для "en-US".
 func WithDefaultLanguage(value string) BundleOption {
 	return func(o *bundleOptions) {
 		o.defaultLanguage = value

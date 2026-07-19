@@ -20,6 +20,9 @@ type (
 
 		// LangCode - возвращает код языка интерфейса пользователя.
 		LangCode() string
+
+		// TimeZone - возвращает IANA-имя часового пояса пользователя (напр. Europe/Moscow).
+		TimeZone() string
 	}
 
 	// entryUser - внутренняя реализация интерфейса User.
@@ -28,18 +31,20 @@ type (
 		group     string
 		sessionID string
 		langCode  string
+		timeZone  string
 		rights    RightsChecker
 	}
 )
 
 // NewUser - создаёт объект User с указанными параметрами.
 // Права доступа определяются через RightsGetter для указанной группы.
-func NewUser(id [16]byte, group, sessionID, langCode string, rights RightsGetter) User {
+func NewUser(id [16]byte, group, sessionID, langCode, timeZone string, rights RightsGetter) User {
 	return &entryUser{
 		id:        id,
 		group:     group,
 		sessionID: sessionID,
 		langCode:  langCode,
+		timeZone:  timeZone,
 		rights:    rights.Rights(group),
 	}
 }
@@ -62,6 +67,11 @@ func (u *entryUser) SessionID() string {
 // LangCode - возвращает код языка интерфейса пользователя.
 func (u *entryUser) LangCode() string {
 	return u.langCode
+}
+
+// TimeZone - возвращает IANA-имя часового пояса пользователя.
+func (u *entryUser) TimeZone() string {
+	return u.timeZone
 }
 
 // Has - сообщает о наличии указанного права у пользователя.
