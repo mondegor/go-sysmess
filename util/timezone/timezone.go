@@ -20,18 +20,27 @@ type (
 	// обходом года по каждому поясу, причём обход обходится дороже загрузки
 	// примерно впятеро (см. BenchmarkStd_LoadLocation и BenchmarkNewLocationList).
 	LocationList struct {
-		locations   map[string]*time.Location
-		offsetIndex map[offsetKey]string
+		locations       map[string]*time.Location
+		offsetIndex     map[offsetKey]string
+		defaultLocation *time.Location
 	}
 )
 
 // NewLocationList - создаёт объект LocationList на основе списка имён часовых поясов.
-// Поддерживаются IANA-имена (например: "Europe/Moscow"), а также "UTC" и "Local",
-// которые регистрируются всегда и указывать их в списке не требуется.
+// Поддерживаются IANA-имена (например: "Europe/Moscow") и "UTC", который регистрируется
+// всегда и указывать его в списке не требуется.
+//
+// Первый пояс списка, который удалось загрузить, становится поясом по умолчанию (см. Default).
+//
+// "Local" (пояс процесса) наружу не отдаётся, даже если указан в списке: он описывает процесс,
+// а не клиента, а список предоставляет клиентам только IANA-имена. Поэтому LocationByName
+// на "Local" отвечает промахом, а NameByOffset его не подбирает. Кому нужен пояс процесса
+// (например, логгеру), берёт его из стандартной библиотеки напрямую (time.Local), не из списка.
 //
 // Ошибку не возвращает: пустые и не найденные в базе часовых поясов имена молча
 // пропускаются, список создаётся из оставшихся, а не попавший в него пояс отличим
 // только по результату обращения (LocationByName - ошибкой, NameByOffset - false).
+// Повторы имён так же молча схлопываются: на состав поясов и на индекс подбора они не влияют.
 // Поэтому вызов config.ValidateTimeZones при загрузке конфигурации обязателен:
 // это единственное место, где негодный список отвергается.
 //
@@ -43,10 +52,9 @@ type (
 // на пояс (BenchmarkNewLocationList_ByCount), поэтому список рассчитан
 // на однократное создание при старте приложения, а не на создание по требованию.
 func NewLocationList(names []string) *LocationList {
-	locations := make(map[string]*time.Location, len(names)+2)
+	locations := make(map[string]*time.Location, len(names)+1)
 
 	locations[nameUTC] = time.UTC
-	locations[nameLocal] = time.Local
 
 	// индекс наполняется в порядке поступления имён, поэтому при совпадении
 	// пары (смещение, признак летнего времени) выигрывает последнее имя;
@@ -57,11 +65,16 @@ func NewLocationList(names []string) *LocationList {
 	// по одному годовому окну, а не каждый по своему
 	now := time.Now()
 
+	// пояс по умолчанию - первое годное имя списка (см. Default)
+	var defaultLocation *time.Location
+
 	for _, name := range names {
 		// пустое имя пропускается отдельно: time.LoadLocation("") молча
 		// возвращает UTC без ошибки, и незаполненная настройка
-		// зарегистрировалась бы поясом с пустым именем
-		if name == "" {
+		// зарегистрировалась бы поясом с пустым именем.
+		// "Local" пропускается здесь же (пояс процесса наружу не отдаётся, см. док.),
+		// поэтому не попадает ни в locations, ни в индекс, ни в пояс по умолчанию
+		if name == "" || name == nameLocal {
 			continue
 		}
 
@@ -74,11 +87,8 @@ func NewLocationList(names []string) *LocationList {
 
 		locations[name] = loc
 
-		// Local в индекс не попадает даже при явном указании в списке:
-		// он совпал бы со смещением процесса, но как результат подбора
-		// бесполезен, вызывающему требуется IANA-имя
-		if name == nameLocal {
-			continue
+		if defaultLocation == nil {
+			defaultLocation = loc
 		}
 
 		addToOffsetIndex(offsetIndex, name, loc, now)
@@ -88,22 +98,44 @@ func NewLocationList(names []string) *LocationList {
 	// и известно заранее, поэтому обход дал бы ту же единственную пару
 	offsetIndex[offsetKey{offset: 0, isDST: false}] = nameUTC
 
+	if defaultLocation == nil {
+		defaultLocation = time.UTC
+	}
+
 	return &LocationList{
-		locations:   locations,
-		offsetIndex: offsetIndex,
+		locations:       locations,
+		offsetIndex:     offsetIndex,
+		defaultLocation: defaultLocation,
 	}
 }
 
-// LocationByName - возвращает часовой пояс по указанному имени,
-// если пояс не зарегистрирован в списке, то возвращается time.UTC и ошибка.
+// LocationByName - возвращает часовой пояс по указанному имени, если пояс
+// не зарегистрирован в списке, то возвращается пояс по умолчанию (см. Default)
+// и ошибка.
+//
+// Проверка строгая: имя принимается, только если оно точно совпадает с одним из поясов
+// списка. "Local" в список не входит (см. NewLocationList), поэтому на нём метод тоже
+// отвечает промахом.
+//
+// Пояс по умолчанию возвращается вместе с ошибкой затем, чтобы вызывающий,
+// которому подходит любой пояс, мог ошибку не разбирать: результат уже пригоден
+// к использованию. Второго метода, подбирающего пояс самостоятельно, у списка нет,
+// поэтому запасной вариант отдаётся прямо здесь, а не оставляется на усмотрение вызывающего.
 func (l *LocationList) LocationByName(value string) (*time.Location, error) {
 	if value == "" {
-		return time.UTC, errors.New("arg 'value' is empty")
+		return l.defaultLocation, errors.New("arg 'value' is empty")
 	}
 
 	if loc, ok := l.locations[value]; ok {
 		return loc, nil
 	}
 
-	return time.UTC, fmt.Errorf("timezone not found for arg '%s'", value)
+	return l.defaultLocation, fmt.Errorf("timezone not found for arg '%s'", value)
+}
+
+// Default - возвращает часовой пояс по умолчанию: первый пояс списка,
+// который удалось загрузить. Если список пуст или загрузить не удалось
+// ни одного пояса, возвращается time.UTC.
+func (l *LocationList) Default() *time.Location {
+	return l.defaultLocation
 }

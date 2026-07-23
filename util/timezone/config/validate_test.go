@@ -25,9 +25,11 @@ func TestValidateTimeZones(t *testing.T) {
 			names: []string{"Europe/Moscow", "Asia/Tokyo", "UTC"},
 		},
 		{
-			// "Local" не является IANA-именем, но доступен всегда
-			name:  "process timezone name",
-			names: []string{"Local"},
+			// пояс процесса LocationList не обслуживает, поэтому в списке
+			// он бесполезен и отвергается валидатором
+			name:    "process timezone name is not allowed",
+			names:   []string{"Local"},
+			wantErr: true,
 		},
 		{
 			name:  "empty list",

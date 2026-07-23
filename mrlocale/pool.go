@@ -11,6 +11,7 @@ type (
 	Pool struct {
 		bundle           *Bundle
 		localizers       []*Localizer
+		localizerByCode  map[string]*Localizer
 		defaultLocalizer *Localizer
 	}
 )
@@ -22,31 +23,61 @@ type (
 // чтобы индекс, возвращаемый language.Matcher.Match, адресовал их напрямую:
 // матчер построен на том же срезе, поэтому индекс и позиция локализатора
 // заведомо совпадают, и промежуточный поиск по тегу не нужен.
+//
+// Параллельно срезу собирается индекс локализаторов по коду: он обслуживает точный
+// подбор (LocalizerByCode), которому матчер не нужен.
 func NewPool(bundle *Bundle) *Pool {
 	localizers := make([]*Localizer, len(bundle.languages))
+	localizerByCode := make(map[string]*Localizer, len(bundle.languages))
 	defaultLocalizer := &Localizer{
 		bundle:   bundle,
 		language: bundle.defaultLanguage,
 	}
 
 	for i, lang := range bundle.languages {
-		if lang == bundle.defaultLanguage {
-			localizers[i] = defaultLocalizer
+		localizer := defaultLocalizer
 
-			continue
+		if lang != bundle.defaultLanguage {
+			localizer = &Localizer{
+				bundle:   bundle,
+				language: lang,
+			}
 		}
 
-		localizers[i] = &Localizer{
-			bundle:   bundle,
-			language: lang,
-		}
+		// код берётся у тега списка, а не у языка локализатора, чтобы ключ
+		// localizerByCode отвечал позиции i независимо от того, попал в неё
+		// общий локализатор по умолчанию или собственный. Дубликаты тегов отвергает
+		// NewBundle, поэтому код тега и Localizer.Language() здесь заведомо совпадают
+		code := lang.String()
+
+		localizers[i] = localizer
+		localizerByCode[code] = localizer
 	}
 
 	return &Pool{
 		bundle:           bundle,
 		localizers:       localizers,
+		localizerByCode:  localizerByCode,
 		defaultLocalizer: defaultLocalizer,
 	}
+}
+
+// LocalizerByCode - возвращает Localizer языка, код которого точно совпадает
+// с указанным, и сообщает false, если такого языка нет.
+//
+// В отличие от Localizer подбор ближайшего языка не выполняется: код сверяется
+// со списком как есть, поэтому "ru" при списке ["ru-RU"] совпадением не считается.
+// Предназначен для источников, значения которых клиент получает от самого приложения:
+// там промах означает ошибку клиента, а не повод подобрать похожий язык.
+//
+// При промахе возвращается nil, а не язык по умолчанию: флаг здесь обязателен к разбору.
+// Вызывающему, которому подходит любой язык, предназначен Localizer - он подбирает язык
+// сам и промахов не имеет, поэтому подмена в обоих методах сразу лишила бы приложение
+// способа отличить неизвестный код от известного.
+func (p *Pool) LocalizerByCode(code string) (*Localizer, bool) {
+	localizer, ok := p.localizerByCode[code]
+
+	return localizer, ok
 }
 
 // Localizer - возвращает Localizer для наиболее близкого языка из списка langs.

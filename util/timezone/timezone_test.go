@@ -35,20 +35,25 @@ func TestLocationList_LocationByName(t *testing.T) {
 			want:  time.UTC,
 		},
 		{
-			name:  "local is registered by default",
-			value: "Local",
-			want:  time.Local,
-		},
-		{
-			name:    "empty value returns utc and error",
-			value:   "",
-			want:    time.UTC,
+			// пояс процесса наружу не отдаётся: в список он не входит,
+			// поэтому промах сводится к поясу по умолчанию
+			name:    "local is not registered",
+			value:   "Local",
+			want:    mustLoadLocation(t, "Europe/Moscow"),
 			wantErr: true,
 		},
 		{
-			name:    "known but not registered name returns utc and error",
+			// промах сводится к поясу по умолчанию, а не к UTC: в этом списке
+			// они различаются, поэтому подмена одного другим была бы заметна
+			name:    "empty value returns the default zone and error",
+			value:   "",
+			want:    mustLoadLocation(t, "Europe/Moscow"),
+			wantErr: true,
+		},
+		{
+			name:    "known but not registered name returns the default zone and error",
 			value:   "Asia/Tokyo",
-			want:    time.UTC,
+			want:    mustLoadLocation(t, "Europe/Moscow"),
 			wantErr: true,
 		},
 	}
@@ -104,20 +109,72 @@ func TestNewLocationList_SkipsInvalidNames(t *testing.T) {
 		got, err := list.LocationByName("Nowhere/Nowhere")
 
 		require.Error(t, err)
-		assert.Equal(t, time.UTC, got)
+		// негодные имена списком не зарегистрированы, поэтому поясом
+		// по умолчанию стало первое годное имя
+		assert.Equal(t, mustLoadLocation(t, "Europe/Moscow"), got)
 	})
 
-	t.Run("always available names are registered", func(t *testing.T) {
+	t.Run("utc is registered by default", func(t *testing.T) {
 		t.Parallel()
 
 		utc, err := list.LocationByName("UTC")
 		require.NoError(t, err)
 		assert.Equal(t, time.UTC, utc)
-
-		local, err := list.LocationByName("Local")
-		require.NoError(t, err)
-		assert.Equal(t, time.Local, local)
 	})
+
+	t.Run("local is not registered", func(t *testing.T) {
+		t.Parallel()
+
+		// пояс процесса наружу не отдаётся даже как всегда доступное имя
+		_, err := list.LocationByName("Local")
+		require.Error(t, err)
+	})
+}
+
+func TestLocationList_Default(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name  string
+		names []string
+		want  *time.Location
+	}{
+		{
+			name:  "first name of the list",
+			names: []string{"Europe/Moscow", "Asia/Tokyo"},
+			want:  mustLoadLocation(t, "Europe/Moscow"),
+		},
+		{
+			name:  "empty list falls back to utc",
+			names: nil,
+			want:  time.UTC,
+		},
+		{
+			// Local наружу не отдаётся, поэтому поясом по умолчанию
+			// становится следующее годное имя списка
+			name:  "local is skipped",
+			names: []string{"Local", "Europe/Moscow"},
+			want:  mustLoadLocation(t, "Europe/Moscow"),
+		},
+		{
+			name:  "unloadable names are skipped",
+			names: []string{"", "Nowhere/Bad", "Asia/Tokyo"},
+			want:  mustLoadLocation(t, "Asia/Tokyo"),
+		},
+		{
+			name:  "entirely unusable list falls back to utc",
+			names: []string{"", "Nowhere/Bad"},
+			want:  time.UTC,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			assert.Equal(t, tc.want, timezone.NewLocationList(tc.names).Default())
+		})
+	}
 }
 
 // mustLoadLocation - загружает часовой пояс или прерывает тест.

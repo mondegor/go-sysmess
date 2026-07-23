@@ -250,3 +250,120 @@ func testPool(t *testing.T) *mrlocale.Pool {
 
 	return mrlocale.NewPool(bundle)
 }
+
+func TestPool_LocalizerByCode(t *testing.T) {
+	t.Parallel()
+
+	pool := testPool(t)
+
+	tests := []struct {
+		name  string
+		code  string
+		want  string
+		wants bool
+	}{
+		{
+			name:  "registered code",
+			code:  "en",
+			want:  "en",
+			wants: true,
+		},
+		{
+			// язык по умолчанию отличим от промаха только флагом,
+			// поэтому проверяется отдельно
+			name:  "default language code",
+			code:  "de",
+			want:  "de",
+			wants: true,
+		},
+		{
+			// в отличие от Localizer подбор ближайшего языка не выполняется
+			name:  "regional tag of registered language is not a match",
+			code:  "en-US",
+			wants: false,
+		},
+		{
+			name:  "unknown code",
+			code:  "ru",
+			wants: false,
+		},
+		{
+			name:  "empty code",
+			code:  "",
+			wants: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, ok := pool.LocalizerByCode(tc.code)
+			require.Equal(t, tc.wants, ok)
+
+			if !tc.wants {
+				assert.Nil(t, got)
+
+				return
+			}
+
+			require.NotNil(t, got)
+			assert.Equal(t, tc.want, got.Language())
+		})
+	}
+}
+
+// TestPool_LocalizerByCode_RegionalLanguages - проверяет точное совпадение
+// на бандле из региональных локалей: базовый язык совпадением не считается,
+// а иная запись той же локали ("ru_RU") к канонической форме не приводится.
+func TestPool_LocalizerByCode_RegionalLanguages(t *testing.T) {
+	t.Parallel()
+
+	bundle, err := mrlocale.NewBundle(
+		[]string{"ru-RU", "en-US"},
+		mrlocale.WithMessageProvider(
+			func(_ []language.Tag) (mrlocale.MessageProvider, error) {
+				return stubProvider{}, nil
+			},
+		),
+	)
+	require.NoError(t, err)
+
+	pool := mrlocale.NewPool(bundle)
+
+	tests := []struct {
+		name  string
+		code  string
+		wants bool
+	}{
+		{
+			name:  "exact regional code",
+			code:  "ru-RU",
+			wants: true,
+		},
+		{
+			name:  "base language is not a match",
+			code:  "ru",
+			wants: false,
+		},
+		{
+			name:  "underscore notation is not a match",
+			code:  "ru_RU",
+			wants: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, ok := pool.LocalizerByCode(tc.code)
+			assert.Equal(t, tc.wants, ok)
+
+			if tc.wants {
+				require.NotNil(t, got)
+				assert.Equal(t, tc.code, got.Language())
+			}
+		})
+	}
+}
