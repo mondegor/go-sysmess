@@ -11,7 +11,7 @@ import (
 )
 
 func newColoredHandler(w io.Writer, opts options) stdlog.Handler {
-	return tint.NewHandler(
+	return tint.NewTextHandler(
 		w,
 		&tint.Options{
 			Level: stdlog.Level(opts.level),
