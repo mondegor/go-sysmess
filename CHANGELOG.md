@@ -9,6 +9,12 @@
   получает от самого приложения (например, query-параметр смены языка);
 - `util/timezone.LocationList.Default()` - пояс по умолчанию: первый загруженный пояс списка
   (симметрично `Bundle`); при пустом или негодном списке - `time.UTC`;
+- `util/timezone.ParseAcceptTimeZone()` и тип `AcceptTimeZone` - разбор значения заголовка
+  часового пояса вида `Europe/Moscow;offset=+03:00;dst=0` в имя, смещение и признак летнего
+  времени (симметрично `language.ParseAcceptLanguage`). Разбор строгий: пробелы не допускаются,
+  смещение принимается только вместе с `dst`; при пустом результате возвращается
+  `ErrInvalidAcceptTimeZone`. Подбор пояса по разобранному значению - за вызывающим
+  (`LocationList.LocationByName` / `NameByOffset`);
 
 ### Changed
 - `util/timezone.LocationList.LocationByName()` стал строгим: имя принимается только при точном
